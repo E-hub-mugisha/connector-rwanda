@@ -1,0 +1,20 @@
+[22-Apr-2025 05:52:18 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/connector/public_html/hiletask/config/app.php:18
+Stack trace:
+#0 {main}
+  thrown in /home4/connector/public_html/hiletask/config/app.php on line 18
+[28-Aug-2025 00:16:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/connector/public_html/hiletask/config/logging.php:20
+Stack trace:
+#0 {main}
+  thrown in /home4/connector/public_html/hiletask/config/logging.php on line 20
+[29-Aug-2025 00:42:13 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/connector/public_html/hiletask/config/logging.php:20
+Stack trace:
+#0 {main}
+  thrown in /home4/connector/public_html/hiletask/config/logging.php on line 20
+[29-Aug-2025 11:28:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/connector/public_html/hiletask/config/logging.php:20
+Stack trace:
+#0 {main}
+  thrown in /home4/connector/public_html/hiletask/config/logging.php on line 20
+[30-Aug-2025 00:05:26 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function env() in /home4/connector/public_html/hiletask/config/logging.php:20
+Stack trace:
+#0 {main}
+  thrown in /home4/connector/public_html/hiletask/config/logging.php on line 20
