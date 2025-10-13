@@ -101,7 +101,7 @@ class ProfileController extends Controller
             $image->move($destinationPath, $profileImage);
             $sprovider['image'] = "$profileImage";
         }
-        $sprovider->update();
+        $sprovider->save();
 
         session()->flash('message', 'Profile has been updated successfully!');
         return redirect()->back();
