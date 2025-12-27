@@ -12,103 +12,99 @@
                     @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{Session::get('message')}}</div>
                     @endif
-                    <form method="POST" action="{{ route('get.modify.profile') }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('get', $sprovider->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <div class="row ">
-                            <div class="col-md-10 dash-input-wrapper mb-30 form-group">
-                               <input type="hidden" name="profile_id" value="{{ Auth::user()->id }}">
 
-                                <div class="col-md-3 dash-btn-one d-inline-block position-relative me-3">
-                                    @if($sprovider->image)
-                                    <img src="{{asset('image/profile')}}/{{$sprovider->image}}" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
-                                    @else
-                                    <img src="{{ asset('assets/images/sproviders/avatar.jpg') }}" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />
-                                    @endif
-                                </div>
-                                <div class="col-md-3 dash-btn-one d-inline-block position-relative me-3">
-                                    <i class="bi bi-plus"></i>
-                                    Upload Profile
-                                    <input type="file" class="form-control-file" id="image" name="image" required>
-                                    @error('image')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                        <!-- Hidden field for profile ID -->
+                        <input type="hidden" name="profile_id" value="{{ Auth::user()->id }}">
 
-                            </div>
+                        <!-- Profile Image -->
+                        <div class="mb-3">
+                            @if($sprovider->image)
+                            <img src="{{ asset('image/profile/' . $sprovider->image) }}" alt="Avatar" class="img-fluid mb-2" style="width: 80px;">
+                            @else
+                            <img src="{{ asset('assets/images/sproviders/avatar.jpg') }}" alt="Avatar" class="img-fluid mb-2" style="width: 80px;">
+                            @endif
+                            <input type="file" name="image" class="form-control">
+                            @error('image')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class=" dash-input-wrapper mb-30 form-group">
-                            <label for="about" class="control-label">About: </label>
-                            <textarea class="form-control summernote" id="about" name="about" required>{{$sprovider->about}}</textarea>
+
+                        <!-- About -->
+                        <div class="mb-3">
+                            <label for="about">About:</label>
+                            <textarea name="about" class="form-control summernote" required>{{ old('about', $sprovider->about) }}</textarea>
                             @error('about')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="row">
-                            <div class=" dash-input-wrapper mb-30 form-group">
-                                <label for="skills" class="control-label">Skills: </label>
-                                <textarea class="form-control summernote" id="skills" name="skills" required>{{$sprovider->skills}}</textarea>
-                                @error('skills')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class=" dash-input-wrapper mb-30 form-group">
-                                <label for="qualification" class="control-label">Qualification: </label>
-                                <textarea class="form-control summernote" id="qualification" name="qualification" required>{{$sprovider->qualification}}</textarea>
-                                @error('qualification')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class=" dash-input-wrapper mb-30 form-group">
-                                <label for="experience" class="control-label">Experience: </label>
-                                <textarea class="form-control summernote" id="experience" name="experience" required>{{$sprovider->experience}}</textarea>
-                                @error('experience')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
+
+                        <!-- Skills -->
+                        <div class="mb-3">
+                            <label for="skills">Skills:</label>
+                            <textarea name="skills" class="form-control summernote" required>{{ old('skills', $sprovider->skills) }}</textarea>
+                            @error('skills')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="row">
 
-                            <div class="col-md-4 dash-input-wrapper mb-30 form-group">
-                                <label for="city" class="control-label">City: </label>
-                                <input type="text" class="form-control" name="city" value="{{$sprovider->city}}" required>
-                                @error('city')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-4 dash-input-wrapper mb-30 form-group">
-                                <label for="service_category_id" class="control-label">Service Category: </label>
-
-                                <select name="service_category_id" class="nice-select form-control" wire:model="service_category_id" required>
-                                    @if($sprovider->service_category_id)
-                                    <option value="{{$sprovider->category}}">{{$sprovider->category->name}}</option>
-                                    @endif
-                                    @foreach ($scategories as $scategory)
-                                    <option value="{{ $scategory->id }}">{{ $scategory->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('service_category_id')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-
-                            </div>
-                            <div class="col-md-4 dash-input-wrapper mb-30 form-group">
-                                <label for="service_location" class="control-label">Service Locations</label>
-
-                                <input type="text" class="form-control" name="service_locations" value="{{$sprovider->service_locations}}" required>
-                                @error('service_locations')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-
-                            </div>
+                        <!-- Qualification -->
+                        <div class="mb-3">
+                            <label for="qualification">Qualification:</label>
+                            <textarea name="qualification" class="form-control summernote" required>{{ old('qualification', $sprovider->qualification) }}</textarea>
+                            @error('qualification')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="" class="control-label"></label>
-                            <div class="col-sm-9">
-                                <button type="submit" class="btn btn-success pull-right">Update Profile</button>
-                            </div>
+
+                        <!-- Experience -->
+                        <div class="mb-3">
+                            <label for="experience">Experience:</label>
+                            <textarea name="experience" class="form-control summernote" required>{{ old('experience', $sprovider->experience) }}</textarea>
+                            @error('experience')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
+
+                        <!-- City -->
+                        <div class="mb-3">
+                            <label for="city">City:</label>
+                            <input type="text" name="city" class="form-control" value="{{ old('city', $sprovider->city) }}" required>
+                            @error('city')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Service Category -->
+                        <div class="mb-3">
+                            <label for="service_category_id">Service Category:</label>
+                            <select name="service_category_id" class="form-control" required>
+                                <option value="">Select Category</option>
+                                @foreach($scategories as $scategory)
+                                <option value="{{ $scategory->id }}" {{ $sprovider->service_category_id == $scategory->id ? 'selected' : '' }}>
+                                    {{ $scategory->name }}
+                                </option>
+                                @endforeach
+                            </select>
+                            @error('service_category_id')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <!-- Service Locations -->
+                        <div class="mb-3">
+                            <label for="service_locations">Service Locations:</label>
+                            <input type="text" name="service_locations" class="form-control" value="{{ old('service_locations', $sprovider->service_locations) }}" required>
+                            @error('service_locations')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Update Profile</button>
                     </form>
+
                 </div>
             </div>
         </div>

@@ -255,7 +255,8 @@ Route::middleware([
     // Route::get('/sprovider/dashboard', SproviderDashboardComponent::class)->name('sprovider.dashboard');
     Route::get('/ServiceProvider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
     Route::get('/ServiceProvider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
-    Route::put('/get/profile/modify', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('get.modify.profile');
+    Route::put('/get/{id}', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('get');
+
 
     // Route::get('/offering', ServicesProviderServiceOfferingComponent::class)->name('offerings.service');
     Route::get('/sprovider/order', SproviderOrderComponent::class)->name('sprovider.order');

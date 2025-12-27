@@ -77,19 +77,22 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'about' => 'required',
+            'skills' => 'required',
+            'qualification' => 'required',
+            'experience' => 'required',
             'city' => 'required',
-            'image' => 'required|mimes:jpeg,jpg,png|max:2048',
-            'profile_id' => 'required',
+            'service_category_id' => 'required|exists:service_categories,id',
+            'service_locations' => 'required',
+            'image' => 'nullable|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        $id = $request->input('profile_id');
-        $sprovider = ServiceProvider::findOrFail($id);
+        // Ensure user can only update their own profile
+        $sprovider = ServiceProvider::where('user_id', Auth::id())->firstOrFail();
 
-        $sprovider->sprovider_name = Auth::user()->name;
         $sprovider->about = $request->input('about');
         $sprovider->skills = $request->input('skills');
         $sprovider->qualification = $request->input('qualification');
@@ -97,8 +100,8 @@ class ProfileController extends Controller
         $sprovider->city = $request->input('city');
         $sprovider->service_category_id = $request->input('service_category_id');
         $sprovider->service_locations = $request->input('service_locations');
-        $sprovider->proEmail = Auth::user()->email;
 
+        // Optional image upload
         if ($image = $request->file('image')) {
             $destinationPath = 'image/profile/';
             $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
@@ -108,8 +111,7 @@ class ProfileController extends Controller
 
         $sprovider->save();
 
-        session()->flash('message', 'Profile has been updated successfully!');
-        return redirect()->back();
+        return redirect()->back()->with('message', 'Profile updated successfully!');
     }
 
 
