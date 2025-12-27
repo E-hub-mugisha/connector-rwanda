@@ -6,13 +6,13 @@
         <div class="col-md-10 grid-margin stretch-card">
             <div class="card container mb-3" style="border-radius: .5rem;">
 
-                <h2 class="main-title mt-3">Edit Account</h2>
+                <h2 class="main-title mt-3">Edit Account <?php echo e($sprovider->user->name); ?></h2>
 
                 <div class="bg-white card-box border-20">
                     <?php if(Session::has('message')): ?>
                     <div class="alert alert-success" role="alert"><?php echo e(Session::get('message')); ?></div>
                     <?php endif; ?>
-                    <form class="form-horizontal" method="POST" action="<?php echo e(route('ServiceProvider.updateProfile',$sprovider->id)); ?>" enctype="multipart/form-data">
+                    <form class="form-horizontal" method="POST" action="<?php echo e(route('service_provider.update_profile',$sprovider->id)); ?>" enctype="multipart/form-data">
                         <?php echo csrf_field(); ?>
                         <?php echo method_field('PUT'); ?>
                         <div class="row ">

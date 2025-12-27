@@ -6,7 +6,7 @@
         <div class="col-md-10 grid-margin stretch-card">
             <div class="card container mb-3" style="border-radius: .5rem;">
 
-                <h2 class="main-title mt-3">Edit Account</h2>
+                <h2 class="main-title mt-3">Edit Account {{ $sprovider->user->name }}</h2>
 
                 <div class="bg-white card-box border-20">
                     @if(Session::has('message'))
