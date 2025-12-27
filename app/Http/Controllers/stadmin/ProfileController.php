@@ -90,23 +90,21 @@ class ProfileController extends Controller
             'image' => 'nullable|mimes:jpeg,jpg,png|max:2048',
         ]);
 
-        // Ensure user can only update their own profile
-        $sprovider = ServiceProvider::where('user_id', Auth::id())->firstOrFail();
+        $sprovider = ServiceProvider::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
 
-        $sprovider->about = $request->input('about');
-        $sprovider->skills = $request->input('skills');
-        $sprovider->qualification = $request->input('qualification');
-        $sprovider->experience = $request->input('experience');
-        $sprovider->city = $request->input('city');
-        $sprovider->service_category_id = $request->input('service_category_id');
-        $sprovider->service_locations = $request->input('service_locations');
+        $sprovider->about = $request->about;
+        $sprovider->skills = $request->skills;
+        $sprovider->qualification = $request->qualification;
+        $sprovider->experience = $request->experience;
+        $sprovider->city = $request->city;
+        $sprovider->service_category_id = $request->service_category_id;
+        $sprovider->service_locations = $request->service_locations;
 
-        // Optional image upload
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/profile/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $sprovider->image = $profileImage;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = date('YmdHis') . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('image/profile'), $imageName);
+            $sprovider->image = $imageName;
         }
 
         $sprovider->save();

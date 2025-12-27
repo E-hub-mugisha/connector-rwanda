@@ -12,7 +12,7 @@
                     @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{Session::get('message')}}</div>
                     @endif
-                    <form method="POST" action="{{ route('get', $sprovider->id) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('sprovider.profile.update', $sprovider->id) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
