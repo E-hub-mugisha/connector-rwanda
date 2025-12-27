@@ -12,11 +12,13 @@
                     @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{Session::get('message')}}</div>
                     @endif
-                    <form class="form-horizontal" method="POST" action="{{ route('get.service.provider.update_profile',$sprovider->id) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('get.modify.profile') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row ">
                             <div class="col-md-10 dash-input-wrapper mb-30 form-group">
+                               <input type="hidden" name="profile_id" value="{{ Auth::user()->id }}">
+
                                 <div class="col-md-3 dash-btn-one d-inline-block position-relative me-3">
                                     @if($sprovider->image)
                                     <img src="{{asset('image/profile')}}/{{$sprovider->image}}" alt="Avatar" class="img-fluid my-5" style="width: 80px;" />

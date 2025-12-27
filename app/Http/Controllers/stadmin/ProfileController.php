@@ -77,14 +77,18 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function updateProfile(Request $request, $id)
+    public function update(Request $request)
     {
         $request->validate([
             'about' => 'required',
             'city' => 'required',
-            'image' => 'required|mimes:jpeg,png'
+            'image' => 'required|mimes:jpeg,jpg,png|max:2048',
+            'profile_id' => 'required',
         ]);
-        $sprovider = ServiceProvider::findORFail($id);
+
+        $id = $request->input('profile_id');
+        $sprovider = ServiceProvider::findOrFail($id);
+
         $sprovider->sprovider_name = Auth::user()->name;
         $sprovider->about = $request->input('about');
         $sprovider->skills = $request->input('skills');
@@ -99,13 +103,15 @@ class ProfileController extends Controller
             $destinationPath = 'image/profile/';
             $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
             $image->move($destinationPath, $profileImage);
-            $sprovider['image'] = "$profileImage";
+            $sprovider->image = $profileImage;
         }
-        $sprovider->update();
+
+        $sprovider->save();
 
         session()->flash('message', 'Profile has been updated successfully!');
         return redirect()->back();
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -117,18 +123,18 @@ class ProfileController extends Controller
     {
         //
     }
-    
+
     public function UserFeedback()
     {
         $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
         $feedbacks = Feedback::where('Service_Provider_ID', $sprovider->id)->where('approved', true)->get();
-        return view('stadmin.feedback.user-feedbacks',compact('feedbacks'));
+        return view('stadmin.feedback.user-feedbacks', compact('feedbacks'));
     }
 
     public function UserReviews()
     {
         $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
         $ratings = Rating::where('Service_Provider_ID', $sprovider->id)->where('approved', true)->get();
-        return view('stadmin.feedback.user-reviews',compact('ratings'));
+        return view('stadmin.feedback.user-reviews', compact('ratings'));
     }
 }
