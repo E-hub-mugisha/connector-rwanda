@@ -13,9 +13,13 @@ class StaffMemberController extends Controller
 {
     public function index()
     {
-        $serviceProviderId = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        $staffMembers = StaffMember::where('service_provider_id', $serviceProviderId->id)->with('services')->get();
-        $services = Service::where('service_provider_id', $serviceProviderId->id)->get();
+        $serviceProvider = ServiceProvider::where('user_id', Auth::id())->firstOrFail();
+
+        $staffMembers = StaffMember::where('service_provider_id', $serviceProvider->id)
+            ->with('services')
+            ->get();
+
+        $services = Service::where('service_provider_id', $serviceProvider->id)->get();
         return view('stadmin.staff.index', compact('staffMembers', 'services'));
     }
 
@@ -75,10 +79,10 @@ class StaffMemberController extends Controller
             'services' => 'array',
             'services.*' => 'exists:services,id',
         ]);
-    
+
         // Find the staff member
         $staffMember = StaffMember::findOrFail($request->staff_id);
-    
+
         // Add the new services to the staff member without removing existing ones
         $staffMember->services()->attach($request->services);
 

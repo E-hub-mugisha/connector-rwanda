@@ -17,6 +17,6 @@ class StaffMember extends Model
 
     public function services()
     {
-        return $this->belongsToMany(Service::class, 'service_staff');
+        return $this->belongsToMany(Service::class, 'service_staff', 'staff_member_id', 'service_id');
     }
 }
