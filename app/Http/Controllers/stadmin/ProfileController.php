@@ -77,7 +77,7 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function updateProfile(Request $request, $id)
     {
         $request->validate([
             'about' => 'required',
