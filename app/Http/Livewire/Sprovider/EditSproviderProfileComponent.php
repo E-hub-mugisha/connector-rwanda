@@ -70,7 +70,7 @@ class EditSproviderProfileComponent extends Component
         $sprovider->service_category_id = $this->service_category_id;
         $sprovider->service_locations = $this->service_locations;
         $sprovider->proEmail = Auth::user()->email;
-        $sprovider->save();
+        $sprovider->update();
 
         session()->flash('message', 'Profile has been updated successfully!');
     }
