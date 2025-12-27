@@ -253,10 +253,10 @@ Route::middleware([
 
     // exceptionnnnn
     // Route::get('/sprovider/dashboard', SproviderDashboardComponent::class)->name('sprovider.dashboard');
-    Route::get('/ServiceProvider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
-    Route::get('/ServiceProvider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
+    Route::get('/serviceprovider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
+    Route::get('/serviceprovider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
     // Update profile
-    Route::put('/ServiceProvider/profile/update/{id}', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('sprovider.profile.update');
+    Route::put('/serviceprovider/profile/update/{id}', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('sprovider.profile.update');
 
 
     // Route::get('/offering', ServicesProviderServiceOfferingComponent::class)->name('offerings.service');
