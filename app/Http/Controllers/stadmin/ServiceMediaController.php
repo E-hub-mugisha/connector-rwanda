@@ -17,37 +17,39 @@ class ServiceMediaController extends Controller
         $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
         $services = Service::where('service_provider_id', $sprovider->id)->get();
         $medias = ServiceMedia::all();
-        return view('stadmin.media.index', compact('services','medias'));
+        return view('stadmin.media.index', compact('services', 'medias'));
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
             'service_id' => 'required|exists:services,id',
             'files.*' => 'required|mimes:jpg,png,jpeg,mp4,mov,avi',
         ]);
-        
-        if ($file) {
-            $destinationPath = 'image/services/';
-            $profileImage = date('YmdHis') . "." . $file->getClientOriginalExtension();
-            $file->move($destinationPath, $profileImage);
-            $service->file = $profileImage;
-            
-            // Determine file type
-            $type = in_array($file->getClientOriginalExtension(), ['mp4', 'mov', 'avi']) ? 'video' : 'image';
+
+        $files = $request->file('files');
+
+        if ($files) {
+            foreach ($files as $file) {
+                $destinationPath = 'image/services/';
+                $fileName = date('YmdHis') . '_' . uniqid() . "." . $file->getClientOriginalExtension();
+                $file->move(public_path($destinationPath), $fileName);
+
+                // Determine file type
+                $type = in_array(strtolower($file->getClientOriginalExtension()), ['mp4', 'mov', 'avi']) ? 'video' : 'image';
+
+                // Save to database
+                ServiceMedia::create([
+                    'service_id' => $request->service_id,
+                    'file_path' => $fileName, // Only filename stored
+                    'type' => $type,
+                ]);
+            }
         }
-        
-        // Save only the filename (not full path) in the database
-            ServiceMedia::create([
-                'service_id' => $request->service_id,
-                'file_path' => $profileImage, // Only filename stored
-                'type' => $type
-            ]);
-    
-    
-        return back()->with('success', 'Media upload successfully.');
-        
+
+        return back()->with('success', 'Media uploaded successfully.');
     }
+
 
     public function destroy($id)
     {
