@@ -83,7 +83,7 @@
                         <div class="mb-3">
                             <h6><i class="fa fa-file-pdf mr-2"></i>Resume</h6>
                             @if($app->resume)
-                            <a href="{{ asset('storage/'.$app->resume) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <a href="{{ asset($app->resume) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                 <i class="fa fa-download"></i> Download
                             </a>
                             @else

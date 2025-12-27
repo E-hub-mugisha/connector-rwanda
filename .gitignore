@@ -1,16 +1,43 @@
+# Node modules
 /node_modules
+
+# Build & hot reload
 /public/build
 /public/hot
+
+# Storage and keys
 /public/storage
 /storage/*.key
+/storage/logs
+/storage/framework/cache
+/storage/framework/sessions
+/storage/framework/testing
+/storage/framework/views
+
+# Vendor
 /vendor
+
+# Environment files
 .env
-.env.backup
+.env.* 
+!.env.example
+
+# Laravel caches
 .phpunit.result.cache
+
+# Homestead
 Homestead.json
 Homestead.yaml
+
+# Composer & NPM
 auth.json
 npm-debug.log
 yarn-error.log
+pnpm-debug.log
+
+# IDEs
 /.idea
 /.vscode
+
+# Optional: Laravel CS fixer
+/.php-cs-fixer.cache

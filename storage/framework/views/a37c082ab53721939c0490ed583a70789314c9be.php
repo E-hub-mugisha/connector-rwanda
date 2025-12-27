@@ -110,7 +110,7 @@
                                 <div class="mb-3">
                                     <h6><i class="fa fa-file-pdf mr-2"></i>Resume</h6>
                                     <?php if($app->resume): ?>
-                                    <a href="<?php echo e(asset('storage/'.$app->resume)); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <a href="<?php echo e(asset($app->resume)); ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class="fa fa-download"></i> Download
                                     </a>
                                     <?php else: ?>

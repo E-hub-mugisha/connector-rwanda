@@ -108,24 +108,31 @@ class JobController extends Controller
             ->first();
 
         if ($existing) {
-            Alert::error('error','You already applied for this job.');
+            Alert::error('error', 'You already applied for this job.');
             return redirect()->back();
         }
 
-        $resumePath = null;
+        $resumeFile = null;
+
         if ($request->hasFile('resume')) {
-            $resumePath = $request->file('resume')->store('resumes', 'public');
+            $resumePath = $request->file('resume');
+            $destinationPath = 'files/applications/';
+            $fileName = date('YmdHis') . "." . $resumePath->getClientOriginalExtension();
+            $resumePath->move(public_path($destinationPath), $fileName);
+
+            $resumeFile = $destinationPath . $fileName;
         }
 
         JobApplication::create([
-            'job_id' => $job->id,
-            'user_id' => Auth::id(),
+            'job_id'       => $job->id,
+            'user_id'      => Auth::id(),
             'cover_letter' => $request->cover_letter,
-            'resume' => $resumePath,
-            'status' => 'pending',
+            'resume'       => $resumeFile,   // null if no file
+            'status'       => 'pending',
         ]);
 
-        Alert::success('success','Application submitted successfully!');
+
+        Alert::success('success', 'Application submitted successfully!');
         return back();
     }
 }
