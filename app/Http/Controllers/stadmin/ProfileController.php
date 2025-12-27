@@ -112,6 +112,44 @@ class ProfileController extends Controller
         return redirect()->back()->with('message', 'Profile updated successfully!');
     }
 
+public function ajaxUpdate(Request $request)
+{
+    $request->validate([
+        'about' => 'required',
+        'skills' => 'required',
+        'qualification' => 'required',
+        'experience' => 'required',
+        'city' => 'required',
+        'service_category_id' => 'required|exists:service_categories,id',
+        'service_locations' => 'required',
+        'image' => 'nullable|mimes:jpeg,jpg,png|max:2048',
+    ]);
+
+    $sprovider = ServiceProvider::where('user_id', Auth::id())->firstOrFail();
+
+    $sprovider->about = $request->about;
+    $sprovider->skills = $request->skills;
+    $sprovider->qualification = $request->qualification;
+    $sprovider->experience = $request->experience;
+    $sprovider->city = $request->city;
+    $sprovider->service_category_id = $request->service_category_id;
+    $sprovider->service_locations = $request->service_locations;
+
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $imageName = date('YmdHis') . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('image/profile'), $imageName);
+        $sprovider->image = $imageName;
+    }
+
+    $sprovider->save();
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Profile updated successfully!',
+        'image' => $sprovider->image ? asset('image/profile/'.$sprovider->image) : null
+    ]);
+}
 
     /**
      * Remove the specified resource from storage.

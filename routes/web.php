@@ -257,6 +257,7 @@ Route::middleware([
     Route::get('/serviceprovider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
     // Update profile
     Route::put('/serviceprovider/profile/update/{id}', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('sprovider.profile.update');
+    Route::post('/service-provider/profile/update', [App\Http\Controllers\stadmin\ProfileController::class, 'ajaxUpdate'])->name('sprovider.profile.ajaxUpdate');
 
 
     // Route::get('/offering', ServicesProviderServiceOfferingComponent::class)->name('offerings.service');
@@ -307,7 +308,7 @@ Route::middleware([
     Route::get('/ServiceProvider/feedbacks', [App\Http\Controllers\stadmin\ProfileController::class, 'UserFeedback'])->name('serviceProvider.feedback');
 
     Route::get('/ServiceProvider/jobs', [App\Http\Controllers\stadmin\JobController::class, 'index'])->name('provider.jobs.index');
-    Route::post('/ServiceProvider/jobs/create', [App\Http\Controllers\stadmin\JobController::class, 'store'])->name('provider.jobs.store');  
+    Route::post('/ServiceProvider/jobs/create', [App\Http\Controllers\stadmin\JobController::class, 'store'])->name('provider.jobs.store');
     Route::put('/ServiceProvider/jobs/{job}', [App\Http\Controllers\stadmin\JobController::class, 'update'])->name('provider.jobs.update');
     Route::delete('/ServiceProvider/jobs/{job}', [App\Http\Controllers\stadmin\JobController::class, 'destroy'])->name('provider.jobs.destroy');
     Route::get('/ServiceProvider/jobs/{job}/applicants', [App\Http\Controllers\stadmin\JobController::class, 'showApplicants'])->name('provider.jobs.applications');
