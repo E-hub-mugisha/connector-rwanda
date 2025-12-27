@@ -256,8 +256,8 @@ Route::middleware([
     Route::get('/serviceprovider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
     Route::get('/serviceprovider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
     // Update profile
-    Route::put('/serviceprovider/profile/update/{id}', [App\Http\Controllers\stadmin\ProfileController::class, 'update'])->name('sprovider.profile.update');
-    Route::post('/service-provider/profile/update', [App\Http\Controllers\stadmin\ProfileController::class, 'ajaxUpdate'])->name('sprovider.profile.ajaxUpdate');
+    // Update profile
+    Route::match(['post', 'put'],'/service-provider/profile/update',[App\Http\Controllers\stadmin\ProfileController::class, 'ajaxUpdate'])->name('sprovider.profile.ajaxUpdate');
 
 
     // Route::get('/offering', ServicesProviderServiceOfferingComponent::class)->name('offerings.service');
