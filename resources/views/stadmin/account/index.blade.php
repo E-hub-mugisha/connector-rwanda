@@ -26,7 +26,7 @@
                     <!-- Account Details -->
                     <div class="col-md-8">
                         <div class="card-body p-4">
-                            <h6 class="mb-4" style="font-weight: bold;">Account Information</h6>
+                            <h6 class="mb-4" style="font-weight: bold;">Account Information for {{ Auth::user()->name ?? 'Unknown User' }}</h6>
                             <hr class="mt-0 mb-4">
 
                             <div class="row pt-1">
