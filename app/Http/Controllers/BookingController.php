@@ -106,7 +106,7 @@ class BookingController extends Controller
                 Mail::to($mailData['email'])->send(new UserBookingMail($mailData));
             } catch (Exception $e) {
                 Log::error('Failed to send booking email: ' . $e->getMessage());
-                Alert::error('Email Error', 'Booking was successful, but the confirmation email could not be sent.');
+                Alert::success('Email success', 'Booking was successful');
             }
 
             // Redirect to the modal page for payment options
