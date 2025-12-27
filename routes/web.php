@@ -83,6 +83,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Models\Feedback;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -425,4 +426,15 @@ Route::middleware([
     Route::get('/jobs/{job}/applications', [App\Http\Controllers\admin\JobApplicationController::class, 'index'])->name('admin.jobs.applications');
     Route::post('/applications/{id}/accept', [App\Http\Controllers\admin\JobApplicationController::class, 'accept'])->name('admin.applications.accept');
     Route::post('/applications/{id}/reject', [App\Http\Controllers\admin\JobApplicationController::class, 'reject'])->name('admin.applications.reject');
+});
+
+Route::get('/clear-cache', function () {
+
+
+    Artisan::call('optimize:clear');
+    Artisan::call('config:cache');
+    Artisan::call('route:cache');
+    Artisan::call('view:cache');
+
+    return "All caches cleared and rebuilt successfully!";
 });
