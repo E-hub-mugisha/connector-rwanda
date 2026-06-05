@@ -38,7 +38,7 @@
                                 <div class="agreement-checkbox d-flex justify-content-between align-items-center">
                                     <div>
                                         <input type="checkbox" id="remember_me" name="remember" {{ old('remember') ? 'checked' : '' }}>
-<label for="remember_me">Keep me logged in</label>
+                                        <label for="remember_me">Keep me logged in</label>
 
                                     </div>
                                     @if (Route::has('password.request'))
