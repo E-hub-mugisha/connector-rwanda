@@ -21,10 +21,8 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             ServiceProvidersTableSeeder::class,
             ServiceCategorySeeder::class,
+            ServiceSeeder::class,
             JobsTableSeeder::class
         ]);
-        \App\Models\Service::factory(20)->create();
-        \App\Models\Category::factory(6)->create();
-        \App\Models\Product::factory(22)->create();
     }
 }
