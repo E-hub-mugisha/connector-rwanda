@@ -14,11 +14,16 @@
         --clr-muted: #5C7268;
         --clr-border: #D8E8E2;
         --clr-bg-soft: #F6FAF8;
+        --clr-whatsapp: #25D366;
+        --clr-whatsapp-dark: #1DA851;
+        --clr-gold: #C99A3B;
         --radius-sm: 8px;
         --radius-md: 14px;
         --radius-lg: 22px;
+        --radius-xl: 32px;
         --shadow-card: 0 2px 16px rgba(37, 64, 53, .07);
         --shadow-hover: 0 8px 32px rgba(37, 64, 53, .13);
+        --shadow-deep: 0 24px 60px rgba(37, 64, 53, .22);
         --font-display: 'Playfair Display', Georgia, serif;
         --font-body: 'DM Sans', sans-serif;
         --transition: .22s cubic-bezier(.4, 0, .2, 1);
@@ -44,6 +49,10 @@
     img {
         display: block;
         max-width: 100%;
+    }
+
+    button, input, select {
+        font-family: inherit;
     }
 
     /* ─── TYPOGRAPHY ─── */
@@ -75,133 +84,306 @@
         max-width: 540px;
     }
 
-    /* ─── HERO ─── */
+    /* ─── HERO (redesigned) ─── */
     .hero {
         position: relative;
-        padding-top: 80px;
+        padding-top: 64px;
+        background:
+            radial-gradient(circle at 85% 15%, rgba(107, 144, 128, .10) 0%, transparent 55%),
+            linear-gradient(180deg, var(--clr-bg-soft) 0%, #ffffff 78%);
         overflow: hidden;
     }
 
-    .hero .carousel-item img {
-        width: 100%;
-        height: 620px;
-        object-fit: cover;
-        filter: brightness(.52);
+    .hero-inner {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 44px 24px 72px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 48px;
+        align-items: center;
     }
 
-    .hero .carousel-item::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(160deg, rgba(37, 64, 53, .6) 0%, rgba(37, 64, 53, .25) 60%, transparent 100%);
-        pointer-events: none;
+    @media(min-width:992px) {
+        .hero-inner {
+            grid-template-columns: 1.02fr .98fr;
+            gap: 56px;
+            padding: 64px 24px 96px;
+        }
     }
 
-    .hero-caption {
-        position: absolute;
-        inset: 0;
+    .hero-content .section-tag {
+        background: var(--clr-white);
+        border: 1px solid var(--clr-sage-md);
+        box-shadow: var(--shadow-card);
+    }
+
+    .hero-content h1 {
+        font-family: var(--font-display);
+        font-size: clamp(34px, 4.6vw, 56px);
+        font-weight: 700;
+        color: var(--clr-forest);
+        line-height: 1.14;
+        max-width: 620px;
+        margin-bottom: 18px;
+    }
+
+    .hero-content h1 em {
+        font-style: normal;
+        color: var(--clr-sage);
+        position: relative;
+    }
+
+    .hero-content p.lead {
+        font-size: 16.5px;
+        color: var(--clr-muted);
+        line-height: 1.7;
+        max-width: 470px;
+        margin-bottom: 32px;
+    }
+
+    /* search bar */
+    .hero-search {
         display: flex;
-        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        background: var(--clr-white);
+        border: 1px solid var(--clr-border);
+        border-radius: 100px;
+        padding: 6px;
+        box-shadow: var(--shadow-card);
+        max-width: 540px;
+        transition: box-shadow var(--transition);
+    }
+
+    .hero-search:focus-within {
+        box-shadow: var(--shadow-hover);
+    }
+
+    .hero-search .field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 16px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .hero-search .field svg {
+        flex-shrink: 0;
+        color: var(--clr-sage);
+    }
+
+    .hero-search input,
+    .hero-search select {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        color: var(--clr-text);
+        width: 100%;
+        padding: 12px 0;
+    }
+
+    .hero-search input::placeholder {
+        color: #9AAFA6;
+    }
+
+    .hero-search .divider {
+        width: 1px;
+        background: var(--clr-border);
+        margin: 8px 0;
+        flex-shrink: 0;
+    }
+
+    .hero-search button {
+        flex-shrink: 0;
+        display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        padding: 0 24px;
-        z-index: 5;
-    }
-
-    .hero-caption h1 {
-        font-family: var(--font-display);
-        font-size: clamp(34px, 6vw, 68px);
-        font-weight: 700;
+        gap: 6px;
+        background: var(--clr-forest);
         color: #fff;
-        line-height: 1.12;
-        max-width: 800px;
-        margin-bottom: 16px;
+        border: none;
+        border-radius: 100px;
+        padding: 0 26px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background var(--transition);
     }
 
-    .hero-caption p {
-        font-size: 17px;
-        color: rgba(255, 255, 255, .82);
-        margin-bottom: 40px;
-        max-width: 500px;
+    .hero-search button:hover {
+        background: var(--clr-forest-lt);
     }
 
-    .hero-stats {
+    /* trust stats */
+    .hero-trust {
         display: flex;
-        gap: 40px;
+        gap: 36px;
         flex-wrap: wrap;
-        justify-content: center;
+        margin-top: 38px;
     }
 
-    .hero-stat {
-        text-align: center;
+    .hero-trust .item {
+        display: flex;
+        flex-direction: column;
     }
 
-    .hero-stat .count {
+    .hero-trust .count {
         font-family: var(--font-display);
-        font-size: 36px;
+        font-size: 28px;
         font-weight: 700;
-        color: #fff;
+        color: var(--clr-forest);
         line-height: 1;
     }
 
-    .hero-stat p {
-        font-size: 13px;
-        color: rgba(255, 255, 255, .7);
-        margin-top: 4px;
+    .hero-trust .label {
+        font-size: 12.5px;
+        color: var(--clr-muted);
+        margin-top: 6px;
+        letter-spacing: .01em;
     }
 
-    .hero-stat-divider {
-        width: 1px;
-        height: 50px;
-        background: rgba(255, 255, 255, .25);
-        align-self: center;
+    /* visual side */
+    .hero-visual {
+        position: relative;
     }
 
-    /* carousel controls */
-    .hero .carousel-control-prev,
-    .hero .carousel-control-next {
-        width: 48px;
-        height: 48px;
-        background: rgba(255, 255, 255, .18);
+    .hero-visual .carousel {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-deep);
+        aspect-ratio: 4 / 4.6;
+    }
+
+    @media(min-width:992px) {
+        .hero-visual .carousel {
+            aspect-ratio: 4 / 4.9;
+        }
+    }
+
+    .hero-visual .carousel-item,
+    .hero-visual .carousel-item img {
+        height: 100%;
+    }
+
+    .hero-visual .carousel-item img {
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .hero-visual .carousel-item::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(0deg, rgba(37, 64, 53, .55) 0%, transparent 42%);
+        pointer-events: none;
+    }
+
+    .hero-slide-title {
+        position: absolute;
+        left: 28px;
+        right: 28px;
+        bottom: 28px;
+        z-index: 3;
+        color: #fff;
+        font-family: var(--font-display);
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .hero-visual .carousel-control-prev,
+    .hero-visual .carousel-control-next {
+        width: 42px;
+        height: 42px;
+        background: rgba(255, 255, 255, .2);
         backdrop-filter: blur(6px);
         border-radius: 50%;
-        top: 50%;
-        transform: translateY(-50%);
+        top: auto;
+        bottom: 28px;
         opacity: 1;
         transition: background var(--transition);
     }
 
-    .hero .carousel-control-prev {
-        left: 24px;
+    .hero-visual .carousel-control-prev {
+        left: auto;
+        right: 84px;
     }
 
-    .hero .carousel-control-next {
-        right: 24px;
+    .hero-visual .carousel-control-next {
+        right: 28px;
     }
 
-    .hero .carousel-control-prev:hover,
-    .hero .carousel-control-next:hover {
-        background: rgba(255, 255, 255, .32);
+    .hero-visual .carousel-control-prev:hover,
+    .hero-visual .carousel-control-next:hover {
+        background: rgba(255, 255, 255, .35);
     }
 
-    .hero .carousel-indicators {
-        bottom: 20px;
-        gap: 6px;
+    .hero-visual .carousel-control-prev-icon,
+    .hero-visual .carousel-control-next-icon {
+        width: 16px;
+        height: 16px;
     }
 
-    .hero .carousel-indicators li {
-        width: 8px;
-        height: 8px;
+    .hero-visual .carousel-indicators {
+        display: none;
+    }
+
+    /* floating verified badge */
+    .hero-badge {
+        position: absolute;
+        left: -18px;
+        bottom: 40px;
+        z-index: 5;
+        background: var(--clr-white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-hover);
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 230px;
+    }
+
+    @media(max-width:560px) {
+        .hero-badge {
+            left: 16px;
+            bottom: 16px;
+        }
+    }
+
+    .hero-badge .avatar-stack {
+        display: flex;
+    }
+
+    .hero-badge .avatar-stack .dot {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, .5);
-        border: none;
-        transition: background var(--transition), transform var(--transition);
+        border: 2px solid #fff;
+        background: var(--clr-sage-md);
+        margin-left: -10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--clr-forest);
     }
 
-    .hero .carousel-indicators li.active {
-        background: #fff;
-        transform: scale(1.35);
+    .hero-badge .avatar-stack .dot:first-child {
+        margin-left: 0;
+    }
+
+    .hero-badge .text .top {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--clr-forest);
+    }
+
+    .hero-badge .text .sub {
+        font-size: 11.5px;
+        color: var(--clr-muted);
     }
 
     /* ─── CATEGORY MENU ─── */
@@ -509,22 +691,59 @@
         font-weight: 500;
     }
 
-    .service-card .book-btn {
-        display: block;
-        text-align: center;
-        background: var(--clr-sage-lt);
-        color: var(--clr-forest);
-        font-size: 14px;
-        font-weight: 700;
-        padding: 12px;
-        border-radius: var(--radius-sm);
-        transition: background var(--transition), color var(--transition);
+    /* two-button action row: View Details + WhatsApp */
+    .service-card .card-actions,
+    .provider-card .card-actions,
+    .promo-card .card-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
         margin-top: auto;
     }
 
-    .service-card .book-btn:hover {
+    .btn-view-detail {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: var(--clr-sage-lt);
+        color: var(--clr-forest);
+        font-size: 13.5px;
+        font-weight: 700;
+        padding: 12px 10px;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        transition: background var(--transition), color var(--transition);
+    }
+
+    .btn-view-detail:hover {
         background: var(--clr-forest);
         color: #fff;
+    }
+
+    .btn-whatsapp {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: var(--clr-whatsapp);
+        color: #fff;
+        font-size: 13.5px;
+        font-weight: 700;
+        padding: 12px 10px;
+        border-radius: var(--radius-sm);
+        text-align: center;
+        transition: background var(--transition), box-shadow var(--transition);
+    }
+
+    .btn-whatsapp:hover {
+        background: var(--clr-whatsapp-dark);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(37, 211, 102, .35);
+    }
+
+    .btn-whatsapp svg {
+        flex-shrink: 0;
     }
 
     /* ─── SORT BAR ─── */
@@ -653,12 +872,6 @@
         color: var(--clr-forest);
     }
 
-    .provider-card .card-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-
     .provider-card .card-actions a {
         padding: 10px;
         border-radius: var(--radius-sm);
@@ -679,12 +892,16 @@
     }
 
     .provider-card .btn-msg {
-        background: var(--clr-forest);
+        background: var(--clr-whatsapp);
         color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
 
     .provider-card .btn-msg:hover {
-        background: var(--clr-forest-lt);
+        background: var(--clr-whatsapp-dark);
     }
 
     /* ─── PROMOTION CARDS ─── */
@@ -779,13 +996,6 @@
         color: #D85A30;
     }
 
-    .promo-card .card-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        margin-top: auto;
-    }
-
     .promo-card .card-actions a {
         padding: 10px;
         border-radius: var(--radius-sm);
@@ -803,15 +1013,6 @@
     .promo-card .btn-view:hover {
         background: var(--clr-forest);
         color: #fff;
-    }
-
-    .promo-card .btn-book {
-        background: var(--clr-forest);
-        color: #fff;
-    }
-
-    .promo-card .btn-book:hover {
-        background: var(--clr-forest-lt);
     }
 
     /* ─── HOW IT WORKS ─── */
@@ -895,8 +1096,6 @@
         font-size: 16px;
         color: #fff;
     }
-
-    .how-step .info {}
 
     .how-step .info .label {
         font-size: 15px;
@@ -1162,6 +1361,21 @@
         .how-steps {
             grid-template-columns: 1fr;
         }
+
+        .hero-search {
+            flex-wrap: wrap;
+            border-radius: var(--radius-lg);
+        }
+
+        .hero-search .divider {
+            display: none;
+        }
+
+        .hero-search button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 4px;
+        }
     }
 </style>
 
@@ -1171,66 +1385,77 @@
 
 <!-- ── HERO ─────────────────────────────────── -->
 <div class="hero">
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-        <ol class="carousel-indicators">
-            @foreach($sliders as $index => $slider)
-            <li data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}"></li>
-            @endforeach
-        </ol>
-        <div class="carousel-inner">
-            @foreach($sliders as $index => $slider)
-            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                <img src="{{ asset('image/slider') }}/{{ $slider->image }}" alt="Slide {{ $index + 1 }}">
-                <div class="hero-caption">
-                    <h1>{{ $slider->title }}</h1>
-                    <p>Discover your path to prosperity — connect with trusted experts today.</p>
-                    <div class="hero-stats">
-                        <div class="hero-stat">
-                            <div class="count"><span class="counter">{{ $totalSales }}</span>+</div>
-                            <p>Total Sales</p>
-                        </div>
-                        <div class="hero-stat-divider"></div>
-                        <div class="hero-stat">
-                            <div class="count"><span class="counter">{{ $totalSprovider }}</span>+</div>
-                            <p>Service Providers</p>
-                        </div>
-                        <div class="hero-stat-divider"></div>
-                        <div class="hero-stat">
-                            <div class="count"><span class="counter">{{ $totalDone }}</span>+</div>
-                            <p>Services Done</p>
-                        </div>
-                    </div>
+    <div class="hero-inner">
+        <div class="hero-content">
+            <span class="section-tag">Trusted marketplace</span>
+            <h1>Find skilled help for <em>anything</em> you need done.</h1>
+            <p class="lead">Connect with vetted, top-rated service providers near you — browse, compare and book in minutes, with real people ready to help.</p>
+
+            <form class="hero-search" action="{{ route('home.services') }}" method="GET">
+                <div class="field">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></svg>
+                    <input type="text" name="q" placeholder="What service are you looking for?">
+                </div>
+                <div class="divider"></div>
+                <div class="field" style="flex:.7;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>
+                    <select name="category">
+                        <option value="">Any category</option>
+                        @foreach($scategories ?? [] as $scategory)
+                        <option value="{{ $scategory->slug }}">{{ $scategory->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button type="submit">Search</button>
+            </form>
+
+            <div class="hero-trust">
+                <div class="item">
+                    <div class="count"><span class="counter">{{ $totalSales }}</span>+</div>
+                    <div class="label">Total Sales</div>
+                </div>
+                <div class="item">
+                    <div class="count"><span class="counter">{{ $totalSprovider }}</span>+</div>
+                    <div class="label">Service Providers</div>
+                </div>
+                <div class="item">
+                    <div class="count"><span class="counter">{{ $totalDone }}</span>+</div>
+                    <div class="label">Services Done</div>
                 </div>
             </div>
-            @endforeach
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+
+        <div class="hero-visual">
+            <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @foreach($sliders as $index => $slider)
+                    <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                        <img src="{{ asset('image/slider') }}/{{ $slider->image }}" alt="Slide {{ $index + 1 }}">
+                        <div class="hero-slide-title">{{ $slider->title }}</div>
+                    </div>
+                    @endforeach
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            <div class="hero-badge">
+                <div class="avatar-stack">
+                    <div class="dot">✓</div>
+                </div>
+                <div class="text">
+                    <div class="top">Verified providers</div>
+                    <div class="sub">Every profile is manually reviewed</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-<!-- ── CATEGORY MENU ─────────────────────────────────── -->
-<nav class="cat-menu">
-    <ul>
-        @foreach($subcategories as $scat)
-        <li><a href="{{ route('home.service_by_subcategory', ['subcategory_slug' => $scat->slug]) }}">{{ $scat->name }}</a></li>
-        @endforeach
-        <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">More</a>
-            <ul class="dropdown-menu">
-                @foreach($subcategories as $scat)
-                <li><a class="dropdown-item" href="{{ route('home.service_by_subcategory', ['subcategory_slug' => $scat->slug]) }}">{{ $scat->name }}</a></li>
-                @endforeach
-            </ul>
-        </li>
-    </ul>
-</nav>
 
 <!-- ── CATEGORIES ─────────────────────────────────── -->
 <section class="section-wrap">
@@ -1238,7 +1463,7 @@
         <div class="section-header">
             <div>
                 <span class="section-tag">Explore</span>
-                <h2 class="section-title">Most demanding<br>job categories</h2>
+                <h2 class="section-title">Most demanding<br>Service categories</h2>
             </div>
             <a href="{{ route('home.service_categories') }}" class="btn-outline-sage">All Categories &rarr;</a>
         </div>
@@ -1275,11 +1500,23 @@
         <div class="services-grid">
             @foreach($services as $service)
             @php
-            $total = $service->price;
-            if($service->discount) {
-            if($service->discount_type == 'fixed') { $total = $total - $service->discount; }
-            elseif($service->discount_type == 'percent') { $total = $total - ($total * $service->discount / 100); }
-            }
+                $total = $service->price;
+                if ($service->discount) {
+                    if ($service->discount_type == 'fixed') {
+                        $total = $total - $service->discount;
+                    } elseif ($service->discount_type == 'percent') {
+                        $total = $total - ($total * $service->discount / 100);
+                    }
+                }
+
+                // WhatsApp booking: uses the provider's phone number when available,
+                // otherwise falls back to the platform's default WhatsApp line.
+                // Adjust the relation/field names below ($service->sprovider->phone)
+                // to match your actual schema.
+                $waRawPhone = optional($service->sprovider ?? null)->phone
+                    ?? config('services.whatsapp.default_number', '250780000000');
+                $waPhone = preg_replace('/\D+/', '', $waRawPhone);
+                $waMessage = rawurlencode('Hello! I\'m interested in booking "' . $service->name . '" (' . number_format($total) . ' RWF). Is it available?');
             @endphp
             <div class="service-card">
                 <div class="thumb">
@@ -1310,7 +1547,13 @@
                         </svg>
                         <a href="{{ route('home.service_location', ['service_location' => $service->location]) }}">{{ $service->location }}</a>
                     </div>
-                    <a href="{{ route('home.booking', ['service_slug' => $service->slug]) }}" class="book-btn">Book Now</a>
+                    <div class="card-actions">
+                        <a href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}" class="btn-view-detail">View Detail</a>
+                        <a href="https://wa.me/{{ $waPhone }}?text={{ $waMessage }}" target="_blank" rel="noopener" class="btn-whatsapp">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.13-4.9-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.73-2.09 1-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.32.07.12.07.68-.17 1.36z"/></svg>
+                            WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
             @endforeach
@@ -1330,6 +1573,10 @@
         <div class="providers-grid">
             @foreach($sproviders as $sprovider)
             @if(!empty($sprovider->sprovider_name))
+            @php
+                $provWaPhone = preg_replace('/\D+/', '', $sprovider->phone ?? config('services.whatsapp.default_number', '250780000000'));
+                $provWaMessage = rawurlencode('Hello ' . $sprovider->sprovider_name . ', I found your profile and would like to get in touch.');
+            @endphp
             <div class="provider-card">
                 <a href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}" class="fav-btn">&#9825;</a>
                 <div class="thumb">
@@ -1352,7 +1599,10 @@
                     </div>
                     <div class="card-actions">
                         <a href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}" class="btn-view">View Profile</a>
-                        <a href="mailto:{{ $sprovider->proEmail }}" class="btn-msg">Message</a>
+                        <a href="https://wa.me/{{ $provWaPhone }}?text={{ $provWaMessage }}" target="_blank" rel="noopener" class="btn-msg">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.13-4.9-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.73-2.09 1-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.32.07.12.07.68-.17 1.36z"/></svg>
+                            Message
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1374,6 +1624,11 @@
         <div class="promos-grid">
             @foreach($promotions as $promotion)
             @if(\Carbon\Carbon::now()->lessThanOrEqualTo($promotion->end_date))
+            @php
+                $promoTotal = $promotion->service->price - ($promotion->service->price * $promotion->discount / 100);
+                $promoWaPhone = preg_replace('/\D+/', '', optional($promotion->service->sprovider ?? null)->phone ?? config('services.whatsapp.default_number', '250780000000'));
+                $promoWaMessage = rawurlencode('Hello! I\'d like to book the promo "' . $promotion->title . '" for ' . number_format($promoTotal) . ' RWF.');
+            @endphp
             <div class="promo-card">
                 <span class="discount-ribbon">{{ $promotion->discount }}% OFF</span>
                 <div class="thumb">
@@ -1397,8 +1652,11 @@
                         </div>
                     </div>
                     <div class="card-actions">
-                        <a href="{{ route('home.service_details', ['service_slug' => $promotion->service->slug]) }}" class="btn-view">View Service</a>
-                        <a href="{{ route('home.booking', ['service_slug' => $promotion->service->slug]) }}" class="btn-book">Book Now</a>
+                        <a href="{{ route('home.service_details', ['service_slug' => $promotion->service->slug]) }}" class="btn-view-detail">View Detail</a>
+                        <a href="https://wa.me/{{ $promoWaPhone }}?text={{ $promoWaMessage }}" target="_blank" rel="noopener" class="btn-whatsapp">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.13-4.9-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.73-2.09 1-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.32.07.12.07.68-.17 1.36z"/></svg>
+                            WhatsApp
+                        </a>
                     </div>
                 </div>
             </div>
@@ -1432,7 +1690,7 @@
                 <div class="how-step">
                     <div class="num">3</div>
                     <div class="info">
-                        <div class="label">Get work done quickly with connector.</div>
+                        <div class="label">Message on WhatsApp and get it done.</div>
                         <a href="#">Payment Methods &rarr;</a>
                     </div>
                 </div>

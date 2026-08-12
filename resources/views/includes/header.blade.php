@@ -11,63 +11,70 @@
     $providerCategories = [ ['name' => '', 'locations' => ['', ...]] ]
     $latestNews         = [ ['title' => '', 'url' => '', 'date' => ''] ]
     $latestJobs         = [ ['title' => '', 'url' => '', 'location' => ''] ]
+
+    The "Explore" panel now follows the same 3-level hover-flyout pattern used
+    by the Terra header (offcanvas -> flyout -> flyout), instead of the old
+    click-to-expand accordion. The "Company" dropdown has been pulled out into
+    its own partial: partials/company-dropdown.blade.php, so it can be edited
+    on its own. The mobile hamburger toggle now sits at the end of the actions
+    row instead of inside the nav.
 --}}
 
 @php
-    $exploreCategories = $exploreCategories ?? [
-        [
-            'name' => 'Home Services',
-            'icon' => 'home',
-            'subcategories' => [
-                ['name' => 'Cleaning', 'locations' => ['Kigali', 'Musanze', 'Huye']],
-                ['name' => 'Plumbing', 'locations' => ['Kigali', 'Rubavu']],
-                ['name' => 'Electrical', 'locations' => ['Kigali', 'Muhanga']],
-            ],
-        ],
-        [
-            'name' => 'Events',
-            'icon' => 'calendar',
-            'subcategories' => [
-                ['name' => 'Photography', 'locations' => ['Kigali', 'Huye']],
-                ['name' => 'Catering', 'locations' => ['Kigali', 'Rubavu', 'Musanze']],
-            ],
-        ],
-        [
-            'name' => 'Professional',
-            'icon' => 'briefcase',
-            'subcategories' => [
-                ['name' => 'Accounting', 'locations' => ['Kigali']],
-                ['name' => 'Legal Consulting', 'locations' => ['Kigali', 'Huye']],
-            ],
-        ],
-        [
-            'name' => 'Beauty & Wellness',
-            'icon' => 'sparkle',
-            'subcategories' => [
-                ['name' => 'Hair & Makeup', 'locations' => ['Kigali', 'Musanze']],
-                ['name' => 'Massage Therapy', 'locations' => ['Kigali']],
-            ],
-        ],
-    ];
+$exploreCategories = $exploreCategories ?? [
+[
+'name' => 'Home Services',
+'icon' => 'home',
+'subcategories' => [
+['name' => 'Cleaning', 'locations' => ['Kigali', 'Musanze', 'Huye']],
+['name' => 'Plumbing', 'locations' => ['Kigali', 'Rubavu']],
+['name' => 'Electrical', 'locations' => ['Kigali', 'Muhanga']],
+],
+],
+[
+'name' => 'Events',
+'icon' => 'calendar',
+'subcategories' => [
+['name' => 'Photography', 'locations' => ['Kigali', 'Huye']],
+['name' => 'Catering', 'locations' => ['Kigali', 'Rubavu', 'Musanze']],
+],
+],
+[
+'name' => 'Professional',
+'icon' => 'briefcase',
+'subcategories' => [
+['name' => 'Accounting', 'locations' => ['Kigali']],
+['name' => 'Legal Consulting', 'locations' => ['Kigali', 'Huye']],
+],
+],
+[
+'name' => 'Beauty & Wellness',
+'icon' => 'sparkle',
+'subcategories' => [
+['name' => 'Hair & Makeup', 'locations' => ['Kigali', 'Musanze']],
+['name' => 'Massage Therapy', 'locations' => ['Kigali']],
+],
+],
+];
 
-    $providerCategories = $providerCategories ?? [
-        ['name' => 'Home Services Providers', 'locations' => ['Kigali', 'Musanze', 'Huye', 'Rubavu']],
-        ['name' => 'Event Providers', 'locations' => ['Kigali', 'Huye']],
-        ['name' => 'Professional Providers', 'locations' => ['Kigali', 'Muhanga']],
-        ['name' => 'Beauty & Wellness Providers', 'locations' => ['Kigali', 'Musanze']],
-    ];
+$providerCategories = $providerCategories ?? [
+['name' => 'Home Services Providers', 'locations' => ['Kigali', 'Musanze', 'Huye', 'Rubavu']],
+['name' => 'Event Providers', 'locations' => ['Kigali', 'Huye']],
+['name' => 'Professional Providers', 'locations' => ['Kigali', 'Muhanga']],
+['name' => 'Beauty & Wellness Providers', 'locations' => ['Kigali', 'Musanze']],
+];
 
-    $latestNews = $latestNews ?? [
-        ['title' => 'Connector launches verified provider badges', 'url' => '#', 'date' => 'Aug 2026'],
-        ['title' => 'How to price your services competitively', 'url' => '#', 'date' => 'Jul 2026'],
-        ['title' => 'New payment options now supported', 'url' => '#', 'date' => 'Jul 2026'],
-    ];
+$latestNews = $latestNews ?? [
+['title' => 'Connector launches verified provider badges', 'url' => '#', 'date' => 'Aug 2026'],
+['title' => 'How to price your services competitively', 'url' => '#', 'date' => 'Jul 2026'],
+['title' => 'New payment options now supported', 'url' => '#', 'date' => 'Jul 2026'],
+];
 
-    $latestJobs = $latestJobs ?? [
-        ['title' => 'Field Operations Coordinator', 'url' => '#', 'location' => 'Kigali'],
-        ['title' => 'Customer Support Associate', 'url' => '#', 'location' => 'Remote'],
-        ['title' => 'Partnerships Manager', 'url' => '#', 'location' => 'Kigali'],
-    ];
+$latestJobs = $latestJobs ?? [
+['title' => 'Field Operations Coordinator', 'url' => '#', 'location' => 'Kigali'],
+['title' => 'Customer Support Associate', 'url' => '#', 'location' => 'Remote'],
+['title' => 'Partnerships Manager', 'url' => '#', 'location' => 'Kigali'],
+];
 @endphp
 
 <header class="cn-header" id="cn-header">
@@ -78,8 +85,8 @@
             <img src="{{ asset('asset/images/logo/logo-connector-header.png') }}" alt="Connector" width="150">
         </a>
 
-        {{-- Explore --}}
-        <button type="button" class="cn-explore-btn" id="cnExploreBtn" aria-haspopup="true" aria-expanded="false" aria-controls="cnExploreCanvas">
+        {{-- Explore (Terra-style flyout offcanvas trigger) --}}
+        <button type="button" class="cn-explore-btn" id="cnfExploreBtn" aria-haspopup="true" aria-expanded="false" aria-controls="cnf-offcanvas" onclick="cnfOpenOffcanvas()">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" />
                 <rect x="14" y="3" width="7" height="7" rx="1.5" />
@@ -91,44 +98,168 @@
 
         {{-- Nav --}}
         <nav class="cn-nav" id="cnNav">
-            <button class="cn-toggler" id="cnToggler" aria-label="Toggle navigation">
-                <span></span><span></span><span></span>
-            </button>
             <ul class="cn-nav-list" id="cnNavList">
                 <li><a href="{{ route('home.service_provider') }}" class="cn-link">Providers</a></li>
                 <li><a href="{{ route('home.jobs') }}" class="cn-link">Jobs</a></li>
 
-                {{-- Company mega menu --}}
-                <li class="cn-mega-wrap">
-                    <button type="button" class="cn-link cn-mega-trigger" id="cnMegaTrigger" aria-haspopup="true" aria-expanded="false">
-                        Company
-                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </button>
+                {{-- Company dropdown lives in its own partial now --}}
+                <li>
+                    {{--
+    Company Dropdown (Connector)
+    -----------------------------
+    Extracted from the main header so it can be edited on its own without
+    touching header-connector.blade.php. Include it wherever the "Company"
+    nav item should appear, e.g.:
 
-                    <div class="cn-mega-panel" id="cnMegaPanel">
-                        <div class="cn-mega-cols">
-                            <div class="cn-mega-col">
-                                <h4>Company</h4>
-                                <a href="{{ route('about') }}">About Us</a>
-                                <a href="{{ route('faq') }}">How It Works</a>
-                                <a href="{{ route('home.jobs') }}">Careers</a>
-                                <a href="{{ route('home.blogs') }}">Blog</a>
-                            </div>
-                            <div class="cn-mega-col">
-                                <h4>Support</h4>
-                                <a href="{{ route('faq') }}">Help Center</a>
-                                <a href="{{ route('home.contact') }}">Contact Us</a>
-                                <a href="{{ route('policy') }}">Trust &amp; Safety</a>
-                            </div>
-                            <div class="cn-mega-col cn-mega-promo">
-                                <h4>Become a Provider</h4>
-                                <p>List your services and reach customers across Rwanda.</p>
-                                <a href="{{ route('register') }}" class="cn-btn-solid cn-btn-sm">Get Started</a>
+        <li>@include('partials.company-dropdown')</li>
+
+    Assumed route names — rename to match your actual route list where they differ:
+    about, faq, home.jobs, home.blogs, home.contact, policy, register
+--}}
+
+                    <div class="cnc-wrap" id="cncCompanyWrap">
+                        <button type="button" class="cn-link cnc-trigger" id="cncTrigger" aria-haspopup="true" aria-expanded="false">
+                            Company
+                            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        <div class="cnc-panel" id="cncPanel">
+                            <div class="cnc-cols">
+                                <div class="cnc-col">
+                                    <h4>Company</h4>
+                                    <a href="{{ route('about') }}">About Us</a>
+                                    <a href="{{ route('faq') }}">How It Works</a>
+                                    <a href="{{ route('home.jobs') }}">Careers</a>
+                                    <a href="{{ route('home.blogs') }}">Blog</a>
+                                </div>
+                                <div class="cnc-col">
+                                    <h4>Support</h4>
+                                    <a href="{{ route('faq') }}">Help Center</a>
+                                    <a href="{{ route('home.contact') }}">Contact Us</a>
+                                    <a href="{{ route('policy') }}">Trust &amp; Safety</a>
+                                </div>
+                                <div class="cnc-col cnc-promo">
+                                    <h4>Become a Provider</h4>
+                                    <p>List your services and reach customers across Rwanda.</p>
+                                    <a href="{{ route('register') }}" class="cn-btn-solid cn-btn-sm">Get Started</a>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <style>
+                        .cnc-wrap {
+                            position: relative;
+                        }
+
+                        .cnc-trigger {
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+                        }
+
+                        .cnc-panel {
+                            display: none;
+                            position: absolute;
+                            top: calc(100% + 12px);
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: #fff;
+                            border: 1px solid var(--cn-border, rgba(37, 64, 53, .14));
+                            border-radius: 16px;
+                            box-shadow: 0 16px 48px rgba(37, 64, 53, .16);
+                            padding: 24px;
+                            width: 520px;
+                            z-index: 1100;
+                        }
+
+                        .cnc-panel.open {
+                            display: block;
+                        }
+
+                        .cnc-cols {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr 1.1fr;
+                            gap: 24px;
+                        }
+
+                        .cnc-col h4 {
+                            font-size: 12px;
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            letter-spacing: .04em;
+                            color: var(--cn-green, #6B9080);
+                            margin-bottom: 12px;
+                        }
+
+                        .cnc-col a {
+                            display: block;
+                            font-size: 14px;
+                            color: var(--cn-dark, #254035);
+                            text-decoration: none;
+                            padding: 7px 0;
+                            transition: color .15s;
+                        }
+
+                        .cnc-col a:hover {
+                            color: var(--cn-green, #6B9080);
+                        }
+
+                        .cnc-promo {
+                            background: var(--cn-light, rgba(107, 144, 128, .1));
+                            border-radius: 12px;
+                            padding: 16px;
+                            margin: -4px;
+                        }
+
+                        .cnc-promo p {
+                            font-size: 13px;
+                            color: #4a5f56;
+                            margin: 0 0 14px;
+                            line-height: 1.5;
+                        }
+
+                        @media (max-width: 992px) {
+                            .cnc-panel {
+                                position: static;
+                                transform: none;
+                                width: auto;
+                                box-shadow: none;
+                                border: none;
+                                padding: 8px 0 0;
+                            }
+
+                            .cnc-cols {
+                                grid-template-columns: 1fr;
+                                gap: 14px;
+                            }
+
+                            .cnc-promo {
+                                margin: 0;
+                            }
+                        }
+                    </style>
+
+                    <script>
+                        (function() {
+                            const trigger = document.getElementById('cncTrigger');
+                            const panel = document.getElementById('cncPanel');
+                            if (!trigger || !panel) return;
+
+                            trigger.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                const isOpen = panel.classList.toggle('open');
+                                trigger.setAttribute('aria-expanded', isOpen);
+                            });
+
+                            document.addEventListener('click', () => {
+                                panel.classList.remove('open');
+                                trigger.setAttribute('aria-expanded', 'false');
+                            });
+                        })();
+                    </script>
                 </li>
             </ul>
         </nav>
@@ -218,121 +349,186 @@
             </div>
             @endauth
             @endif
+
+            {{-- Mobile toggler — moved to the end of the actions row --}}
+            <button class="cn-toggler" id="cnToggler" aria-label="Toggle navigation">
+                <span></span><span></span><span></span>
+            </button>
         </div>
 
     </div>
 </header>
 
-{{-- ============ Explore Off-canvas ============ --}}
-<div class="cn-canvas-backdrop" id="cnCanvasBackdrop"></div>
-<aside class="cn-canvas" id="cnExploreCanvas" aria-hidden="true">
-    <div class="cn-canvas-head">
-        <h3>Explore Connector</h3>
-        <button type="button" class="cn-canvas-close" id="cnCanvasClose" aria-label="Close">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
+{{-- ============ Explore Off-canvas — Terra-style hover flyout ============ --}}
+<div class="cnf-overlay" id="cnf-overlay" onclick="cnfCloseOffcanvas()"></div>
+<aside class="cnf-offcanvas" id="cnf-offcanvas" aria-label="Explore Connector">
+    <div class="cnf-offcanvas-head">
+        <h3 class="cnf-offcanvas-title">Explore Connector</h3>
+        <button class="cnf-offcanvas-close" type="button" onclick="cnfCloseOffcanvas()" aria-label="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12" />
             </svg>
         </button>
     </div>
 
-    <div class="cn-canvas-body">
+    <div class="cnf-offcanvas-body">
+        <div class="cnf-cat-list">
 
-        {{-- 1. Service categories --}}
-        <section class="cn-canvas-section">
-            <button type="button" class="cn-section-toggle is-open" data-target="cnSecCategories">
-                <span class="cn-section-num">1</span>
-                <span>Service Categories</span>
-                <svg class="cn-chev" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            <div class="cn-section-body" id="cnSecCategories">
-                @foreach($exploreCategories as $cat)
-                <div class="cn-acc-item">
-                    <button type="button" class="cn-acc-toggle" data-target="cnCat{{ $loop->index }}">
-                        <span>{{ $cat['name'] }}</span>
-                        <svg class="cn-chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-                    </button>
-                    <div class="cn-acc-body" id="cnCat{{ $loop->index }}">
-                        @foreach($cat['subcategories'] as $sub)
-                        <div class="cn-acc-item cn-acc-item-nested">
-                            <button type="button" class="cn-acc-toggle cn-acc-toggle-sm" data-target="cnSub{{ $loop->parent->index }}_{{ $loop->index }}">
-                                <span>{{ $sub['name'] }}</span>
-                                <svg class="cn-chev" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-                            </button>
-                            <div class="cn-acc-body" id="cnSub{{ $loop->parent->index }}_{{ $loop->index }}">
-                                <div class="cn-loc-tags">
-                                    @foreach($sub['locations'] as $loc)
-                                    <a href="{{ route('home.services', ['category' => $cat['name'], 'sub' => $sub['name'], 'location' => $loc]) }}" class="cn-loc-tag">{{ $loc }}</a>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-                @endforeach
+            {{-- Service category top-level items --}}
+            @forelse($exploreCategories as $ci => $cat)
+            <div class="cnf-cat-row">
+                <button type="button" class="cnf-cat-item"
+                    data-opens-flyout="cnf-subflyout-cat-{{ $ci }}"
+                    onclick="cnfToggleCat(event, 'cat-{{ $ci }}')"
+                    onmouseenter="cnfHoverOpen('cnf-subflyout-cat-{{ $ci }}', this, 'cat')"
+                    onmouseleave="cnfHoverClose('cnf-subflyout-cat-{{ $ci }}')">
+                    {{ $cat['name'] }}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
             </div>
-        </section>
+            @empty
+            <div class="cnf-flyout-empty">No service categories yet</div>
+            @endforelse
 
-        {{-- 2. Providers --}}
-        <section class="cn-canvas-section">
-            <button type="button" class="cn-section-toggle" data-target="cnSecProviders">
-                <span class="cn-section-num">2</span>
-                <span>Providers</span>
-                <svg class="cn-chev" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            <div class="cn-section-body" id="cnSecProviders">
-                @foreach($providerCategories as $pcat)
-                <div class="cn-acc-item">
-                    <button type="button" class="cn-acc-toggle" data-target="cnProv{{ $loop->index }}">
-                        <span>{{ $pcat['name'] }}</span>
-                        <svg class="cn-chev" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-                    </button>
-                    <div class="cn-acc-body" id="cnProv{{ $loop->index }}">
-                        <div class="cn-loc-tags">
-                            @foreach($pcat['locations'] as $loc)
-                            <a href="{{ route('home.service_provider', ['category' => $pcat['name'], 'location' => $loc]) }}" class="cn-loc-tag">{{ $loc }}</a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-                @endforeach
+            {{-- Providers --}}
+            <div class="cnf-cat-row">
+                <button type="button" class="cnf-cat-item"
+                    data-opens-flyout="cnf-subflyout-providers"
+                    onclick="cnfToggleCat(event, 'providers')"
+                    onmouseenter="cnfHoverOpen('cnf-subflyout-providers', this, 'cat')"
+                    onmouseleave="cnfHoverClose('cnf-subflyout-providers')">
+                    Providers
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
             </div>
-        </section>
 
-        {{-- 3. Latest updates --}}
-        <section class="cn-canvas-section">
-            <button type="button" class="cn-section-toggle" data-target="cnSecUpdates">
-                <span class="cn-section-num">3</span>
-                <span>Latest Updates</span>
-                <svg class="cn-chev" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            <div class="cn-section-body" id="cnSecUpdates">
-                <div class="cn-updates-cols">
-                    <div class="cn-updates-col">
-                        <h5>News</h5>
-                        <ul class="cn-updates-list">
-                            @foreach($latestNews as $item)
-                            <li><a href="{{ $item['url'] }}">{{ $item['title'] }}<span>{{ $item['date'] }}</span></a></li>
-                            @endforeach
-                        </ul>
-                        <a href="{{ route('home.blogs') }}" class="cn-updates-more">View all news →</a>
-                    </div>
-                    <div class="cn-updates-col">
-                        <h5>Jobs</h5>
-                        <ul class="cn-updates-list">
-                            @foreach($latestJobs as $item)
-                            <li><a href="{{ $item['url'] }}">{{ $item['title'] }}<span>{{ $item['location'] }}</span></a></li>
-                            @endforeach
-                        </ul>
-                        <a href="{{ route('home.jobs') }}" class="cn-updates-more">View all jobs →</a>
-                    </div>
-                </div>
+            {{-- Latest Updates & News --}}
+            <div class="cnf-cat-row">
+                <button type="button" class="cnf-cat-item"
+                    data-opens-flyout="cnf-subflyout-updates"
+                    onclick="cnfToggleCat(event, 'updates')"
+                    onmouseenter="cnfHoverOpen('cnf-subflyout-updates', this, 'cat')"
+                    onmouseleave="cnfHoverClose('cnf-subflyout-updates')">
+                    Latest Updates & News
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18l6-6-6-6" />
+                    </svg>
+                </button>
             </div>
-        </section>
 
+        </div>
     </div>
 </aside>
+
+{{-- LEVEL 2 flyouts — each explore category's subcategories --}}
+@foreach($exploreCategories as $ci => $cat)
+<div class="cnf-flyout cnf-sub-flyout" id="cnf-subflyout-cat-{{ $ci }}"
+    onmouseenter="cnfCancelClose('cnf-subflyout-cat-{{ $ci }}')"
+    onmouseleave="cnfHoverClose('cnf-subflyout-cat-{{ $ci }}')">
+    @forelse($cat['subcategories'] as $si => $sub)
+    <button type="button" class="cnf-flyout-item"
+        data-opens-flyout="cnf-flyout-cat-{{ $ci }}-{{ $si }}"
+        onclick="cnfToggleSub(event, 'cat-{{ $ci }}-{{ $si }}')"
+        onmouseenter="cnfHoverOpen('cnf-flyout-cat-{{ $ci }}-{{ $si }}', this, 'sub')"
+        onmouseleave="cnfHoverClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')">
+        {{ $sub['name'] }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6" />
+        </svg>
+    </button>
+    @empty
+    <div class="cnf-flyout-empty">No sub-categories yet</div>
+    @endforelse
+</div>
+@endforeach
+
+{{-- LEVEL 3 flyouts — each subcategory's locations --}}
+@foreach($exploreCategories as $ci => $cat)
+@foreach($cat['subcategories'] as $si => $sub)
+<div class="cnf-flyout cnf-service-flyout" id="cnf-flyout-cat-{{ $ci }}-{{ $si }}"
+    data-parent-flyout="cnf-subflyout-cat-{{ $ci }}"
+    onmouseenter="cnfCancelClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')"
+    onmouseleave="cnfHoverClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')">
+    @forelse($sub['locations'] as $loc)
+    <a href="{{ route('home.services', ['category' => $cat['name'], 'sub' => $sub['name'], 'location' => $loc]) }}" class="cnf-flyout-item">
+        {{ $loc }}
+    </a>
+    @empty
+    <div class="cnf-flyout-empty">No locations yet</div>
+    @endforelse
+</div>
+@endforeach
+@endforeach
+
+{{-- LEVEL 2 flyout — Providers → provider categories --}}
+<div class="cnf-flyout cnf-sub-flyout" id="cnf-subflyout-providers"
+    onmouseenter="cnfCancelClose('cnf-subflyout-providers')"
+    onmouseleave="cnfHoverClose('cnf-subflyout-providers')">
+    @forelse($providerCategories as $pi => $pcat)
+    <button type="button" class="cnf-flyout-item"
+        data-opens-flyout="cnf-flyout-provider-{{ $pi }}"
+        onclick="cnfToggleSub(event, 'provider-{{ $pi }}')"
+        onmouseenter="cnfHoverOpen('cnf-flyout-provider-{{ $pi }}', this, 'sub')"
+        onmouseleave="cnfHoverClose('cnf-flyout-provider-{{ $pi }}')">
+        {{ $pcat['name'] }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18l6-6-6-6" />
+        </svg>
+    </button>
+    @empty
+    <div class="cnf-flyout-empty">No provider categories yet</div>
+    @endforelse
+</div>
+
+{{-- LEVEL 3 flyouts — each provider category's locations --}}
+@foreach($providerCategories as $pi => $pcat)
+<div class="cnf-flyout cnf-service-flyout" id="cnf-flyout-provider-{{ $pi }}"
+    data-parent-flyout="cnf-subflyout-providers"
+    onmouseenter="cnfCancelClose('cnf-flyout-provider-{{ $pi }}')"
+    onmouseleave="cnfHoverClose('cnf-flyout-provider-{{ $pi }}')">
+    @forelse($pcat['locations'] as $loc)
+    <a href="{{ route('home.service_provider', ['category' => $pcat['name'], 'location' => $loc]) }}" class="cnf-flyout-item">
+        {{ $loc }}
+    </a>
+    @empty
+    <div class="cnf-flyout-empty">No locations yet</div>
+    @endforelse
+</div>
+@endforeach
+
+{{-- Latest Updates & News flyout — direct links, no third level --}}
+<div class="cnf-flyout cnf-sub-flyout cnf-updates-flyout" id="cnf-subflyout-updates"
+    onmouseenter="cnfCancelClose('cnf-subflyout-updates')"
+    onmouseleave="cnfHoverClose('cnf-subflyout-updates')">
+
+    <div class="cnf-flyout-label">News</div>
+    @forelse($latestNews as $item)
+    <a href="{{ $item['url'] }}" class="cnf-flyout-item cnf-flyout-item-meta">
+        <span>{{ $item['title'] }}</span>
+        <em>{{ $item['date'] }}</em>
+    </a>
+    @empty
+    <div class="cnf-flyout-empty">No news yet</div>
+    @endforelse
+    <a href="{{ route('home.blogs') }}" class="cnf-flyout-item cnf-flyout-viewall">View all news →</a>
+
+    <div class="cnf-flyout-divider"></div>
+
+    <div class="cnf-flyout-label">Jobs</div>
+    @forelse($latestJobs as $item)
+    <a href="{{ $item['url'] }}" class="cnf-flyout-item cnf-flyout-item-meta">
+        <span>{{ $item['title'] }}</span>
+        <em>{{ $item['location'] }}</em>
+    </a>
+    @empty
+    <div class="cnf-flyout-empty">No jobs yet</div>
+    @endforelse
+    <a href="{{ route('home.jobs') }}" class="cnf-flyout-item cnf-flyout-viewall">View all jobs →</a>
+</div>
 
 {{-- ============ Login Modal ============ --}}
 <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
@@ -389,6 +585,7 @@
         --cn-white: #fff;
         --cn-border: rgba(37, 64, 53, .14);
         --cn-light: rgba(107, 144, 128, .1);
+        --cnf-t: .2s cubic-bezier(.4, 0, .2, 1);
     }
 
     /* ---- Header ---- */
@@ -490,77 +687,6 @@
 
     .cn-toggler {
         display: none;
-    }
-
-    /* ---- Mega menu ---- */
-    .cn-mega-wrap {
-        position: relative;
-    }
-
-    .cn-mega-panel {
-        display: none;
-        position: absolute;
-        top: calc(100% + 12px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: #fff;
-        border: 1px solid var(--cn-border);
-        border-radius: 16px;
-        box-shadow: 0 16px 48px rgba(37, 64, 53, .16);
-        padding: 24px;
-        width: 520px;
-        z-index: 1100;
-    }
-
-    .cn-mega-panel.open {
-        display: block;
-    }
-
-    .cn-mega-cols {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1.1fr;
-        gap: 24px;
-    }
-
-    .cn-mega-col h4 {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: var(--cn-green);
-        margin-bottom: 12px;
-    }
-
-    .cn-mega-col a {
-        display: block;
-        font-size: 14px;
-        color: var(--cn-dark);
-        text-decoration: none;
-        padding: 7px 0;
-        transition: color .15s;
-    }
-
-    .cn-mega-col a:hover {
-        color: var(--cn-green);
-    }
-
-    .cn-mega-promo {
-        background: var(--cn-light);
-        border-radius: 12px;
-        padding: 16px;
-        margin: -4px;
-    }
-
-    .cn-mega-promo p {
-        font-size: 13px;
-        color: #4a5f56;
-        margin: 0 0 14px;
-        line-height: 1.5;
-    }
-
-    .cn-btn-sm {
-        padding: 8px 16px;
-        font-size: 12px;
     }
 
     /* ---- Search bar ---- */
@@ -709,6 +835,11 @@
         color: #fff;
     }
 
+    .cn-btn-sm {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+
     .cn-btn-block {
         width: 100%;
         text-align: center;
@@ -805,266 +936,6 @@
 
     .cn-dropdown li:last-child a:hover {
         background: #fdf0ee;
-    }
-
-    /* ---- Off-canvas Explore ---- */
-    .cn-canvas-backdrop {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(37, 64, 53, .45);
-        z-index: 1200;
-    }
-
-    .cn-canvas-backdrop.open {
-        display: block;
-    }
-
-    .cn-canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 420px;
-        max-width: 92vw;
-        background: #fff;
-        z-index: 1201;
-        display: flex;
-        flex-direction: column;
-        transform: translateX(-100%);
-        transition: transform .35s ease;
-        box-shadow: 8px 0 32px rgba(37, 64, 53, .18);
-    }
-
-    .cn-canvas.open {
-        transform: translateX(0);
-    }
-
-    .cn-canvas-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 22px;
-        border-bottom: 1px solid var(--cn-border);
-        flex-shrink: 0;
-        background: var(--cn-dark);
-    }
-
-    .cn-canvas-head h3 {
-        font-size: 17px;
-        font-weight: 700;
-        color: #fff;
-        margin: 0;
-    }
-
-    .cn-canvas-close {
-        background: rgba(255, 255, 255, .12);
-        border: none;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        cursor: pointer;
-        transition: background .2s;
-    }
-
-    .cn-canvas-close:hover {
-        background: rgba(255, 255, 255, .22);
-    }
-
-    .cn-canvas-body {
-        flex: 1;
-        overflow-y: auto;
-        padding: 8px 0 24px;
-    }
-
-    .cn-canvas-section {
-        border-bottom: 1px solid var(--cn-border);
-    }
-
-    .cn-section-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        background: none;
-        border: none;
-        padding: 18px 22px;
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--cn-dark);
-        cursor: pointer;
-        text-align: left;
-        font-family: inherit;
-    }
-
-    .cn-section-num {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        background: var(--cn-green);
-        color: #fff;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .cn-section-toggle span:nth-of-type(1) {
-        flex: 1;
-    }
-
-    .cn-chev {
-        flex-shrink: 0;
-        transition: transform .25s;
-        color: var(--cn-green);
-    }
-
-    .cn-section-toggle.is-open .cn-chev {
-        transform: rotate(180deg);
-    }
-
-    .cn-section-body {
-        display: none;
-        padding: 0 22px 18px 22px;
-    }
-
-    .cn-section-body.is-open {
-        display: block;
-    }
-
-    .cn-acc-item {
-        border-top: 1px solid var(--cn-border);
-    }
-
-    .cn-acc-item:first-child {
-        border-top: none;
-    }
-
-    .cn-acc-toggle {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: none;
-        border: none;
-        padding: 12px 4px;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--cn-dark);
-        cursor: pointer;
-        text-align: left;
-        font-family: inherit;
-    }
-
-    .cn-acc-toggle span {
-        flex: 1;
-    }
-
-    .cn-acc-toggle-sm {
-        font-size: 13px;
-        font-weight: 500;
-        padding-left: 14px;
-        color: #45594e;
-    }
-
-    .cn-acc-toggle.is-open .cn-chev {
-        transform: rotate(180deg);
-    }
-
-    .cn-acc-body {
-        display: none;
-        padding: 0 4px 14px 14px;
-    }
-
-    .cn-acc-body.is-open {
-        display: block;
-    }
-
-    .cn-acc-item-nested {
-        padding-left: 8px;
-    }
-
-    .cn-loc-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .cn-loc-tag {
-        font-size: 12.5px;
-        font-weight: 500;
-        padding: 6px 13px;
-        border-radius: 18px;
-        background: var(--cn-light);
-        color: var(--cn-dark);
-        text-decoration: none;
-        transition: background .15s, color .15s;
-    }
-
-    .cn-loc-tag:hover {
-        background: var(--cn-green);
-        color: #fff;
-    }
-
-    .cn-updates-cols {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
-
-    .cn-updates-col h5 {
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        color: var(--cn-green);
-        margin: 4px 0 10px;
-    }
-
-    .cn-updates-list {
-        list-style: none;
-        margin: 0 0 8px;
-        padding: 0;
-    }
-
-    .cn-updates-list li a {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 8px 0;
-        font-size: 13.5px;
-        color: var(--cn-dark);
-        text-decoration: none;
-        border-bottom: 1px dashed var(--cn-border);
-    }
-
-    .cn-updates-list li:last-child a {
-        border-bottom: none;
-    }
-
-    .cn-updates-list li a span {
-        flex-shrink: 0;
-        font-size: 11.5px;
-        color: #8ba39a;
-        font-weight: 500;
-    }
-
-    .cn-updates-list li a:hover {
-        color: var(--cn-green);
-    }
-
-    .cn-updates-more {
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--cn-green);
-        text-decoration: none;
     }
 
     /* ---- Login modal ---- */
@@ -1181,6 +1052,250 @@
         font-weight: 500;
     }
 
+    /* ================================================
+       EXPLORE — Terra-style hover-flyout off-canvas
+       (prefixed cnf- to avoid clashing with cn- header)
+       ================================================ */
+    .cnf-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1199;
+        background: rgba(37, 64, 53, .5);
+        backdrop-filter: blur(3px);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--cnf-t), visibility var(--cnf-t);
+    }
+
+    .cnf-overlay.open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .cnf-offcanvas {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: -100%;
+        z-index: 1200;
+        width: min(340px, 92vw);
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 20px 0 60px rgba(0, 0, 0, .25);
+        transition: left .32s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .cnf-offcanvas.open {
+        left: 0;
+    }
+
+    .cnf-offcanvas-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 22px;
+        background: var(--cn-dark);
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .cnf-offcanvas-title {
+        flex: 1;
+        min-width: 0;
+        font-size: 17px;
+        font-weight: 700;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cnf-offcanvas-close {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .12);
+        border: none;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        color: #fff;
+        transition: background var(--cnf-t);
+    }
+
+    .cnf-offcanvas-close:hover {
+        background: var(--cn-green);
+    }
+
+    .cnf-offcanvas-close svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .cnf-offcanvas-body {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .cnf-cat-list {
+        padding: 8px;
+    }
+
+    .cnf-cat-row {
+        position: relative;
+    }
+
+    .cnf-cat-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 13px 14px;
+        border: none;
+        background: none;
+        border-radius: 10px;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: var(--cn-dark);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background var(--cnf-t), color var(--cnf-t);
+    }
+
+    .cnf-cat-item:hover,
+    .cnf-cat-item.active {
+        background: var(--cn-light);
+        color: var(--cn-green);
+    }
+
+    .cnf-cat-item svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        color: rgba(37, 64, 53, .35);
+        transition: color var(--cnf-t);
+    }
+
+    .cnf-cat-item:hover svg,
+    .cnf-cat-item.active svg {
+        color: var(--cn-green);
+    }
+
+    .cnf-flyout {
+        position: fixed;
+        z-index: 1250;
+        min-width: 230px;
+        max-width: 300px;
+        max-height: 70vh;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid var(--cn-border);
+        box-shadow: 0 20px 50px rgba(37, 64, 53, .2);
+        padding: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-6px);
+        transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+    }
+
+    .cnf-flyout.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateX(0);
+    }
+
+    .cnf-flyout:not(.open) {
+        pointer-events: none;
+    }
+
+    .cnf-flyout-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 10px 11px;
+        border: none;
+        background: none;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--cn-dark);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background var(--cnf-t), color var(--cnf-t);
+    }
+
+    .cnf-flyout-item:hover,
+    .cnf-flyout-item.active {
+        background: var(--cn-light);
+        color: var(--cn-green);
+    }
+
+    .cnf-flyout-item svg {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+        color: rgba(37, 64, 53, .35);
+        transition: color var(--cnf-t);
+    }
+
+    .cnf-flyout-item:hover svg {
+        color: var(--cn-green);
+    }
+
+    .cnf-flyout-item-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+
+    .cnf-flyout-item-meta em {
+        font-style: normal;
+        font-size: 11px;
+        font-weight: 500;
+        color: #8ba39a;
+    }
+
+    .cnf-flyout-viewall {
+        font-weight: 700;
+        color: var(--cn-green);
+        justify-content: flex-start;
+    }
+
+    .cnf-flyout-label {
+        padding: 8px 11px 4px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #8ba39a;
+    }
+
+    .cnf-flyout-divider {
+        height: 1px;
+        background: var(--cn-border);
+        margin: 8px 4px;
+    }
+
+    .cnf-flyout-empty {
+        padding: 12px 11px;
+        font-size: 12.5px;
+        color: rgba(37, 64, 53, .4);
+    }
+
+    .cnf-updates-flyout {
+        min-width: 260px;
+        max-width: 320px;
+    }
+
     /* ---- Mobile ---- */
     @media (max-width: 1100px) {
         .cn-search-bar {
@@ -1254,25 +1369,7 @@
             color: #254035 !important;
         }
 
-        .cn-mega-panel {
-            position: static;
-            transform: none;
-            width: auto;
-            box-shadow: none;
-            border: none;
-            padding: 8px 0 0;
-        }
-
-        .cn-mega-cols {
-            grid-template-columns: 1fr;
-            gap: 14px;
-        }
-
-        .cn-mega-promo {
-            margin: 0;
-        }
-
-        .cn-canvas {
+        .cnf-offcanvas {
             width: 100%;
             max-width: 100%;
         }
@@ -1287,18 +1384,14 @@
         const drop = document.getElementById('userDropdown');
         const toggler = document.getElementById('cnToggler');
         const navList = document.getElementById('cnNavList');
-        const megaTrigger = document.getElementById('cnMegaTrigger');
-        const megaPanel = document.getElementById('cnMegaPanel');
-        const exploreBtn = document.getElementById('cnExploreBtn');
-        const canvas = document.getElementById('cnExploreCanvas');
-        const canvasBackdrop = document.getElementById('cnCanvasBackdrop');
-        const canvasClose = document.getElementById('cnCanvasClose');
 
         // Sticky scroll
         const onScroll = () => {
             hdr.classList.toggle('scrolled', window.scrollY > 40);
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('scroll', onScroll, {
+            passive: true
+        });
         onScroll();
 
         // User dropdown
@@ -1309,70 +1402,194 @@
             });
         }
 
-        // Company mega menu
-        if (megaTrigger && megaPanel) {
-            megaTrigger.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isOpen = megaPanel.classList.toggle('open');
-                megaTrigger.setAttribute('aria-expanded', isOpen);
-            });
-        }
-
         document.addEventListener('click', () => {
             if (drop) drop.classList.remove('open');
-            if (megaPanel) {
-                megaPanel.classList.remove('open');
-                megaTrigger.setAttribute('aria-expanded', 'false');
-            }
         });
 
-        // Mobile nav toggle
+        // Mobile nav toggle (button now lives at the end of .cn-actions)
         if (toggler && navList) {
             toggler.addEventListener('click', () => navList.classList.toggle('open'));
         }
+    })();
 
-        // Explore off-canvas
-        function openCanvas() {
-            canvas.classList.add('open');
-            canvasBackdrop.classList.add('open');
-            canvas.setAttribute('aria-hidden', 'false');
-            exploreBtn.setAttribute('aria-expanded', 'true');
+    /* ════════════════════════════════════════════
+       EXPLORE OFFCANVAS — Terra-style 3-level flyout
+       ════════════════════════════════════════════ */
+    (function() {
+        const overlay = document.getElementById('cnf-overlay');
+        const panel = document.getElementById('cnf-offcanvas');
+        if (!overlay || !panel) return;
+
+        const CLOSE_DELAY = 280;
+        const closeTimers = {};
+
+        function getParentFlyoutId(flyoutId) {
+            const el = document.getElementById(flyoutId);
+            return el ? (el.dataset.parentFlyout || null) : null;
+        }
+
+        function cancelCloseChain(flyoutId) {
+            if (closeTimers[flyoutId]) {
+                clearTimeout(closeTimers[flyoutId]);
+                delete closeTimers[flyoutId];
+            }
+            const parentId = getParentFlyoutId(flyoutId);
+            if (parentId) cancelCloseChain(parentId);
+        }
+
+        function closeNow(flyoutId) {
+            if (closeTimers[flyoutId]) {
+                clearTimeout(closeTimers[flyoutId]);
+                delete closeTimers[flyoutId];
+            }
+            const el = document.getElementById(flyoutId);
+            if (el) el.classList.remove('open');
+
+            document.querySelectorAll('[data-opens-flyout="' + flyoutId + '"]').forEach(t => {
+                t.classList.remove('active');
+            });
+
+            document.querySelectorAll('[data-parent-flyout="' + flyoutId + '"]').forEach(child => {
+                if (child.id) closeNow(child.id);
+            });
+        }
+
+        function scheduleClose(flyoutId) {
+            if (closeTimers[flyoutId]) clearTimeout(closeTimers[flyoutId]);
+            closeTimers[flyoutId] = setTimeout(() => {
+                closeNow(flyoutId);
+                delete closeTimers[flyoutId];
+            }, CLOSE_DELAY);
+        }
+
+        function closeSiblings(flyoutId, type) {
+            if (type === 'cat') {
+                document.querySelectorAll('.cnf-sub-flyout.open').forEach(f => {
+                    if (f.id !== flyoutId) closeNow(f.id);
+                });
+            } else if (type === 'sub') {
+                const parentId = getParentFlyoutId(flyoutId);
+                if (parentId) {
+                    document.querySelectorAll('[data-parent-flyout="' + parentId + '"].open').forEach(f => {
+                        if (f.id !== flyoutId) closeNow(f.id);
+                    });
+                }
+            }
+        }
+
+        function positionFlyout(flyout, triggerEl, type) {
+            const rect = triggerEl.getBoundingClientRect();
+
+            if (type === 'cat') {
+                const offRect = panel.getBoundingClientRect();
+                flyout.style.top = rect.top + 'px';
+                flyout.style.left = (offRect.right + 4) + 'px';
+                flyout.style.right = '';
+            } else if (type === 'sub') {
+                const parentFlyout = triggerEl.closest('.cnf-flyout');
+                const parentRect = parentFlyout ? parentFlyout.getBoundingClientRect() : rect;
+                flyout.style.top = rect.top + 'px';
+                flyout.style.left = (parentRect.right + 4) + 'px';
+                flyout.style.right = '';
+            }
+
+            requestAnimationFrame(() => {
+                const fRect = flyout.getBoundingClientRect();
+                if (fRect.right > window.innerWidth - 10) {
+                    flyout.style.left = '';
+                    flyout.style.right = '10px';
+                }
+                if (fRect.bottom > window.innerHeight - 10) {
+                    flyout.style.top = Math.max(10, window.innerHeight - fRect.height - 10) + 'px';
+                }
+            });
+        }
+
+        window.cnfHoverOpen = function(flyoutId, triggerEl, type) {
+            cancelCloseChain(flyoutId);
+
+            const parentFlyout = triggerEl.closest('.cnf-flyout');
+            if (parentFlyout && parentFlyout.id) {
+                cancelCloseChain(parentFlyout.id);
+            }
+
+            const flyout = document.getElementById(flyoutId);
+            if (!flyout) return;
+
+            closeSiblings(flyoutId, type);
+
+            positionFlyout(flyout, triggerEl, type);
+            flyout.classList.add('open');
+            triggerEl.classList.add('active');
+        };
+
+        window.cnfHoverClose = function(flyoutId) {
+            scheduleClose(flyoutId);
+        };
+
+        window.cnfCancelClose = function(flyoutId) {
+            cancelCloseChain(flyoutId);
+        };
+
+        window.cnfOpenOffcanvas = function() {
+            overlay.classList.add('open');
+            panel.classList.add('open');
             document.body.style.overflow = 'hidden';
-        }
+        };
 
-        function closeCanvas() {
-            canvas.classList.remove('open');
-            canvasBackdrop.classList.remove('open');
-            canvas.setAttribute('aria-hidden', 'true');
-            exploreBtn.setAttribute('aria-expanded', 'false');
+        window.cnfCloseOffcanvas = function() {
+            overlay.classList.remove('open');
+            panel.classList.remove('open');
+            document.querySelectorAll('.cnf-flyout.open').forEach(f => f.classList.remove('open'));
+            document.querySelectorAll('.cnf-cat-item.active, .cnf-flyout-item.active').forEach(el => el.classList.remove('active'));
+            Object.keys(closeTimers).forEach(id => {
+                clearTimeout(closeTimers[id]);
+                delete closeTimers[id];
+            });
             document.body.style.overflow = '';
-        }
+        };
 
-        if (exploreBtn) exploreBtn.addEventListener('click', openCanvas);
-        if (canvasClose) canvasClose.addEventListener('click', closeCanvas);
-        if (canvasBackdrop) canvasBackdrop.addEventListener('click', closeCanvas);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeCanvas();
-        });
+        window.cnfToggleCat = function(e, catId) {
+            const flyoutId = 'cnf-subflyout-' + catId;
+            const flyout = document.getElementById(flyoutId);
+            if (!flyout) return;
+            if (flyout.classList.contains('open')) {
+                closeNow(flyoutId);
+            } else {
+                document.querySelectorAll('.cnf-sub-flyout.open').forEach(f => {
+                    if (f.id !== flyoutId) closeNow(f.id);
+                });
+                positionFlyout(flyout, e.currentTarget, 'cat');
+                flyout.classList.add('open');
+                e.currentTarget.classList.add('active');
+            }
+        };
 
-        // Top-level section accordions (1 / 2 / 3)
-        document.querySelectorAll('.cn-section-toggle').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const body = document.getElementById(btn.dataset.target);
-                const willOpen = !btn.classList.contains('is-open');
-                btn.classList.toggle('is-open', willOpen);
-                if (body) body.classList.toggle('is-open', willOpen);
-            });
-        });
+        window.cnfToggleSub = function(e, subId) {
+            const flyoutId = 'cnf-flyout-' + subId;
+            const flyout = document.getElementById(flyoutId);
+            if (!flyout) return;
+            if (flyout.classList.contains('open')) {
+                closeNow(flyoutId);
+            } else {
+                const parentFlyout = e.currentTarget.closest('.cnf-flyout');
+                if (parentFlyout) {
+                    document.querySelectorAll('[data-parent-flyout="' + parentFlyout.id + '"].open').forEach(f => {
+                        if (f.id !== flyoutId) closeNow(f.id);
+                    });
+                }
+                positionFlyout(flyout, e.currentTarget, 'sub');
+                flyout.classList.add('open');
+                e.currentTarget.classList.add('active');
+            }
+        };
 
-        // Nested accordions (categories -> subcategories, providers -> locations)
-        document.querySelectorAll('.cn-acc-toggle').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const body = document.getElementById(btn.dataset.target);
-                const willOpen = !btn.classList.contains('is-open');
-                btn.classList.toggle('is-open', willOpen);
-                if (body) body.classList.toggle('is-open', willOpen);
-            });
+        document.addEventListener('click', function(e) {
+            if (!panel.contains(e.target) &&
+                !e.target.closest('.cnf-flyout') &&
+                !e.target.closest('#cnfExploreBtn')) {
+                document.querySelectorAll('.cnf-flyout.open').forEach(f => closeNow(f.id));
+            }
         });
     })();
 </script>
