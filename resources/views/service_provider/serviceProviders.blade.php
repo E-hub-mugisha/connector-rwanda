@@ -4,6 +4,37 @@
 
 @section('content')
 
+@php
+    $currentSearch   = request('search', '');
+    $currentCategory = request('category', '');
+    $currentLocation = request('location', '');
+    $currentSort     = request('sort', 'latest');
+
+    $providerCount = $sproviders->total();
+
+    $selectedCategory = collect($categories ?? [])->firstWhere('slug', $currentCategory);
+
+    $defaultWhatsapp = config(
+        'services.whatsapp.default_number',
+        '250780000000'
+    );
+
+    $hasFilters = $currentSearch || $currentCategory || $currentLocation;
+
+    $buildFilterUrl = function ($params = []) {
+        $query = array_merge(request()->query(), $params);
+
+        foreach ($query as $key => $value) {
+            if ($value === null || $value === '') {
+                unset($query[$key]);
+            }
+        }
+
+        return url()->current() . '?' . http_build_query($query);
+    };
+@endphp
+
+
 <style>
     :root {
         --connector-primary: #6B9080;
@@ -15,389 +46,579 @@
         --connector-border: #E1EAE6;
         --connector-gold: #C99A3B;
         --connector-danger: #C95A43;
-        --connector-white: #FFFFFF;
+        --connector-whatsapp: #25D366;
+
+        --connector-radius: 16px;
+        --connector-card-radius: 18px;
         --connector-shadow: 0 10px 30px rgba(37, 64, 53, .07);
-        --connector-shadow-lg: 0 20px 50px rgba(37, 64, 53, .12);
+        --connector-shadow-hover: 0 18px 40px rgba(37, 64, 53, .12);
     }
 
-    body {
+    /* =====================================================
+       GLOBAL
+    ===================================================== */
+
+    .connector-providers-page {
         background: var(--connector-bg);
+        color: var(--connector-text);
+        min-height: 100vh;
     }
 
-    /* =========================================================
-       HERO
-    ========================================================= */
+    .connector-providers-page *,
+    .connector-providers-page *::before,
+    .connector-providers-page *::after {
+        box-sizing: border-box;
+    }
 
-    .providers-hero {
+    .connector-providers-page a {
+        text-decoration: none;
+    }
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .provider-hero {
         position: relative;
         overflow: hidden;
         background:
             linear-gradient(
                 135deg,
                 var(--connector-primary-dark) 0%,
-                #355A4C 55%,
+                #355C4E 50%,
                 var(--connector-primary) 100%
             );
-        padding: 65px 0 72px;
+        padding: 72px 0 76px;
     }
 
-    .providers-hero-content {
-        position: relative;
-        z-index: 2;
-        max-width: 780px;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 7px 12px;
-        border: 1px solid rgba(255,255,255,.2);
-        border-radius: 999px;
-        background: rgba(255,255,255,.10);
-        color: #fff;
-        font-size: 11px;
-        font-weight: 750;
-        letter-spacing: .05em;
-        text-transform: uppercase;
-        backdrop-filter: blur(10px);
-    }
-
-    .hero-badge-dot {
-        width: 7px;
-        height: 7px;
-        background: #B7D7C9;
-        border-radius: 50%;
-    }
-
-    .providers-hero h1 {
-        color: #fff;
-        font-size: 42px;
-        line-height: 1.12;
-        font-weight: 850;
-        letter-spacing: -.035em;
-        margin: 18px 0 12px;
-    }
-
-    .providers-hero p {
-        color: rgba(255,255,255,.78);
-        font-size: 15px;
-        line-height: 1.65;
-        margin: 0 auto;
-        max-width: 620px;
-    }
-
-    .hero-decoration {
+    .provider-hero::before {
+        content: "";
         position: absolute;
-        border-radius: 50%;
-        border: 1px solid rgba(255,255,255,.08);
+        inset: 0;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(255,255,255,.04) 1px,
+                transparent 1px
+            ),
+            linear-gradient(
+                rgba(255,255,255,.04) 1px,
+                transparent 1px
+            );
+        background-size: 42px 42px;
+        opacity: .35;
         pointer-events: none;
     }
 
-    .hero-decoration.one {
-        width: 360px;
-        height: 360px;
-        right: -130px;
-        top: -170px;
+    .provider-hero-content {
+        position: relative;
+        z-index: 2;
     }
 
-    .hero-decoration.two {
-        width: 240px;
-        height: 240px;
-        left: -100px;
-        bottom: -130px;
+    .provider-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border: 1px solid rgba(255,255,255,.16);
+        background: rgba(255,255,255,.10);
+        border-radius: 999px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
     }
 
-    /* =========================================================
-       MAIN
-    ========================================================= */
+    .provider-eyebrow i {
+        font-size: 8px;
+        color: #B9D7C9;
+    }
+
+    .provider-hero h1 {
+        margin: 0;
+        max-width: 760px;
+        color: #fff;
+        font-size: clamp(34px, 4vw, 54px);
+        line-height: 1.08;
+        font-weight: 800;
+        letter-spacing: -.035em;
+    }
+
+    .provider-hero-description {
+        max-width: 650px;
+        margin: 18px 0 0;
+        color: rgba(255,255,255,.78);
+        font-size: 17px;
+        line-height: 1.7;
+    }
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    .provider-search-wrap {
+        position: relative;
+        z-index: 5;
+        margin-top: -30px;
+    }
+
+    .provider-search-box {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 230px 125px;
+        gap: 10px;
+        align-items: center;
+        padding: 10px;
+        background: #fff;
+        border: 1px solid var(--connector-border);
+        border-radius: 18px;
+        box-shadow: var(--connector-shadow-hover);
+    }
+
+    .provider-search-input {
+        position: relative;
+        min-width: 0;
+    }
+
+    .provider-search-input i {
+        position: absolute;
+        left: 17px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--connector-primary);
+        font-size: 17px;
+        z-index: 2;
+    }
+
+    .provider-search-input input {
+        width: 100%;
+        height: 56px;
+        border: 0;
+        outline: 0;
+        background: #fff;
+        color: var(--connector-text);
+        padding: 0 18px 0 48px;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+
+    .provider-search-input input::placeholder {
+        color: #93A29C;
+    }
+
+    .provider-search-category {
+        min-width: 0;
+    }
+
+    .provider-search-category select {
+        width: 100%;
+        height: 56px;
+        border: 1px solid var(--connector-border);
+        outline: 0;
+        background: var(--connector-soft);
+        color: var(--connector-text);
+        border-radius: 12px;
+        padding: 0 15px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .provider-search-button {
+        height: 56px;
+        border: 0;
+        border-radius: 12px;
+        background: var(--connector-primary);
+        color: #fff;
+        padding: 0 22px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .provider-search-button:hover {
+        background: var(--connector-primary-dark);
+    }
+
+    /* =====================================================
+       CONTENT AREA
+    ===================================================== */
 
     .providers-section {
-        padding: 34px 0 90px;
-        background: var(--connector-bg);
+        padding: 55px 0 100px;
     }
 
     .providers-layout {
         display: grid;
-        grid-template-columns: 255px minmax(0, 1fr);
-        gap: 22px;
+        grid-template-columns: 250px minmax(0, 1fr);
+        gap: 30px;
         align-items: start;
     }
 
-    /* =========================================================
+    /* =====================================================
        FILTER SIDEBAR
-    ========================================================= */
+    ===================================================== */
 
-    .filter-sidebar {
+    .provider-filter {
+        position: sticky;
+        top: 25px;
         background: #fff;
         border: 1px solid var(--connector-border);
-        border-radius: 18px;
+        border-radius: var(--connector-card-radius);
         box-shadow: var(--connector-shadow);
         overflow: hidden;
-        position: sticky;
-        top: 20px;
     }
 
     .filter-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--connector-border);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 17px;
-        border-bottom: 1px solid var(--connector-border);
+        gap: 10px;
     }
 
-    .filter-header-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .filter-header h3 {
+        margin: 0;
         color: var(--connector-text);
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 800;
     }
 
-    .filter-header-title svg {
+    .filter-clear {
         color: var(--connector-primary);
+        font-size: 12px;
+        font-weight: 700;
     }
 
-    .reset-link {
-        border: 0;
-        background: transparent;
-        color: var(--connector-primary);
-        font-size: 10px;
-        font-weight: 800;
-        padding: 0;
-        cursor: pointer;
+    .filter-clear:hover {
+        color: var(--connector-primary-dark);
     }
 
     .filter-body {
-        padding: 17px;
+        padding: 20px;
     }
 
     .filter-group {
-        margin-bottom: 21px;
+        padding-bottom: 22px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid var(--connector-border);
     }
 
     .filter-group:last-child {
+        padding-bottom: 0;
         margin-bottom: 0;
+        border-bottom: 0;
     }
 
-    .filter-label {
-        display: block;
-        color: var(--connector-text);
-        font-size: 11px;
-        font-weight: 800;
-        margin-bottom: 8px;
-    }
-
-    .filter-input-wrap {
-        position: relative;
-    }
-
-    .filter-input-wrap svg {
-        position: absolute;
-        left: 11px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #8A9993;
-        pointer-events: none;
-    }
-
-    .filter-input,
-    .filter-select {
-        width: 100%;
-        min-height: 39px;
-        border: 1px solid var(--connector-border);
-        border-radius: 9px;
-        background: #FBFDFC;
-        color: var(--connector-text);
-        font-size: 11px;
-        outline: none;
-        transition: .2s;
-    }
-
-    .filter-input {
-        padding: 0 10px 0 34px;
-    }
-
-    .filter-select {
-        padding: 0 10px;
-    }
-
-    .filter-input:focus,
-    .filter-select:focus {
-        border-color: var(--connector-primary);
-        box-shadow: 0 0 0 3px rgba(107,144,128,.09);
-        background: #fff;
-    }
-
-    .filter-check {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--connector-muted);
-        font-size: 11px;
-        font-weight: 650;
-        margin-bottom: 9px;
-        cursor: pointer;
-    }
-
-    .filter-check:last-child {
-        margin-bottom: 0;
-    }
-
-    .filter-check input {
-        width: 15px;
-        height: 15px;
-        accent-color: var(--connector-primary);
-    }
-
-    .apply-filter {
-        width: 100%;
-        min-height: 41px;
-        border: 0;
-        border-radius: 10px;
-        background: var(--connector-primary);
-        color: #fff;
-        font-size: 11px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    .apply-filter:hover {
-        background: var(--connector-primary-dark);
-    }
-
-    /* =========================================================
-       CONTENT
-    ========================================================= */
-
-    .providers-content {
-        min-width: 0;
-    }
-
-    .content-toolbar {
+    .filter-title {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 17px;
+        margin-bottom: 12px;
     }
 
-    .results-title {
-        color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 850;
+    .filter-title h4 {
         margin: 0;
-        letter-spacing: -.02em;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--connector-text);
+        text-transform: uppercase;
+        letter-spacing: .06em;
     }
 
-    .results-meta {
+    .filter-count {
         color: var(--connector-muted);
         font-size: 11px;
-        margin-top: 4px;
     }
 
-    .toolbar-right {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+    /* =====================================================
+       FILTER SEARCH
+    ===================================================== */
 
-    .mobile-filter-button {
-        display: none;
-    }
-
-    .sort-select {
-        min-height: 38px;
-        min-width: 145px;
-        border: 1px solid var(--connector-border);
-        border-radius: 9px;
-        background: #fff;
-        color: var(--connector-text);
-        font-size: 11px;
-        font-weight: 700;
-        padding: 0 10px;
-        outline: none;
-    }
-
-    .sort-select:focus {
-        border-color: var(--connector-primary);
-    }
-
-    /* =========================================================
-       ACTIVE FILTERS
-    ========================================================= */
-
-    .active-filters {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 16px;
-    }
-
-    .active-filter {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: var(--connector-soft);
-        border: 1px solid #D7E5DF;
-        border-radius: 999px;
-        padding: 5px 8px;
-        color: var(--connector-primary-dark);
-        font-size: 9px;
-        font-weight: 800;
-    }
-
-    .active-filter a {
-        color: inherit;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-    }
-
-    /* =========================================================
-       PROVIDER GRID
-    ========================================================= */
-
-    .provider-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 13px;
-    }
-
-    .provider-card {
+    .filter-search {
         position: relative;
-        background: #fff;
+    }
+
+    .filter-search i {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--connector-muted);
+        font-size: 13px;
+    }
+
+    .filter-search input {
+        width: 100%;
+        height: 43px;
         border: 1px solid var(--connector-border);
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: var(--connector-shadow);
-        transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        border-radius: 10px;
+        padding: 0 12px 0 36px;
+        outline: none;
+        color: var(--connector-text);
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .filter-search input:focus {
+        border-color: var(--connector-primary);
+        box-shadow: 0 0 0 3px rgba(107,144,128,.10);
+    }
+
+    /* =====================================================
+       CATEGORY / LOCATION LIST
+    ===================================================== */
+
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-height: 265px;
+        overflow-y: auto;
+        padding-right: 3px;
+    }
+
+    .filter-options::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .filter-options::-webkit-scrollbar-thumb {
+        background: #D2DFD9;
+        border-radius: 20px;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        border-radius: 9px;
+        color: var(--connector-muted);
+        background: transparent;
+        transition: .18s ease;
+    }
+
+    .filter-option-main {
+        display: flex;
+        align-items: center;
+        gap: 9px;
         min-width: 0;
     }
 
+    .filter-option-icon {
+        width: 26px;
+        height: 26px;
+        flex: 0 0 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        background: var(--connector-soft);
+        color: var(--connector-primary);
+        font-size: 11px;
+    }
+
+    .filter-option-label {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .filter-option:hover {
+        color: var(--connector-primary-dark);
+        background: var(--connector-soft);
+    }
+
+    .filter-option.active {
+        color: var(--connector-primary-dark);
+        background: var(--connector-soft);
+    }
+
+    .filter-option.active .filter-option-icon {
+        background: var(--connector-primary);
+        color: #fff;
+    }
+
+    .filter-check {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+        border: 1px solid #D2DED8;
+        border-radius: 50%;
+        position: relative;
+    }
+
+    .filter-option.active .filter-check {
+        border-color: var(--connector-primary);
+        background: var(--connector-primary);
+    }
+
+    .filter-option.active .filter-check::after {
+        content: "";
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+        top: 5px;
+        left: 5px;
+    }
+
+    /* =====================================================
+       ACTIVE FILTERS
+    ===================================================== */
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 22px;
+    }
+
+    .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: var(--connector-soft);
+        color: var(--connector-primary-dark);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .filter-chip i {
+        font-size: 9px;
+    }
+
+    /* =====================================================
+       RESULTS
+    ===================================================== */
+
+    .providers-results {
+        min-width: 0;
+    }
+
+    .results-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .results-title {
+        min-width: 0;
+    }
+
+    .results-title h2 {
+        margin: 0;
+        font-size: 23px;
+        line-height: 1.2;
+        font-weight: 800;
+        color: var(--connector-text);
+    }
+
+    .results-title p {
+        margin: 5px 0 0;
+        color: var(--connector-muted);
+        font-size: 13px;
+    }
+
+    .results-sort {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 0 0 auto;
+    }
+
+    .results-sort span {
+        color: var(--connector-muted);
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .sort-links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px;
+        background: #fff;
+        border: 1px solid var(--connector-border);
+        border-radius: 10px;
+    }
+
+    .sort-link {
+        padding: 7px 10px;
+        border-radius: 7px;
+        color: var(--connector-muted);
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .sort-link:hover {
+        color: var(--connector-primary-dark);
+    }
+
+    .sort-link.active {
+        background: var(--connector-soft);
+        color: var(--connector-primary-dark);
+    }
+
+    /* =====================================================
+       PROVIDER GRID
+    ===================================================== */
+
+    .providers-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    /* =====================================================
+       PROVIDER CARD
+    ===================================================== */
+
+    .provider-card {
+        min-width: 0;
+        background: #fff;
+        border: 1px solid var(--connector-border);
+        border-radius: var(--connector-card-radius);
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(37,64,53,.045);
+        transition:
+            transform .22s ease,
+            box-shadow .22s ease,
+            border-color .22s ease;
+    }
+
     .provider-card:hover {
-        transform: translateY(-3px);
-        border-color: #C8D9D2;
-        box-shadow: 0 16px 34px rgba(37,64,53,.10);
+        transform: translateY(-4px);
+        border-color: #D0DFD8;
+        box-shadow: var(--connector-shadow-hover);
     }
 
     .provider-image-wrap {
         position: relative;
-        height: 150px;
-        background: var(--connector-soft);
+        width: 100%;
+        aspect-ratio: 1 / .88;
         overflow: hidden;
+        background: var(--connector-soft);
     }
 
     .provider-image {
+        display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
         transition: transform .35s ease;
     }
 
@@ -405,325 +626,408 @@
         transform: scale(1.035);
     }
 
-    .provider-image-fallback {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--connector-primary);
+    .provider-image-overlay {
+        position: absolute;
+        inset: auto 0 0;
+        height: 45%;
         background: linear-gradient(
-            135deg,
-            #EEF4F1,
-            #E3EEE9
+            to top,
+            rgba(24,48,40,.30),
+            transparent
         );
+        pointer-events: none;
     }
 
-    .provider-favourite {
+    .provider-category-badge {
         position: absolute;
-        right: 9px;
-        top: 9px;
-        width: 29px;
-        height: 29px;
-        border: 0;
-        border-radius: 50%;
-        background: rgba(255,255,255,.94);
-        color: var(--connector-muted);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        box-shadow: 0 5px 15px rgba(0,0,0,.08);
-        transition: .2s;
-    }
-
-    .provider-favourite:hover {
-        color: var(--connector-danger);
-        background: #fff;
-    }
-
-    .provider-badges {
-        position: absolute;
-        left: 9px;
-        bottom: 9px;
-        display: flex;
-        gap: 5px;
-    }
-
-    .provider-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 7px;
-        border-radius: 999px;
+        top: 12px;
+        left: 12px;
+        max-width: calc(100% - 24px);
+        padding: 6px 9px;
+        border-radius: 8px;
         background: rgba(255,255,255,.94);
         color: var(--connector-primary-dark);
-        font-size: 8px;
-        font-weight: 850;
-        box-shadow: 0 4px 12px rgba(0,0,0,.07);
-    }
-
-    .provider-badge.featured {
-        color: #8B671E;
+        font-size: 10px;
+        line-height: 1.2;
+        font-weight: 800;
+        box-shadow: 0 5px 15px rgba(0,0,0,.08);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .provider-body {
-        padding: 13px;
-    }
-
-    .provider-category {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        color: var(--connector-primary);
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .035em;
-        margin-bottom: 5px;
+        padding: 16px;
     }
 
     .provider-name {
+        display: block;
         margin: 0;
-        font-size: 14px;
-        line-height: 1.3;
-        font-weight: 850;
-        letter-spacing: -.015em;
-    }
-
-    .provider-name a {
         color: var(--connector-text);
-        text-decoration: none;
+        font-size: 15px;
+        line-height: 1.35;
+        font-weight: 800;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .provider-name a:hover {
+    .provider-name:hover {
         color: var(--connector-primary);
     }
 
-    .provider-location {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: var(--connector-muted);
-        font-size: 9px;
+    .provider-service {
+        min-height: 18px;
         margin-top: 5px;
-        min-width: 0;
-    }
+        color: var(--connector-primary);
+        font-size: 11px;
+        line-height: 1.4;
+        font-weight: 700;
 
-    .provider-location span {
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .provider-rating {
+    .provider-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-top: 13px;
+        padding-top: 12px;
+        border-top: 1px solid var(--connector-border);
+    }
+
+    .provider-meta-item {
         display: flex;
         align-items: center;
-        gap: 5px;
-        margin-top: 10px;
-        padding-top: 9px;
-        border-top: 1px solid #EFF3F1;
-    }
-
-    .rating-stars {
-        display: inline-flex;
-        gap: 1px;
-        color: var(--connector-gold);
-    }
-
-    .rating-number {
-        color: var(--connector-text);
-        font-size: 10px;
-        font-weight: 800;
-    }
-
-    .rating-reviews {
+        gap: 7px;
+        min-width: 0;
         color: var(--connector-muted);
-        font-size: 9px;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+
+    .provider-meta-item i {
+        width: 16px;
+        flex: 0 0 16px;
+        color: var(--connector-primary);
+        text-align: center;
+    }
+
+    .provider-meta-item span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .provider-actions {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-        margin-top: 11px;
+        grid-template-columns: minmax(0, 1fr) 42px;
+        gap: 8px;
+        margin-top: 15px;
     }
 
-    .provider-action {
-        min-height: 33px;
-        display: inline-flex;
+    .provider-profile-btn {
+        display: flex;
         align-items: center;
         justify-content: center;
-        gap: 5px;
-        border-radius: 8px;
-        font-size: 9px;
-        font-weight: 800;
-        text-decoration: none !important;
-        transition: .2s;
-    }
-
-    .provider-view {
+        min-width: 0;
+        height: 39px;
+        padding: 0 12px;
+        border-radius: 9px;
         background: var(--connector-primary);
-        color: #fff !important;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        transition: .2s ease;
     }
 
-    .provider-view:hover {
+    .provider-profile-btn:hover {
         background: var(--connector-primary-dark);
+        color: #fff;
     }
 
-    .provider-message {
-        background: var(--connector-soft);
-        border: 1px solid #DCE9E4;
-        color: var(--connector-primary-dark) !important;
+    .provider-whatsapp-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 39px;
+        border-radius: 9px;
+        background: #EAF8EF;
+        color: #179447;
+        font-size: 16px;
+        transition: .2s ease;
     }
 
-    .provider-message:hover {
-        background: #E0ECE7;
+    .provider-whatsapp-btn:hover {
+        background: var(--connector-whatsapp);
+        color: #fff;
     }
 
-    /* =========================================================
-       EMPTY
-    ========================================================= */
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
 
-    .empty-state {
+    .provider-empty {
+        grid-column: 1 / -1;
         background: #fff;
         border: 1px solid var(--connector-border);
-        border-radius: 17px;
+        border-radius: var(--connector-card-radius);
         padding: 70px 25px;
         text-align: center;
-        box-shadow: var(--connector-shadow);
-        grid-column: 1 / -1;
     }
 
     .empty-icon {
-        width: 60px;
-        height: 60px;
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 17px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 15px;
-        border-radius: 17px;
+        border-radius: 16px;
         background: var(--connector-soft);
         color: var(--connector-primary);
+        font-size: 23px;
     }
 
-    .empty-state h3 {
-        margin: 0 0 7px;
+    .provider-empty h3 {
+        margin: 0;
         color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 850;
+        font-size: 20px;
+        font-weight: 800;
     }
 
-    .empty-state p {
-        margin: 0 auto 18px;
+    .provider-empty p {
+        max-width: 450px;
+        margin: 9px auto 20px;
         color: var(--connector-muted);
-        font-size: 12px;
-        max-width: 420px;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
-    .reset-all {
+    .empty-reset {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        padding: 10px 15px;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 16px;
         border-radius: 9px;
         background: var(--connector-primary);
-        color: #fff !important;
-        text-decoration: none !important;
-        font-size: 11px;
+        color: #fff;
+        font-size: 12px;
         font-weight: 800;
     }
 
-    /* =========================================================
+    .empty-reset:hover {
+        background: var(--connector-primary-dark);
+        color: #fff;
+    }
+
+    /* =====================================================
        PAGINATION
-    ========================================================= */
+    ===================================================== */
 
-    .pagination-wrapper {
+    .providers-pagination {
+        margin-top: 30px;
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        margin-top: 22px;
-        padding: 15px 17px;
-        background: #fff;
-        border: 1px solid var(--connector-border);
-        border-radius: 14px;
-        box-shadow: var(--connector-shadow);
+        justify-content: center;
     }
 
-    .pagination-info {
-        color: var(--connector-muted);
-        font-size: 10px;
+    .providers-pagination nav {
+        display: flex;
+        justify-content: center;
     }
 
-    .pagination-info strong {
-        color: var(--connector-text);
-        font-weight: 800;
+    .providers-pagination .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
-    .pagination-wrapper .pagination {
+    .providers-pagination .page-item {
         margin: 0;
     }
 
-    .pagination-wrapper .page-link {
-        border-color: var(--connector-border);
-        color: var(--connector-primary-dark);
-        font-size: 10px;
-        font-weight: 750;
-        border-radius: 7px !important;
-        margin: 0 2px;
+    .providers-pagination .page-link {
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--connector-border);
+        border-radius: 9px;
+        background: #fff;
+        color: var(--connector-muted);
+        font-size: 12px;
+        font-weight: 700;
     }
 
-    .pagination-wrapper .page-item.active .page-link {
+    .providers-pagination .page-link:hover {
+        background: var(--connector-soft);
+        color: var(--connector-primary-dark);
+    }
+
+    .providers-pagination .active .page-link {
         background: var(--connector-primary);
         border-color: var(--connector-primary);
         color: #fff;
     }
 
-    /* =========================================================
-       MOBILE FILTER
-    ========================================================= */
-
-    .filter-offcanvas {
-        width: 310px !important;
-        border: 0;
+    .providers-pagination .disabled .page-link {
+        opacity: .45;
+        pointer-events: none;
     }
 
-    .filter-offcanvas .offcanvas-header {
+    /* =====================================================
+       MOBILE FILTER BUTTON
+    ===================================================== */
+
+    .mobile-filter-button {
+        display: none;
+        width: 100%;
+        height: 46px;
+        border: 1px solid var(--connector-border);
+        border-radius: 11px;
+        background: #fff;
+        color: var(--connector-text);
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        margin-bottom: 15px;
+    }
+
+    .mobile-filter-button i {
+        color: var(--connector-primary);
+        margin-right: 7px;
+    }
+
+    /* =====================================================
+       MOBILE FILTER DRAWER
+    ===================================================== */
+
+    .filter-overlay {
+        display: none;
+        position: fixed;
+        z-index: 9998;
+        inset: 0;
+        background: rgba(24,48,40,.45);
+        backdrop-filter: blur(3px);
+    }
+
+    .mobile-filter-drawer {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: min(340px, 88vw);
+        height: 100vh;
+        background: #fff;
+        transform: translateX(-105%);
+        transition: transform .25s ease;
+        overflow-y: auto;
+        box-shadow: 15px 0 40px rgba(0,0,0,.12);
+    }
+
+    body.filter-open {
+        overflow: hidden;
+    }
+
+    body.filter-open .filter-overlay {
+        display: block;
+    }
+
+    body.filter-open .mobile-filter-drawer {
+        transform: translateX(0);
+    }
+
+    .drawer-header {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        padding: 17px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fff;
         border-bottom: 1px solid var(--connector-border);
     }
 
-    .filter-offcanvas .offcanvas-title {
-        color: var(--connector-text);
+    .drawer-header strong {
         font-size: 15px;
-        font-weight: 850;
+        color: var(--connector-text);
     }
 
-    /* =========================================================
+    .drawer-close {
+        width: 34px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: 8px;
+        background: var(--connector-soft);
+        color: var(--connector-text);
+        cursor: pointer;
+    }
+
+    .drawer-body {
+        padding: 18px;
+    }
+
+    /* =====================================================
        RESPONSIVE
-    ========================================================= */
+    ===================================================== */
 
-    @media (max-width: 1350px) {
-        .provider-grid {
+    @media (max-width: 1399px) {
+        .providers-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
-    @media (max-width: 1100px) {
+    @media (max-width: 1199px) {
         .providers-layout {
-            grid-template-columns: 220px minmax(0, 1fr);
+            grid-template-columns: 225px minmax(0, 1fr);
+            gap: 22px;
         }
 
-        .provider-grid {
+        .providers-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
         }
 
-        .provider-image-wrap {
-            height: 135px;
+        .provider-body {
+            padding: 14px;
+        }
+
+        .provider-search-box {
+            grid-template-columns: minmax(0, 1fr) 200px 115px;
         }
     }
 
     @media (max-width: 991px) {
+        .provider-hero {
+            padding: 55px 0 65px;
+        }
+
+        .provider-search-box {
+            grid-template-columns: 1fr;
+        }
+
+        .provider-search-button {
+            width: 100%;
+        }
+
+        .providers-section {
+            padding-top: 40px;
+        }
+
         .providers-layout {
             display: block;
         }
@@ -733,1188 +1037,1071 @@
         }
 
         .mobile-filter-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            min-height: 38px;
-            padding: 0 12px;
-            border: 1px solid var(--connector-border);
-            border-radius: 9px;
-            background: #fff;
-            color: var(--connector-text);
-            font-size: 10px;
-            font-weight: 800;
+            display: block;
         }
 
-        .provider-grid {
+        .providers-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
 
     @media (max-width: 767px) {
-        .providers-hero {
-            padding: 45px 0 52px;
+        .provider-hero {
+            padding: 45px 0 58px;
         }
 
-        .providers-hero h1 {
-            font-size: 32px;
+        .provider-hero h1 {
+            font-size: 34px;
+        }
+
+        .provider-hero-description {
+            font-size: 14px;
+        }
+
+        .provider-search-wrap {
+            margin-top: -25px;
         }
 
         .providers-section {
-            padding-top: 22px;
+            padding: 32px 0 70px;
         }
 
-        .content-toolbar {
+        .providers-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .results-header {
             align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        .toolbar-right {
-            flex-wrap: wrap;
-            justify-content: flex-end;
+        .results-sort {
+            width: 100%;
+            justify-content: space-between;
         }
 
-        .sort-select {
-            min-width: 130px;
+        .sort-links {
+            margin-left: auto;
         }
 
-        .provider-grid {
+        .provider-image-wrap {
+            aspect-ratio: 1 / .92;
+        }
+
+        .provider-body {
+            padding: 13px;
+        }
+
+        .provider-name {
+            font-size: 14px;
+        }
+
+        .provider-service {
+            font-size: 10px;
+        }
+
+        .provider-actions {
+            grid-template-columns: minmax(0, 1fr) 38px;
+        }
+
+        .provider-whatsapp-btn {
+            width: 38px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .provider-hero h1 {
+            font-size: 29px;
+        }
+
+        .provider-eyebrow {
+            font-size: 10px;
+        }
+
+        .provider-search-box {
+            padding: 8px;
+            border-radius: 14px;
+        }
+
+        .provider-search-input input,
+        .provider-search-category select,
+        .provider-search-button {
+            height: 50px;
+        }
+
+        .providers-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
         }
 
-        .provider-image-wrap {
-            height: 140px;
+        .provider-card {
+            border-radius: 14px;
         }
 
         .provider-body {
             padding: 11px;
         }
-    }
 
-    @media (max-width: 500px) {
-        .providers-hero h1 {
-            font-size: 27px;
+        .provider-category-badge {
+            top: 8px;
+            left: 8px;
+            max-width: calc(100% - 16px);
+            padding: 5px 7px;
+            font-size: 9px;
         }
 
-        .providers-hero p {
-            font-size: 13px;
+        .provider-meta {
+            margin-top: 10px;
+            padding-top: 10px;
+            gap: 5px;
         }
 
-        .content-toolbar {
-            display: block;
-        }
-
-        .toolbar-right {
-            margin-top: 12px;
-            justify-content: space-between;
-        }
-
-        .mobile-filter-button {
-            flex: 1;
-        }
-
-        .sort-select {
-            flex: 1;
-        }
-
-        .provider-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .provider-image-wrap {
-            height: 125px;
+        .provider-meta-item {
+            font-size: 9px;
         }
 
         .provider-actions {
-            grid-template-columns: 1fr;
+            margin-top: 11px;
+            gap: 5px;
+            grid-template-columns: minmax(0, 1fr) 34px;
         }
 
-        .provider-action {
-            min-height: 32px;
+        .provider-profile-btn {
+            height: 35px;
+            padding: 0 7px;
+            font-size: 9px;
         }
 
-        .provider-message {
-            display: none;
+        .provider-whatsapp-btn {
+            width: 34px;
+            height: 35px;
+            font-size: 14px;
         }
 
-        .pagination-wrapper {
-            display: block;
-        }
-
-        .pagination-info {
-            margin-bottom: 12px;
-        }
-
-        .pagination-wrapper .pagination {
-            overflow-x: auto;
-            display: flex;
-            flex-wrap: nowrap;
-        }
-    }
-
-    @media (max-width: 360px) {
-        .provider-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .provider-image-wrap {
-            height: 170px;
-        }
-
-        .provider-message {
-            display: inline-flex;
-        }
-
-        .provider-actions {
-            grid-template-columns: 1fr 1fr;
+        .results-title h2 {
+            font-size: 20px;
         }
     }
 </style>
 
 
-{{-- =========================================================
-     HERO
-========================================================= --}}
-<section class="providers-hero">
+<div class="connector-providers-page">
 
-    <div class="hero-decoration one"></div>
-    <div class="hero-decoration two"></div>
+    {{-- =====================================================
+         HERO
+    ====================================================== --}}
+    <section class="provider-hero">
+        <div class="container">
+            <div class="provider-hero-content">
 
-    <div class="container">
+                <div class="provider-eyebrow">
+                    <i class="fa-solid fa-circle"></i>
+                    Connector Marketplace
+                </div>
 
-        <div class="providers-hero-content">
+                <h1>
+                    Find trusted service providers
+                </h1>
 
-            <span class="hero-badge">
-                <span class="hero-badge-dot"></span>
-                Connector Marketplace
-            </span>
+                <p class="provider-hero-description">
+                    Discover skilled professionals and reliable providers
+                    for the services you need.
+                </p>
 
-            <h1>
-                Find trusted service providers
-            </h1>
-
-            <p>
-                Discover skilled professionals, compare their services,
-                explore their profiles and connect with the right provider
-                for your needs.
-            </p>
-
+            </div>
         </div>
-
-    </div>
-
-</section>
+    </section>
 
 
-{{-- =========================================================
-     PROVIDERS SECTION
-========================================================= --}}
-<section class="providers-section">
+    {{-- =====================================================
+         SEARCH
+    ====================================================== --}}
+    <div class="provider-search-wrap">
+        <div class="container">
 
-    <div class="container">
+            <form
+                method="GET"
+                action="{{ url()->current() }}"
+                class="provider-search-box"
+            >
 
-        <div class="providers-layout">
+                <div class="provider-search-input">
+                    <i class="fa-solid fa-magnifying-glass"></i>
 
-
-            {{-- =================================================
-                 DESKTOP FILTER SIDEBAR
-            ================================================== --}}
-            <aside class="filter-sidebar desktop-filter">
-
-                <div class="filter-header">
-
-                    <div class="filter-header-title">
-                        <i data-lucide="sliders-horizontal" width="15"></i>
-                        Filter Providers
-                    </div>
-
-                    <a
-                        href="{{ route('home.service_provider') }}"
-                        class="reset-link"
+                    <input
+                        type="search"
+                        name="search"
+                        value="{{ $currentSearch }}"
+                        placeholder="Search providers, services or locations..."
+                        autocomplete="off"
                     >
-                        Reset
-                    </a>
-
                 </div>
 
+                <div class="provider-search-category">
+                    <select name="category">
+                        <option value="">All categories</option>
 
-                <form
-                    method="GET"
-                    action="{{ route('home.service_provider') }}"
-                    class="filter-body"
-                >
-
-                    {{-- Search --}}
-                    <div class="filter-group">
-
-                        <label class="filter-label">
-                            Search
-                        </label>
-
-                        <div class="filter-input-wrap">
-
-                            <i data-lucide="search" width="14"></i>
-
-                            <input
-                                type="text"
-                                name="search"
-                                class="filter-input"
-                                placeholder="Provider or service..."
-                                value="{{ request('search') }}"
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- Category --}}
-                    <div class="filter-group">
-
-                        <label class="filter-label">
-                            Category
-                        </label>
-
-                        <select
-                            name="category"
-                            class="filter-select"
-                        >
-
-                            <option value="">
-                                All categories
-                            </option>
-
-                            @foreach($categories ?? [] as $category)
-
-                                <option
-                                    value="{{ $category->slug }}"
-                                    @selected(request('category') == $category->slug)
-                                >
-                                    {{ $category->name }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-
-                    {{-- Location --}}
-                    <div class="filter-group">
-
-                        <label class="filter-label">
-                            Location
-                        </label>
-
-                        <select
-                            name="location"
-                            class="filter-select"
-                        >
-
-                            <option value="">
-                                All locations
-                            </option>
-
-                            @foreach($locations ?? [] as $location)
-
-                                <option
-                                    value="{{ $location }}"
-                                    @selected(request('location') == $location)
-                                >
-                                    {{ $location }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-
-                    {{-- Availability --}}
-                    <div class="filter-group">
-
-                        <label class="filter-label">
-                            Availability
-                        </label>
-
-                        <label class="filter-check">
-                            <input
-                                type="radio"
-                                name="availability"
-                                value=""
-                                @checked(!request('availability'))
-                            >
-                            <span>All providers</span>
-                        </label>
-
-                        <label class="filter-check">
-                            <input
-                                type="radio"
-                                name="availability"
-                                value="available"
-                                @checked(request('availability') === 'available')
-                            >
-                            <span>Available now</span>
-                        </label>
-
-                        <label class="filter-check">
-                            <input
-                                type="radio"
-                                name="availability"
-                                value="verified"
-                                @checked(request('availability') === 'verified')
-                            >
-                            <span>Verified providers</span>
-                        </label>
-
-                    </div>
-
-
-                    {{-- Sort --}}
-                    <div class="filter-group">
-
-                        <label class="filter-label">
-                            Sort By
-                        </label>
-
-                        <select
-                            name="sort"
-                            class="filter-select"
-                        >
-
+                        @foreach($categories ?? [] as $category)
                             <option
-                                value="latest"
-                                @selected(request('sort', 'latest') === 'latest')
+                                value="{{ $category->slug }}"
+                                @selected($currentCategory === $category->slug)
                             >
-                                Newest
+                                {{ $category->name }}
                             </option>
-
-                            <option
-                                value="name"
-                                @selected(request('sort') === 'name')
-                            >
-                                Name A–Z
-                            </option>
-
-                            <option
-                                value="rating"
-                                @selected(request('sort') === 'rating')
-                            >
-                                Highest rated
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="apply-filter"
-                    >
-                        Apply Filters
-                    </button>
-
-                </form>
-
-            </aside>
-
-
-            {{-- =================================================
-                 PROVIDERS CONTENT
-            ================================================== --}}
-            <main class="providers-content">
-
-
-                {{-- =================================================
-                     TOOLBAR
-                ================================================== --}}
-                <div class="content-toolbar">
-
-                    <div>
-
-                        <h2 class="results-title">
-                            Service Providers
-                        </h2>
-
-                        <div class="results-meta">
-
-                            @if(method_exists($sproviders, 'total'))
-
-                                Showing
-                                <strong>
-                                    {{ number_format($sproviders->total()) }}
-                                </strong>
-                                providers
-
-                            @else
-
-                                {{ $sproviders->count() }}
-                                providers
-
-                            @endif
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="toolbar-right">
-
-                        {{-- Mobile filter --}}
-                        <button
-                            type="button"
-                            class="mobile-filter-button"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#mobileProviderFilter"
-                        >
-                            <i data-lucide="sliders-horizontal" width="14"></i>
-                            Filters
-
-                            @php
-                                $filterCount = collect([
-                                    request('search'),
-                                    request('category'),
-                                    request('location'),
-                                    request('availability'),
-                                ])->filter(fn($value) => filled($value))->count();
-                            @endphp
-
-                            @if($filterCount > 0)
-                                <span
-                                    style="
-                                        width:17px;
-                                        height:17px;
-                                        display:inline-flex;
-                                        align-items:center;
-                                        justify-content:center;
-                                        background:var(--connector-primary);
-                                        color:#fff;
-                                        border-radius:50%;
-                                        font-size:8px;
-                                    "
-                                >
-                                    {{ $filterCount }}
-                                </span>
-                            @endif
-
-                        </button>
-
-
-                        {{-- Sort --}}
-                        <form
-                            method="GET"
-                            action="{{ route('home.service_provider') }}"
-                        >
-
-                            @foreach(request()->except('sort', 'page') as $key => $value)
-
-                                @if(is_array($value))
-
-                                    @foreach($value as $item)
-                                        <input
-                                            type="hidden"
-                                            name="{{ $key }}[]"
-                                            value="{{ $item }}"
-                                        >
-                                    @endforeach
-
-                                @else
-
-                                    <input
-                                        type="hidden"
-                                        name="{{ $key }}"
-                                        value="{{ $value }}"
-                                    >
-
-                                @endif
-
-                            @endforeach
-
-                            <select
-                                name="sort"
-                                class="sort-select"
-                                onchange="this.form.submit()"
-                            >
-
-                                <option
-                                    value="latest"
-                                    @selected(request('sort', 'latest') === 'latest')
-                                >
-                                    Newest
-                                </option>
-
-                                <option
-                                    value="name"
-                                    @selected(request('sort') === 'name')
-                                >
-                                    Name A–Z
-                                </option>
-
-                                <option
-                                    value="rating"
-                                    @selected(request('sort') === 'rating')
-                                >
-                                    Top rated
-                                </option>
-
-                            </select>
-
-                        </form>
-
-                    </div>
-
+                        @endforeach
+                    </select>
                 </div>
 
-
-                {{-- =================================================
-                     ACTIVE FILTERS
-                ================================================== --}}
-                @if(
-                    request('search') ||
-                    request('category') ||
-                    request('location') ||
-                    request('availability')
-                )
-
-                    <div class="active-filters">
-
-                        <span
-                            style="
-                                font-size:9px;
-                                color:var(--connector-muted);
-                                font-weight:800;
-                            "
-                        >
-                            Active:
-                        </span>
-
-                        @if(request('search'))
-
-                            <span class="active-filter">
-
-                                Search:
-                                {{ request('search') }}
-
-                                <a
-                                    href="{{ request()->fullUrlWithQuery(['search' => null, 'page' => null]) }}"
-                                >
-                                    <i data-lucide="x" width="10"></i>
-                                </a>
-
-                            </span>
-
-                        @endif
-
-
-                        @if(request('category'))
-
-                            <span class="active-filter">
-
-                                Category:
-                                {{ request('category') }}
-
-                                <a
-                                    href="{{ request()->fullUrlWithQuery(['category' => null, 'page' => null]) }}"
-                                >
-                                    <i data-lucide="x" width="10"></i>
-                                </a>
-
-                            </span>
-
-                        @endif
-
-
-                        @if(request('location'))
-
-                            <span class="active-filter">
-
-                                Location:
-                                {{ request('location') }}
-
-                                <a
-                                    href="{{ request()->fullUrlWithQuery(['location' => null, 'page' => null]) }}"
-                                >
-                                    <i data-lucide="x" width="10"></i>
-                                </a>
-
-                            </span>
-
-                        @endif
-
-
-                        @if(request('availability'))
-
-                            <span class="active-filter">
-
-                                {{ ucfirst(request('availability')) }}
-
-                                <a
-                                    href="{{ request()->fullUrlWithQuery(['availability' => null, 'page' => null]) }}"
-                                >
-                                    <i data-lucide="x" width="10"></i>
-                                </a>
-
-                            </span>
-
-                        @endif
-
-                    </div>
-
+                @if($currentLocation)
+                    <input
+                        type="hidden"
+                        name="location"
+                        value="{{ $currentLocation }}"
+                    >
                 @endif
 
+                @if($currentSort)
+                    <input
+                        type="hidden"
+                        name="sort"
+                        value="{{ $currentSort }}"
+                    >
+                @endif
+
+                <button type="submit" class="provider-search-button">
+                    Search
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    {{-- =====================================================
+         PROVIDERS
+    ====================================================== --}}
+    <section class="providers-section">
+        <div class="container">
+
+            {{-- Mobile filter button --}}
+            <button
+                type="button"
+                class="mobile-filter-button"
+                id="openProviderFilter"
+            >
+                <i class="fa-solid fa-sliders"></i>
+                Filter providers
+            </button>
+
+
+            <div class="providers-layout">
 
                 {{-- =================================================
-                     PROVIDER GRID
+                     DESKTOP FILTER
                 ================================================== --}}
-                <div class="provider-grid">
+                <aside class="provider-filter desktop-filter">
 
-                    @forelse($sproviders as $sprovider)
+                    <div class="filter-header">
 
-                        @php
+                        <h3>Filters</h3>
 
-                            $providerImage = !empty($sprovider->image)
-                                ? asset('image/profile/' . $sprovider->image)
-                                : asset('asset/images/lazy.svg');
+                        @if($hasFilters)
+                            <a
+                                href="{{ url()->current() }}"
+                                class="filter-clear"
+                            >
+                                Clear all
+                            </a>
+                        @endif
 
-                            $providerName = $sprovider->sprovider_name
-                                ?: 'Service Provider';
+                    </div>
 
-                            $categoryName = '';
+                    <div class="filter-body">
 
-                            if(
-                                !empty($sprovider->service_category_id) &&
-                                isset($sprovider->category)
-                            ) {
-                                $categoryName = $sprovider->category->name;
-                            }
+                        {{-- Search --}}
+                        <div class="filter-group">
 
-                            $location = $sprovider->city
-                                ?: $sprovider->service_locations
-                                ?: 'Location not specified';
+                            <div class="filter-title">
+                                <h4>Search</h4>
+                            </div>
 
-                            /*
-                             * Support different possible rating fields.
-                             */
-                            $rating = $sprovider->rating
-                                ?? $sprovider->average_rating
-                                ?? 0;
+                            <div class="filter-search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
 
-                            $rating = is_numeric($rating)
-                                ? round((float)$rating, 1)
-                                : 0;
+                                <input
+                                    type="text"
+                                    id="sidebarProviderSearch"
+                                    value="{{ $currentSearch }}"
+                                    placeholder="Search..."
+                                >
+                            </div>
 
-                            $reviewCount = $sprovider->reviews_count
-                                ?? $sprovider->ratings_count
-                                ?? 0;
-
-                        @endphp
+                        </div>
 
 
-                        <article class="provider-card">
+                        {{-- Category --}}
+                        <div class="filter-group">
 
-                            {{-- IMAGE --}}
-                            <div class="provider-image-wrap">
+                            <div class="filter-title">
+                                <h4>Category</h4>
+
+                                <span class="filter-count">
+                                    {{ count($categories ?? []) }}
+                                </span>
+                            </div>
+
+                            <div class="filter-options">
 
                                 <a
-                                    href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
+                                    href="{{ $buildFilterUrl(['category' => null, 'page' => null]) }}"
+                                    class="filter-option {{ !$currentCategory ? 'active' : '' }}"
                                 >
+                                    <span class="filter-option-main">
 
-                                    <img
-                                        src="{{ $providerImage }}"
-                                        alt="{{ $providerName }}"
-                                        class="provider-image"
-                                        loading="lazy"
-                                        onerror="
-                                            this.style.display='none';
-                                            this.nextElementSibling.style.display='flex';
-                                        "
-                                    >
+                                        <span class="filter-option-icon">
+                                            <i class="fa-solid fa-layer-group"></i>
+                                        </span>
 
-                                    <div
-                                        class="provider-image-fallback"
-                                        style="display:none;"
-                                    >
-                                        <i data-lucide="user-round" width="38"></i>
-                                    </div>
+                                        <span class="filter-option-label">
+                                            All categories
+                                        </span>
 
+                                    </span>
+
+                                    <span class="filter-check"></span>
                                 </a>
 
 
-                                {{-- Favourite --}}
-                                <a
-                                    href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                    class="provider-favourite"
-                                    aria-label="View provider"
-                                >
-                                    <i data-lucide="heart" width="14"></i>
-                                </a>
+                                @foreach($categories ?? [] as $category)
 
+                                    <a
+                                        href="{{ $buildFilterUrl([
+                                            'category' => $category->slug,
+                                            'page' => null
+                                        ]) }}"
+                                        class="filter-option {{ $currentCategory === $category->slug ? 'active' : '' }}"
+                                    >
 
-                                {{-- Badges --}}
-                                <div class="provider-badges">
+                                        <span class="filter-option-main">
 
-                                    @if(!empty($sprovider->featured))
-                                        <span class="provider-badge featured">
-                                            <i data-lucide="star" width="9"></i>
-                                            Featured
+                                            <span class="filter-option-icon">
+                                                <i class="fa-solid fa-briefcase"></i>
+                                            </span>
+
+                                            <span
+                                                class="filter-option-label"
+                                                title="{{ $category->name }}"
+                                            >
+                                                {{ $category->name }}
+                                            </span>
+
                                         </span>
-                                    @endif
 
-                                    @if(!empty($sprovider->verified))
-                                        <span class="provider-badge">
-                                            <i data-lucide="badge-check" width="9"></i>
-                                            Verified
-                                        </span>
-                                    @endif
+                                        <span class="filter-check"></span>
 
-                                </div>
+                                    </a>
+
+                                @endforeach
 
                             </div>
 
-
-                            {{-- BODY --}}
-                            <div class="provider-body">
-
-                                @if($categoryName)
-
-                                    <div class="provider-category">
-                                        <i data-lucide="briefcase-business" width="10"></i>
-                                        {{ $categoryName }}
-                                    </div>
-
-                                @endif
+                        </div>
 
 
-                                <h3 class="provider-name">
+                        {{-- Location --}}
+                        <div class="filter-group">
+
+                            <div class="filter-title">
+                                <h4>Location</h4>
+
+                                <span class="filter-count">
+                                    {{ count($locations ?? []) }}
+                                </span>
+                            </div>
+
+                            <div class="filter-options">
+
+                                <a
+                                    href="{{ $buildFilterUrl(['location' => null, 'page' => null]) }}"
+                                    class="filter-option {{ !$currentLocation ? 'active' : '' }}"
+                                >
+
+                                    <span class="filter-option-main">
+
+                                        <span class="filter-option-icon">
+                                            <i class="fa-solid fa-globe"></i>
+                                        </span>
+
+                                        <span class="filter-option-label">
+                                            All locations
+                                        </span>
+
+                                    </span>
+
+                                    <span class="filter-check"></span>
+
+                                </a>
+
+
+                                @foreach($locations ?? [] as $location)
 
                                     <a
-                                        href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
+                                        href="{{ $buildFilterUrl([
+                                            'location' => $location,
+                                            'page' => null
+                                        ]) }}"
+                                        class="filter-option {{ $currentLocation === $location ? 'active' : '' }}"
+                                    >
+
+                                        <span class="filter-option-main">
+
+                                            <span class="filter-option-icon">
+                                                <i class="fa-solid fa-location-dot"></i>
+                                            </span>
+
+                                            <span
+                                                class="filter-option-label"
+                                                title="{{ $location }}"
+                                            >
+                                                {{ $location }}
+                                            </span>
+
+                                        </span>
+
+                                        <span class="filter-check"></span>
+
+                                    </a>
+
+                                @endforeach
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </aside>
+
+
+                {{-- =================================================
+                     RESULTS
+                ================================================== --}}
+                <main class="providers-results">
+
+                    {{-- Active filters --}}
+                    @if($hasFilters)
+
+                        <div class="active-filters">
+
+                            @if($currentSearch)
+                                <span class="filter-chip">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    {{ $currentSearch }}
+                                </span>
+                            @endif
+
+                            @if($selectedCategory)
+                                <span class="filter-chip">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    {{ $selectedCategory->name }}
+                                </span>
+                            @endif
+
+                            @if($currentLocation)
+                                <span class="filter-chip">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                    {{ $currentLocation }}
+                                </span>
+                            @endif
+
+                        </div>
+
+                    @endif
+
+
+                    {{-- Results header --}}
+                    <div class="results-header">
+
+                        <div class="results-title">
+
+                            <h2>
+                                Service providers
+                            </h2>
+
+                            <p>
+                                {{ number_format($providerCount) }}
+                                {{ $providerCount === 1 ? 'provider' : 'providers' }}
+                                available
+                            </p>
+
+                        </div>
+
+
+                        <div class="results-sort">
+
+                            <span>Sort:</span>
+
+                            <div class="sort-links">
+
+                                <a
+                                    href="{{ $buildFilterUrl(['sort' => 'latest', 'page' => null]) }}"
+                                    class="sort-link {{ $currentSort === 'latest' ? 'active' : '' }}"
+                                >
+                                    Newest
+                                </a>
+
+                                <a
+                                    href="{{ $buildFilterUrl(['sort' => 'name', 'page' => null]) }}"
+                                    class="sort-link {{ $currentSort === 'name' ? 'active' : '' }}"
+                                >
+                                    A–Z
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- =================================================
+                         PROVIDER GRID
+                    ================================================== --}}
+                    <div class="providers-grid">
+
+                        @forelse($sproviders as $sprovider)
+
+                            @php
+                                $providerName = trim($sprovider->sprovider_name ?? '');
+
+                                $categoryName = optional($sprovider->category)->name
+                                    ?? 'Service Provider';
+
+                                $city = trim($sprovider->city ?? '');
+
+                                $serviceLocations = trim(
+                                    $sprovider->service_locations ?? ''
+                                );
+
+                                $image = !empty($sprovider->image)
+                                    ? asset('image/profile/' . $sprovider->image)
+                                    : asset('image/profile/default.png');
+
+                                $whatsappNumber = preg_replace(
+                                    '/[^0-9]/',
+                                    '',
+                                    $sprovider->phone ?? $defaultWhatsapp
+                                );
+
+                                $whatsappMessage = urlencode(
+                                    'Hello ' . $providerName .
+                                    ', I found your profile on Connector and would like to know more about your services.'
+                                );
+                            @endphp
+
+
+                            <article class="provider-card">
+
+                                {{-- Image --}}
+                                <div class="provider-image-wrap">
+
+                                    <img
+                                        src="{{ $image }}"
+                                        alt="{{ $providerName }}"
+                                        class="provider-image"
+                                        loading="lazy"
+                                        onerror="this.onerror=null;this.src='{{ asset('image/profile/default.png') }}';"
+                                    >
+
+                                    <div class="provider-image-overlay"></div>
+
+                                    <span
+                                        class="provider-category-badge"
+                                        title="{{ $categoryName }}"
+                                    >
+                                        {{ $categoryName }}
+                                    </span>
+
+                                </div>
+
+
+                                {{-- Body --}}
+                                <div class="provider-body">
+
+                                    <a
+                                        href="{{ route('home.service-provider_profile', [
+                                            'sprovider_id' => $sprovider->id
+                                        ]) }}"
+                                        class="provider-name"
+                                        title="{{ $providerName }}"
                                     >
                                         {{ $providerName }}
                                     </a>
 
+
+                                    <div
+                                        class="provider-service"
+                                        title="{{ $categoryName }}"
+                                    >
+                                        {{ $categoryName }}
+                                    </div>
+
+
+                                    <div class="provider-meta">
+
+                                        @if($city)
+                                            <div class="provider-meta-item">
+
+                                                <i class="fa-solid fa-location-dot"></i>
+
+                                                <span title="{{ $city }}">
+                                                    {{ $city }}
+                                                </span>
+
+                                            </div>
+                                        @endif
+
+
+                                        @if($serviceLocations)
+
+                                            <div class="provider-meta-item">
+
+                                                <i class="fa-solid fa-map-location-dot"></i>
+
+                                                <span title="{{ $serviceLocations }}">
+                                                    {{ $serviceLocations }}
+                                                </span>
+
+                                            </div>
+
+                                        @elseif($city)
+
+                                            <div class="provider-meta-item">
+
+                                                <i class="fa-solid fa-globe"></i>
+
+                                                <span>
+                                                    Service available locally
+                                                </span>
+
+                                            </div>
+
+                                        @endif
+
+                                    </div>
+
+
+                                    <div class="provider-actions">
+
+                                        <a
+                                            href="{{ route('home.service-provider_profile', [
+                                                'sprovider_id' => $sprovider->id
+                                            ]) }}"
+                                            class="provider-profile-btn"
+                                        >
+                                            View profile
+                                        </a>
+
+
+                                        <a
+                                            href="https://wa.me/{{ $whatsappNumber }}?text={{ $whatsappMessage }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="provider-whatsapp-btn"
+                                            aria-label="Contact {{ $providerName }} on WhatsApp"
+                                            title="WhatsApp"
+                                        >
+                                            <i class="fa-brands fa-whatsapp"></i>
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        @empty
+
+                            <div class="provider-empty">
+
+                                <div class="empty-icon">
+                                    <i class="fa-solid fa-user-group"></i>
+                                </div>
+
+                                <h3>
+                                    No service providers found
                                 </h3>
 
+                                <p>
+                                    We couldn't find providers matching your
+                                    current filters. Try another category,
+                                    location, or search term.
+                                </p>
 
-                                <div class="provider-location">
-
-                                    <i data-lucide="map-pin" width="11"></i>
-
-                                    <span>
-                                        {{ $location }}
-                                    </span>
-
-                                </div>
-
-
-                                {{-- Rating --}}
-                                <div class="provider-rating">
-
-                                    <span class="rating-stars">
-
-                                        @for($i = 1; $i <= 5; $i++)
-
-                                            @if($rating >= $i)
-
-                                                <i
-                                                    data-lucide="star"
-                                                    width="10"
-                                                    fill="currentColor"
-                                                ></i>
-
-                                            @elseif($rating >= $i - .5)
-
-                                                <i
-                                                    data-lucide="star-half"
-                                                    width="10"
-                                                    fill="currentColor"
-                                                ></i>
-
-                                            @else
-
-                                                <i
-                                                    data-lucide="star"
-                                                    width="10"
-                                                ></i>
-
-                                            @endif
-
-                                        @endfor
-
-                                    </span>
-
-                                    <span class="rating-number">
-                                        {{ number_format($rating, 1) }}
-                                    </span>
-
-                                    @if($reviewCount > 0)
-
-                                        <span class="rating-reviews">
-                                            ({{ number_format($reviewCount) }})
-                                        </span>
-
-                                    @endif
-
-                                </div>
-
-
-                                {{-- Actions --}}
-                                <div class="provider-actions">
-
-                                    <a
-                                        href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                        class="provider-action provider-view"
-                                    >
-                                        <i data-lucide="eye" width="12"></i>
-                                        View Profile
-                                    </a>
-
-
-                                    @if(!empty($sprovider->proEmail))
-
-                                        <a
-                                            href="mailto:{{ $sprovider->proEmail }}"
-                                            class="provider-action provider-message"
-                                        >
-                                            <i data-lucide="message-circle" width="12"></i>
-                                            Message
-                                        </a>
-
-                                    @else
-
-                                        <a
-                                            href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                            class="provider-action provider-message"
-                                        >
-                                            <i data-lucide="message-circle" width="12"></i>
-                                            Contact
-                                        </a>
-
-                                    @endif
-
-                                </div>
+                                <a
+                                    href="{{ url()->current() }}"
+                                    class="empty-reset"
+                                >
+                                    Clear filters
+                                </a>
 
                             </div>
 
-                        </article>
-
-                    @empty
-
-                        <div class="empty-state">
-
-                            <div class="empty-icon">
-                                <i data-lucide="users-round-search" width="28"></i>
-                            </div>
-
-                            <h3>
-                                No service providers found
-                            </h3>
-
-                            <p>
-                                We couldn't find providers matching your current
-                                filters. Try changing the category, location or
-                                search keywords.
-                            </p>
-
-                            <a
-                                href="{{ route('home.service_provider') }}"
-                                class="reset-all"
-                            >
-                                <i data-lucide="rotate-ccw" width="13"></i>
-                                Reset Filters
-                            </a>
-
-                        </div>
-
-                    @endforelse
-
-                </div>
-
-
-                {{-- =================================================
-                     PAGINATION
-                ================================================== --}}
-                @if(method_exists($sproviders, 'hasPages') && $sproviders->hasPages())
-
-                    <div class="pagination-wrapper">
-
-                        <div class="pagination-info">
-
-                            Showing
-
-                            <strong>
-                                {{ $sproviders->firstItem() ?? 0 }}
-                            </strong>
-
-                            to
-
-                            <strong>
-                                {{ $sproviders->lastItem() ?? 0 }}
-                            </strong>
-
-                            of
-
-                            <strong>
-                                {{ number_format($sproviders->total()) }}
-                            </strong>
-
-                            providers
-
-                        </div>
-
-
-                        <div>
-                            {{ $sproviders->onEachSide(1)->links() }}
-                        </div>
+                        @endforelse
 
                     </div>
 
-                @endif
 
-            </main>
+                    {{-- Pagination --}}
+                    @if($sproviders->hasPages())
+
+                        <div class="providers-pagination">
+
+                            {{ $sproviders->onEachSide(1)->links() }}
+
+                        </div>
+
+                    @endif
+
+                </main>
+
+            </div>
 
         </div>
-
-    </div>
-
-</section>
-
-
-{{-- =========================================================
-     MOBILE FILTER OFFCANVAS
-========================================================= --}}
-<div
-    class="offcanvas offcanvas-start filter-offcanvas"
-    tabindex="-1"
-    id="mobileProviderFilter"
-    aria-labelledby="mobileProviderFilterLabel"
->
-
-    <div class="offcanvas-header">
-
-        <h5
-            class="offcanvas-title"
-            id="mobileProviderFilterLabel"
-        >
-            Filter Providers
-        </h5>
-
-        <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="offcanvas"
-            aria-label="Close"
-        ></button>
-
-    </div>
-
-
-    <div class="offcanvas-body p-0">
-
-        <form
-            method="GET"
-            action="{{ route('home.service_provider') }}"
-            class="filter-body"
-        >
-
-            {{-- Search --}}
-            <div class="filter-group">
-
-                <label class="filter-label">
-                    Search
-                </label>
-
-                <div class="filter-input-wrap">
-
-                    <i data-lucide="search" width="14"></i>
-
-                    <input
-                        type="text"
-                        name="search"
-                        class="filter-input"
-                        placeholder="Provider or service..."
-                        value="{{ request('search') }}"
-                    >
-
-                </div>
-
-            </div>
-
-
-            {{-- Category --}}
-            <div class="filter-group">
-
-                <label class="filter-label">
-                    Category
-                </label>
-
-                <select
-                    name="category"
-                    class="filter-select"
-                >
-
-                    <option value="">
-                        All categories
-                    </option>
-
-                    @foreach($categories ?? [] as $category)
-
-                        <option
-                            value="{{ $category->slug }}"
-                            @selected(request('category') == $category->slug)
-                        >
-                            {{ $category->name }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-
-            {{-- Location --}}
-            <div class="filter-group">
-
-                <label class="filter-label">
-                    Location
-                </label>
-
-                <select
-                    name="location"
-                    class="filter-select"
-                >
-
-                    <option value="">
-                        All locations
-                    </option>
-
-                    @foreach($locations ?? [] as $location)
-
-                        <option
-                            value="{{ $location }}"
-                            @selected(request('location') == $location)
-                        >
-                            {{ $location }}
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-
-            {{-- Availability --}}
-            <div class="filter-group">
-
-                <label class="filter-label">
-                    Availability
-                </label>
-
-                <label class="filter-check">
-                    <input
-                        type="radio"
-                        name="availability"
-                        value=""
-                        @checked(!request('availability'))
-                    >
-                    <span>All providers</span>
-                </label>
-
-                <label class="filter-check">
-                    <input
-                        type="radio"
-                        name="availability"
-                        value="available"
-                        @checked(request('availability') === 'available')
-                    >
-                    <span>Available now</span>
-                </label>
-
-                <label class="filter-check">
-                    <input
-                        type="radio"
-                        name="availability"
-                        value="verified"
-                        @checked(request('availability') === 'verified')
-                    >
-                    <span>Verified providers</span>
-                </label>
-
-            </div>
-
-
-            {{-- Sort --}}
-            <div class="filter-group">
-
-                <label class="filter-label">
-                    Sort By
-                </label>
-
-                <select
-                    name="sort"
-                    class="filter-select"
-                >
-
-                    <option
-                        value="latest"
-                        @selected(request('sort', 'latest') === 'latest')
-                    >
-                        Newest
-                    </option>
-
-                    <option
-                        value="name"
-                        @selected(request('sort') === 'name')
-                    >
-                        Name A–Z
-                    </option>
-
-                    <option
-                        value="rating"
-                        @selected(request('sort') === 'rating')
-                    >
-                        Highest rated
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <button
-                type="submit"
-                class="apply-filter"
-            >
-                Apply Filters
-            </button>
-
-        </form>
-
-    </div>
+    </section>
 
 </div>
 
 
 {{-- =========================================================
-     CALL TO ACTION
+     MOBILE FILTER DRAWER
 ========================================================= --}}
-@include('includes.call-to-action')
+
+<div class="filter-overlay" id="providerFilterOverlay"></div>
+
+<aside
+    class="mobile-filter-drawer"
+    id="providerFilterDrawer"
+    aria-label="Provider filters"
+>
+
+    <div class="drawer-header">
+
+        <strong>
+            Filter providers
+        </strong>
+
+        <button
+            type="button"
+            class="drawer-close"
+            id="closeProviderFilter"
+            aria-label="Close filters"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+    </div>
+
+
+    <div class="drawer-body">
+
+        <div class="filter-group">
+
+            <div class="filter-title">
+                <h4>Search</h4>
+            </div>
+
+            <form
+                method="GET"
+                action="{{ url()->current() }}"
+                class="filter-search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    name="search"
+                    value="{{ $currentSearch }}"
+                    placeholder="Search providers..."
+                >
+
+                @if($currentCategory)
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ $currentCategory }}"
+                    >
+                @endif
+
+                @if($currentLocation)
+                    <input
+                        type="hidden"
+                        name="location"
+                        value="{{ $currentLocation }}"
+                    >
+                @endif
+
+                <input
+                    type="hidden"
+                    name="sort"
+                    value="{{ $currentSort }}"
+                >
+
+            </form>
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <div class="filter-title">
+
+                <h4>Category</h4>
+
+                <span class="filter-count">
+                    {{ count($categories ?? []) }}
+                </span>
+
+            </div>
+
+
+            <div class="filter-options">
+
+                <a
+                    href="{{ $buildFilterUrl([
+                        'category' => null,
+                        'page' => null
+                    ]) }}"
+                    class="filter-option {{ !$currentCategory ? 'active' : '' }}"
+                >
+
+                    <span class="filter-option-main">
+
+                        <span class="filter-option-icon">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </span>
+
+                        <span class="filter-option-label">
+                            All categories
+                        </span>
+
+                    </span>
+
+                    <span class="filter-check"></span>
+
+                </a>
+
+
+                @foreach($categories ?? [] as $category)
+
+                    <a
+                        href="{{ $buildFilterUrl([
+                            'category' => $category->slug,
+                            'page' => null
+                        ]) }}"
+                        class="filter-option {{ $currentCategory === $category->slug ? 'active' : '' }}"
+                    >
+
+                        <span class="filter-option-main">
+
+                            <span class="filter-option-icon">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </span>
+
+                            <span
+                                class="filter-option-label"
+                                title="{{ $category->name }}"
+                            >
+                                {{ $category->name }}
+                            </span>
+
+                        </span>
+
+                        <span class="filter-check"></span>
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-group">
+
+            <div class="filter-title">
+
+                <h4>Location</h4>
+
+                <span class="filter-count">
+                    {{ count($locations ?? []) }}
+                </span>
+
+            </div>
+
+
+            <div class="filter-options">
+
+                <a
+                    href="{{ $buildFilterUrl([
+                        'location' => null,
+                        'page' => null
+                    ]) }}"
+                    class="filter-option {{ !$currentLocation ? 'active' : '' }}"
+                >
+
+                    <span class="filter-option-main">
+
+                        <span class="filter-option-icon">
+                            <i class="fa-solid fa-globe"></i>
+                        </span>
+
+                        <span class="filter-option-label">
+                            All locations
+                        </span>
+
+                    </span>
+
+                    <span class="filter-check"></span>
+
+                </a>
+
+
+                @foreach($locations ?? [] as $location)
+
+                    <a
+                        href="{{ $buildFilterUrl([
+                            'location' => $location,
+                            'page' => null
+                        ]) }}"
+                        class="filter-option {{ $currentLocation === $location ? 'active' : '' }}"
+                    >
+
+                        <span class="filter-option-main">
+
+                            <span class="filter-option-icon">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </span>
+
+                            <span
+                                class="filter-option-label"
+                                title="{{ $location }}"
+                            >
+                                {{ $location }}
+                            </span>
+
+                        </span>
+
+                        <span class="filter-check"></span>
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ url()->current() }}"
+            class="empty-reset"
+            style="width:100%;"
+        >
+            Clear all filters
+        </a>
+
+    </div>
+
+</aside>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
+    const body = document.body;
+
+    const openButton = document.getElementById('openProviderFilter');
+    const closeButton = document.getElementById('closeProviderFilter');
+    const overlay = document.getElementById('providerFilterOverlay');
+
+    function openFilter() {
+        body.classList.add('filter-open');
+    }
+
+    function closeFilter() {
+        body.classList.remove('filter-open');
+    }
+
+    if (openButton) {
+        openButton.addEventListener('click', openFilter);
+    }
+
+    if (closeButton) {
+        closeButton.addEventListener('click', closeFilter);
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', closeFilter);
+    }
+
+
+    /*
+     * Sidebar search:
+     * Press Enter to submit the search while preserving
+     * currently selected category/location.
+     */
+    const sidebarSearch = document.getElementById(
+        'sidebarProviderSearch'
+    );
+
+    if (sidebarSearch) {
+
+        sidebarSearch.addEventListener('keydown', function (event) {
+
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            event.preventDefault();
+
+            const url = new URL(window.location.href);
+
+            const value = this.value.trim();
+
+            if (value) {
+                url.searchParams.set('search', value);
+            } else {
+                url.searchParams.delete('search');
+            }
+
+            url.searchParams.delete('page');
+
+            window.location.href = url.toString();
+
+        });
+
+    }
+
+
+    /*
+     * Escape closes mobile filter drawer.
+     */
+    document.addEventListener('keydown', function (event) {
+
+        if (event.key === 'Escape') {
+            closeFilter();
         }
 
     });
+
+});
 </script>
+
 
 @endsection

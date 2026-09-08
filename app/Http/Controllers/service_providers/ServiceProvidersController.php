@@ -18,35 +18,190 @@ use App\Models\Promotion;
 
 class ServiceProvidersController extends Controller
 {
-    public function serviceProviders()
+    public function serviceProviders(Request $request)
     {
-        $sproviders = ServiceProvider::paginate(12);
-        return view('service_provider.serviceProviders',compact('sproviders'));
+        $query = ServiceProvider::query()
+            ->with('category')
+            ->whereNotNull('sprovider_name')
+            ->where('sprovider_name', '!=', '');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->filled('search')) {
+
+            $search = trim($request->input('search'));
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where(
+                    'sprovider_name',
+                    'like',
+                    "%{$search}%"
+                )
+
+                    ->orWhere(
+                        'city',
+                        'like',
+                        "%{$search}%"
+                    )
+
+                    ->orWhere(
+                        'service_locations',
+                        'like',
+                        "%{$search}%"
+                    );
+            });
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Category
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->filled('category')) {
+
+            $query->whereHas(
+                'category',
+                function ($q) use ($request) {
+
+                    $q->where(
+                        'slug',
+                        $request->input('category')
+                    );
+                }
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Location
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->filled('location')) {
+
+            $location = $request->input('location');
+
+            $query->where(function ($q) use ($location) {
+
+                $q->where(
+                    'city',
+                    $location
+                )
+
+                    ->orWhere(
+                        'service_locations',
+                        $location
+                    );
+            });
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Sorting
+    |--------------------------------------------------------------------------
+    */
+
+        switch ($request->input('sort', 'latest')) {
+
+            case 'name':
+
+                $query->orderBy(
+                    'sprovider_name',
+                    'asc'
+                );
+
+                break;
+
+            case 'latest':
+            default:
+
+                $query->latest('created_at');
+
+                break;
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+
+        $sproviders = $query
+            ->paginate(20)
+            ->withQueryString();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Categories
+    |--------------------------------------------------------------------------
+    */
+
+        $categories = ServiceCategory::query()
+            ->orderBy('name')
+            ->get();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Locations
+    |--------------------------------------------------------------------------
+    */
+
+        $locations = ServiceProvider::query()
+            ->whereNotNull('city')
+            ->where('city', '!=', '')
+            ->select('city')
+            ->distinct()
+            ->orderBy('city')
+            ->pluck('city');
+
+        return view('service_provider.serviceProviders', compact(
+            'sproviders',
+            'categories',
+            'locations'
+        ));
     }
     public function profile($sprovider_id)
-{
-    $sproviders = ServiceProvider::where('id', $sprovider_id)->first();
-    $portfolios = Portfolio::where('service_provider_id', $sproviders->id)->get();
-    $workingHours = WorkingHour::where('sprovider_id', $sprovider_id)->get();
-    $feedback = Feedback::where('Service_Provider_ID', $sprovider_id)->where('approved', true)->get();
-    $ratings = Rating::where('Service_provider_ID', $sprovider_id)->where('approved', true)->get();
-    $averageRating = Rating::where('Service_provider_ID', $sprovider_id)->where('approved', true)->avg('rating');
-    $averageRating = round($averageRating, 1);
-    $promotions = Promotion::where('service_provider_id', $sprovider_id)->where('end_date', '>=', Carbon::now())->get();
+    {
+        $sproviders = ServiceProvider::where('id', $sprovider_id)->first();
+        $portfolios = Portfolio::where('service_provider_id', $sproviders->id)->get();
+        $workingHours = WorkingHour::where('sprovider_id', $sprovider_id)->get();
+        $feedback = Feedback::where('Service_Provider_ID', $sprovider_id)->where('approved', true)->get();
+        $ratings = Rating::where('Service_provider_ID', $sprovider_id)->where('approved', true)->get();
+        $averageRating = Rating::where('Service_provider_ID', $sprovider_id)->where('approved', true)->avg('rating');
+        $averageRating = round($averageRating, 1);
+        $promotions = Promotion::where('service_provider_id', $sprovider_id)->where('end_date', '>=', Carbon::now())->get();
 
-    // Group services by subcategory
-    $servicesBySubcategory = Service::where('service_provider_id', $sprovider_id)
-        ->with('subcategory')
-        ->get()
-        ->groupBy(function ($service) {
-            return $service->subcategory ? $service->subcategory->name : 'Uncategorized';
-        });
+        // Group services by subcategory
+        $servicesBySubcategory = Service::where('service_provider_id', $sprovider_id)
+            ->with('subcategory')
+            ->get()
+            ->groupBy(function ($service) {
+                return $service->subcategory ? $service->subcategory->name : 'Uncategorized';
+            });
 
-    return view('service_provider.serviceProviderProfile', compact(
-        'sproviders', 'portfolios', 'workingHours', 'feedback',
-        'ratings', 'averageRating', 'promotions', 'servicesBySubcategory'
-    ));
-}
+        return view('service_provider.serviceProviderProfile', compact(
+            'sproviders',
+            'portfolios',
+            'workingHours',
+            'feedback',
+            'ratings',
+            'averageRating',
+            'promotions',
+            'servicesBySubcategory'
+        ));
+    }
 
     public function sendEmailInquiry(Request $request)
     {
@@ -67,14 +222,13 @@ class ServiceProvidersController extends Controller
     }
     public function ProviderByLocation($location)
     {
-        $sproviders = ServiceProvider::where('service_locations',$location)->paginate(9);
-        return view('service_provider.serviceProviderByLocation',compact('sproviders'));
+        $sproviders = ServiceProvider::where('service_locations', $location)->paginate(9);
+        return view('service_provider.serviceProviderByLocation', compact('sproviders'));
     }
     public function serviceProviderByCategory($service_category_name)
     {
-        $scategory = ServiceCategory::where('slug',$service_category_name)->first();
-        $sproviders = ServiceProvider::where('service_category_id',$scategory->id)->paginate(9);
-        return view('service_provider.serviceProviderByCategory',compact('sproviders'));
+        $scategory = ServiceCategory::where('slug', $service_category_name)->first();
+        $sproviders = ServiceProvider::where('service_category_id', $scategory->id)->paginate(9);
+        return view('service_provider.serviceProviderByCategory', compact('sproviders'));
     }
-    
 }
