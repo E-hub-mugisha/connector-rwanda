@@ -5,2785 +5,1752 @@
 @section('content')
 
 <style>
-    :root {
-        --connector-primary: #6B9080;
-        --connector-primary-dark: #254035;
-        --connector-soft: #EEF4F1;
-        --connector-bg: #F7FAF8;
-        --connector-text: #183028;
-        --connector-muted: #65786F;
-        --connector-border: #E1EAE6;
-        --connector-gold: #C99A3B;
-        --connector-danger: #C95A43;
-        --connector-white: #ffffff;
-        --connector-shadow: 0 10px 30px rgba(37, 64, 53, .08);
-        --connector-shadow-lg: 0 20px 50px rgba(37, 64, 53, .12);
-        --connector-radius: 18px;
+  :root {
+    --connector-primary: #6B9080;
+    --connector-primary-dark: #254035;
+    --connector-soft: #EEF4F1;
+    --connector-bg: #F7FAF8;
+    --connector-text: #183028;
+    --connector-muted: #65786F;
+    --connector-border: #E1EAE6;
+    --connector-gold: #C99A3B;
+    --connector-danger: #C95A43;
+    --connector-white: #FFFFFF;
+    --connector-shadow: 0 10px 30px rgba(37, 64, 53, .07);
+    --connector-shadow-lg: 0 20px 50px rgba(37, 64, 53, .11);
+  }
+
+  .category-page {
+    min-height: calc(100vh - 70px);
+    background: var(--connector-bg);
+    padding: 28px 0 45px;
+  }
+
+  .category-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  /* =========================================================
+       PAGE HEADER
+    ========================================================= */
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .page-header-left {
+    min-width: 0;
+  }
+
+  .page-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--connector-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .page-eyebrow span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--connector-primary);
+  }
+
+  .page-title {
+    color: var(--connector-text);
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: -.035em;
+    margin: 0;
+  }
+
+  .page-description {
+    color: var(--connector-muted);
+    font-size: 14px;
+    margin: 7px 0 0;
+    max-width: 680px;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .btn-saas {
+    min-height: 42px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 11px;
+    border: 1px solid var(--connector-border);
+    background: #fff;
+    color: var(--connector-text);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+
+  .btn-saas:hover {
+    color: var(--connector-primary-dark);
+    text-decoration: none;
+    border-color: #cadbd4;
+    transform: translateY(-1px);
+  }
+
+  .btn-saas-primary {
+    background: var(--connector-primary-dark);
+    color: #fff;
+    border-color: var(--connector-primary-dark);
+    box-shadow: 0 7px 18px rgba(37, 64, 53, .14);
+  }
+
+  .btn-saas-primary:hover {
+    background: #1c3229;
+    color: #fff;
+    border-color: #1c3229;
+  }
+
+
+  /* =========================================================
+       ALERT
+    ========================================================= */
+
+  .saas-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: var(--connector-soft);
+    border: 1px solid #d7e6df;
+    border-radius: 12px;
+    color: var(--connector-primary-dark);
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .saas-alert i {
+    color: var(--connector-primary);
+  }
+
+
+  /* =========================================================
+       STATS
+    ========================================================= */
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: #fff;
+    border: 1px solid var(--connector-border);
+    border-radius: 15px;
+    padding: 18px;
+    box-shadow: var(--connector-shadow);
+    transition: .2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--connector-shadow-lg);
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .stat-label {
+    color: var(--connector-muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .055em;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--connector-soft);
+    color: var(--connector-primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .stat-value {
+    color: var(--connector-text);
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -.03em;
+  }
+
+  .stat-description {
+    margin-top: 7px;
+    color: var(--connector-muted);
+    font-size: 11px;
+  }
+
+
+  /* =========================================================
+       MAIN CARD
+    ========================================================= */
+
+  .main-card {
+    background: #fff;
+    border: 1px solid var(--connector-border);
+    border-radius: 18px;
+    box-shadow: var(--connector-shadow);
+    overflow: hidden;
+  }
+
+  .main-card-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--connector-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .card-heading {
+    min-width: 0;
+  }
+
+  .card-title {
+    color: var(--connector-text);
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .card-description {
+    color: var(--connector-muted);
+    font-size: 12px;
+    margin: 4px 0 0;
+  }
+
+
+  /* =========================================================
+       TOOLBAR
+    ========================================================= */
+
+  .toolbar {
+    padding: 14px 20px;
+    background: #fbfdfc;
+    border-bottom: 1px solid var(--connector-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .search-box {
+    width: 330px;
+    position: relative;
+  }
+
+  .search-box i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #92a39b;
+    font-size: 12px;
+  }
+
+  .search-box input {
+    width: 100%;
+    height: 39px;
+    border: 1px solid var(--connector-border);
+    border-radius: 10px;
+    background: #fff;
+    padding: 0 13px 0 36px;
+    color: var(--connector-text);
+    font-size: 12px;
+    outline: none;
+    transition: .2s ease;
+  }
+
+  .search-box input:focus {
+    border-color: var(--connector-primary);
+    box-shadow: 0 0 0 3px rgba(107, 144, 128, .10);
+  }
+
+  .toolbar-count {
+    color: var(--connector-muted);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+
+  /* =========================================================
+       TABLE
+    ========================================================= */
+
+  .table-wrap {
+    overflow-x: auto;
+  }
+
+  .category-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  .category-table th {
+    background: #fafcfb;
+    color: var(--connector-muted);
+    border-bottom: 1px solid var(--connector-border);
+    padding: 12px 18px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    white-space: nowrap;
+  }
+
+  .category-table td {
+    padding: 14px 18px;
+    border-bottom: 1px solid #edf2ef;
+    vertical-align: middle;
+    color: var(--connector-text);
+    font-size: 13px;
+  }
+
+  .category-table tbody tr {
+    transition: .15s ease;
+  }
+
+  .category-table tbody tr:hover {
+    background: #fbfdfc;
+  }
+
+  .category-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+
+  /* =========================================================
+       CATEGORY ID
+    ========================================================= */
+
+  .category-id {
+    width: 45px;
+    color: #95a49e;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+
+  /* =========================================================
+       CATEGORY IMAGE
+    ========================================================= */
+
+  .category-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid var(--connector-border);
+    background: var(--connector-soft);
+  }
+
+  .image-placeholder {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--connector-soft);
+    color: var(--connector-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+
+  /* =========================================================
+       CATEGORY NAME
+    ========================================================= */
+
+  .category-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .category-name {
+    color: var(--connector-text);
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 3px;
+  }
+
+  .category-slug {
+    color: var(--connector-muted);
+    font-size: 10px;
+  }
+
+
+  /* =========================================================
+       BADGES
+    ========================================================= */
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-featured {
+    color: #89681c;
+    background: #faf4e4;
+  }
+
+  .status-normal {
+    color: var(--connector-muted);
+    background: #f1f4f2;
+  }
+
+  .parent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--connector-primary-dark);
+    background: var(--connector-soft);
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .sub-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 27px;
+    height: 27px;
+    padding: 0 8px;
+    border-radius: 8px;
+    background: var(--connector-soft);
+    color: var(--connector-primary-dark);
+    font-size: 11px;
+    font-weight: 800;
+    margin-right: 6px;
+  }
+
+  .view-subcategories {
+    border: 0;
+    background: transparent;
+    color: var(--connector-primary);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .view-subcategories:hover {
+    color: var(--connector-primary-dark);
+  }
+
+
+  /* =========================================================
+       ACTIONS
+    ========================================================= */
+
+  .action-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--connector-border);
+    background: #fff;
+    color: var(--connector-muted);
+    transition: .2s ease;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .action-btn:hover {
+    color: var(--connector-primary-dark);
+    background: var(--connector-soft);
+    border-color: #cadbd4;
+    text-decoration: none;
+  }
+
+  .action-btn.delete:hover {
+    color: var(--connector-danger);
+    background: #fff3f0;
+    border-color: #f0d4cd;
+  }
+
+  .action-form {
+    margin: 0;
+    padding: 0;
+  }
+
+
+  /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+  .empty-state {
+    padding: 65px 25px;
+    text-align: center;
+  }
+
+  .empty-icon {
+    width: 58px;
+    height: 58px;
+    margin: 0 auto 15px;
+    border-radius: 16px;
+    background: var(--connector-soft);
+    color: var(--connector-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+
+  .empty-title {
+    color: var(--connector-text);
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 5px;
+  }
+
+  .empty-description {
+    color: var(--connector-muted);
+    font-size: 12px;
+    margin-bottom: 17px;
+  }
+
+
+  /* =========================================================
+       MODAL
+    ========================================================= */
+
+  .saas-modal .modal-content {
+    border: 0;
+    border-radius: 18px;
+    box-shadow: 0 25px 70px rgba(20, 40, 32, .20);
+    overflow: hidden;
+  }
+
+  .saas-modal .modal-header {
+    padding: 19px 20px;
+    background: #fff;
+    border-bottom: 1px solid var(--connector-border);
+  }
+
+  .saas-modal .modal-title {
+    color: var(--connector-text);
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .saas-modal .modal-body {
+    padding: 22px;
+    background: #fff;
+  }
+
+  .saas-modal .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--connector-border);
+    background: #fbfdfc;
+  }
+
+  .modal-subtitle {
+    color: var(--connector-muted);
+    font-size: 12px;
+    margin-top: 3px;
+  }
+
+  .form-label-saas {
+    display: block;
+    color: var(--connector-text);
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 7px;
+  }
+
+  .required {
+    color: var(--connector-danger);
+  }
+
+  .form-control-saas {
+    width: 100%;
+    height: 43px;
+    border: 1px solid var(--connector-border);
+    border-radius: 10px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: var(--connector-text);
+    background: #fff;
+    outline: none;
+    transition: .2s ease;
+  }
+
+  textarea.form-control-saas {
+    height: auto;
+    min-height: 100px;
+    padding-top: 10px;
+  }
+
+  .form-control-saas:focus {
+    border-color: var(--connector-primary);
+    box-shadow: 0 0 0 3px rgba(107, 144, 128, .10);
+  }
+
+  .form-help {
+    display: block;
+    color: var(--connector-muted);
+    font-size: 10px;
+    margin-top: 6px;
+  }
+
+  .image-upload {
+    border: 1px dashed #cbdad4;
+    border-radius: 12px;
+    background: #fbfdfc;
+    padding: 15px;
+  }
+
+  .image-upload input {
+    width: 100%;
+    font-size: 12px;
+    color: var(--connector-muted);
+  }
+
+  .modal-btn {
+    min-height: 40px;
+    padding: 0 15px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid var(--connector-border);
+  }
+
+  .modal-btn-primary {
+    background: var(--connector-primary-dark);
+    color: #fff;
+    border-color: var(--connector-primary-dark);
+  }
+
+  .modal-btn-primary:hover {
+    background: #1d342b;
+    color: #fff;
+  }
+
+
+  /* =========================================================
+       SUBCATEGORY LIST
+    ========================================================= */
+
+  .subcategory-list {
+    display: grid;
+    gap: 8px;
+  }
+
+  .subcategory-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid var(--connector-border);
+    border-radius: 10px;
+    background: #fbfdfc;
+  }
+
+  .subcategory-number {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--connector-soft);
+    color: var(--connector-primary-dark);
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .subcategory-name {
+    color: var(--connector-text);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .no-subcategories {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--connector-muted);
+    font-size: 12px;
+  }
+
+
+  /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+  @media (max-width: 1200px) {
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
 
+  }
+
+  @media (max-width: 768px) {
+
     .category-page {
-        min-height: calc(100vh - 70px);
-        background: var(--connector-bg);
-        padding: 28px;
+      padding-top: 20px;
     }
 
     .category-container {
-        max-width: 1500px;
-        margin: 0 auto;
+      padding: 0 15px;
     }
-
-    /* -------------------------------------------------------
-       HEADER
-    ------------------------------------------------------- */
 
     .page-header {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 28px;
-    }
-
-    .page-header-left {
-        min-width: 0;
-    }
-
-    .eyebrow {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: .08em;
-        text-transform: uppercase;
-        color: var(--connector-primary);
-        margin-bottom: 8px;
-    }
-
-    .eyebrow-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--connector-primary);
-    }
-
-    .page-title {
-        margin: 0;
-        color: var(--connector-text);
-        font-size: 30px;
-        line-height: 1.15;
-        font-weight: 800;
-        letter-spacing: -.03em;
-    }
-
-    .page-description {
-        margin: 8px 0 0;
-        color: var(--connector-muted);
-        font-size: 14px;
-        max-width: 650px;
-        line-height: 1.6;
+      flex-direction: column;
+      align-items: flex-start;
     }
 
     .page-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-shrink: 0;
+      width: 100%;
     }
 
-    /* -------------------------------------------------------
-       BUTTONS
-    ------------------------------------------------------- */
-
-    .btn-connector {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        border: 0;
-        border-radius: 11px;
-        padding: 11px 16px;
-        font-size: 13px;
-        font-weight: 750;
-        text-decoration: none !important;
-        transition: all .2s ease;
-        cursor: pointer;
-        white-space: nowrap;
+    .page-actions .btn-saas {
+      flex: 1;
     }
 
-    .btn-primary {
-        background: var(--connector-primary);
-        color: white !important;
-        box-shadow: 0 7px 18px rgba(107, 144, 128, .22);
+    .page-title {
+      font-size: 24px;
     }
-
-    .btn-primary:hover {
-        background: var(--connector-primary-dark);
-        transform: translateY(-1px);
-        color: white !important;
-    }
-
-    .btn-light {
-        background: white;
-        color: var(--connector-text) !important;
-        border: 1px solid var(--connector-border);
-    }
-
-    .btn-light:hover {
-        background: var(--connector-soft);
-        border-color: #cbdad4;
-    }
-
-    .btn-danger {
-        background: #FFF3F0;
-        color: var(--connector-danger) !important;
-        border: 1px solid #F2D8D2;
-    }
-
-    .btn-danger:hover {
-        background: var(--connector-danger);
-        color: white !important;
-    }
-
-    .btn-gold {
-        background: #FBF6EA;
-        color: #8B671E !important;
-        border: 1px solid #EBDDAD;
-    }
-
-    .btn-gold:hover {
-        background: var(--connector-gold);
-        color: white !important;
-    }
-
-    /* -------------------------------------------------------
-       ALERT
-    ------------------------------------------------------- */
-
-    .success-alert {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        background: #ECF8F2;
-        border: 1px solid #CFE9DA;
-        color: #286345;
-        padding: 13px 16px;
-        border-radius: 12px;
-        margin-bottom: 22px;
-        font-size: 13px;
-        font-weight: 650;
-    }
-
-    .success-alert-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .success-alert svg {
-        flex-shrink: 0;
-    }
-
-    .alert-close {
-        border: 0;
-        background: transparent;
-        color: inherit;
-        cursor: pointer;
-        opacity: .7;
-    }
-
-    /* -------------------------------------------------------
-       STATS
-    ------------------------------------------------------- */
 
     .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 22px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .main-card-header {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .search-box {
+      width: 100%;
+    }
+
+  }
+
+  @media (max-width: 500px) {
+
+    .stats-grid {
+      grid-template-columns: 1fr;
     }
 
     .stat-card {
-        background: white;
-        border: 1px solid var(--connector-border);
-        border-radius: var(--connector-radius);
-        padding: 19px;
-        box-shadow: var(--connector-shadow);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
+      padding: 16px;
     }
 
-    .stat-label {
-        font-size: 12px;
-        color: var(--connector-muted);
-        font-weight: 700;
-        margin-bottom: 6px;
+    .page-actions {
+      flex-direction: column;
     }
 
-    .stat-value {
-        font-size: 25px;
-        color: var(--connector-text);
-        font-weight: 850;
-        line-height: 1;
+    .page-actions .btn-saas {
+      width: 100%;
     }
 
-    .stat-icon {
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 13px;
-        background: var(--connector-soft);
-        color: var(--connector-primary);
-        flex-shrink: 0;
-    }
-
-    .stat-icon.gold {
-        background: #FBF6EA;
-        color: var(--connector-gold);
-    }
-
-    .stat-icon.dark {
-        background: #EEF2F0;
-        color: var(--connector-primary-dark);
-    }
-
-    /* -------------------------------------------------------
-       MAIN WORKSPACE
-    ------------------------------------------------------- */
-
-    .workspace {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 430px;
-        gap: 20px;
-        align-items: start;
-    }
-
-    .category-library {
-        background: white;
-        border: 1px solid var(--connector-border);
-        border-radius: 20px;
-        box-shadow: var(--connector-shadow);
-        min-width: 0;
-        overflow: hidden;
-    }
-
-    .library-header {
-        padding: 20px;
-        border-bottom: 1px solid var(--connector-border);
-    }
-
-    .library-title-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 16px;
-    }
-
-    .library-title {
-        margin: 0;
-        font-size: 17px;
-        font-weight: 800;
-        color: var(--connector-text);
-    }
-
-    .library-count {
-        color: var(--connector-muted);
-        font-size: 12px;
-        font-weight: 700;
-    }
-
-    .search-form {
-        display: flex;
-        gap: 8px;
-    }
-
-    .search-wrapper {
-        position: relative;
-        flex: 1;
-    }
-
-    .search-wrapper svg {
-        position: absolute;
-        left: 13px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #8B9B94;
-        pointer-events: none;
-    }
-
-    .search-input {
-        width: 100%;
-        height: 42px;
-        border: 1px solid var(--connector-border);
-        border-radius: 10px;
-        background: #FAFCFB;
-        color: var(--connector-text);
-        padding: 0 13px 0 40px;
-        font-size: 13px;
-        outline: none;
-        transition: .2s;
-    }
-
-    .search-input:focus {
-        border-color: var(--connector-primary);
-        box-shadow: 0 0 0 3px rgba(107, 144, 128, .10);
-        background: white;
-    }
-
-    .search-button {
-        height: 42px;
-        padding: 0 15px;
-        border-radius: 10px;
-        border: 0;
-        background: var(--connector-primary);
-        color: white;
-        font-size: 13px;
-        font-weight: 750;
-        cursor: pointer;
-    }
-
-    .clear-search {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 42px;
-        padding: 0 14px;
-        border-radius: 10px;
-        border: 1px solid var(--connector-border);
-        color: var(--connector-muted);
-        background: white;
-        text-decoration: none !important;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    /* -------------------------------------------------------
-       CATEGORY GRID
-    ------------------------------------------------------- */
-
-    .category-grid {
-        padding: 20px;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px;
-    }
-
-    .category-card {
-        position: relative;
-        background: #fff;
-        border: 1px solid var(--connector-border);
-        border-radius: 16px;
-        overflow: hidden;
-        transition: all .22s ease;
-        cursor: pointer;
-    }
-
-    .category-card:hover {
-        border-color: #bfd1c9;
-        box-shadow: 0 12px 30px rgba(37, 64, 53, .09);
-        transform: translateY(-2px);
-    }
-
-    .category-card.active {
-        border-color: var(--connector-primary);
-        box-shadow: 0 0 0 3px rgba(107, 144, 128, .12);
-    }
-
-    .category-card-top {
-        display: flex;
-        gap: 14px;
-        padding: 16px;
-    }
-
-    .category-image {
-        width: 78px;
-        height: 78px;
-        border-radius: 13px;
-        overflow: hidden;
-        flex-shrink: 0;
-        background: var(--connector-soft);
-        border: 1px solid var(--connector-border);
-    }
-
-    .category-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .category-image-placeholder {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--connector-primary);
-    }
-
-    .category-main {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .category-heading {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 8px;
-    }
-
-    .category-name {
-        margin: 0;
-        color: var(--connector-text);
-        font-size: 15px;
-        line-height: 1.3;
-        font-weight: 800;
-    }
-
-    .featured-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        background: #FBF6EA;
-        color: #8B671E;
-        border: 1px solid #EBDDAD;
-        border-radius: 999px;
-        padding: 4px 7px;
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        flex-shrink: 0;
-    }
-
-    .category-slug {
-        margin-top: 5px;
-        font-size: 11px;
-        color: var(--connector-muted);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .category-info {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        margin-top: 12px;
-        flex-wrap: wrap;
-    }
-
-    .category-info-item {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        color: var(--connector-muted);
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .category-info-item svg {
-        color: var(--connector-primary);
-    }
-
-    .category-card-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        padding: 11px 13px;
-        background: #FAFCFB;
-        border-top: 1px solid var(--connector-border);
-    }
-
-    .view-category {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: var(--connector-primary-dark);
-        font-size: 11px;
-        font-weight: 800;
-        background: transparent;
-        border: 0;
-        cursor: pointer;
-        padding: 4px;
-    }
-
-    .category-actions {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .action-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        min-height: 30px;
-        padding: 6px 9px;
-        border-radius: 8px;
-        border: 1px solid transparent;
-        background: transparent;
-        font-size: 10px;
-        font-weight: 800;
-        cursor: pointer;
-        text-decoration: none !important;
-        transition: .2s;
-    }
-
-    .action-edit {
-        color: var(--connector-primary-dark);
-        background: #F0F6F3;
-        border-color: #D9E8E1;
-    }
-
-    .action-edit:hover {
-        background: var(--connector-primary);
-        color: white;
-    }
-
-    .action-delete {
-        color: var(--connector-danger);
-        background: #FFF3F0;
-        border-color: #F2D8D2;
-    }
-
-    .action-delete:hover {
-        background: var(--connector-danger);
-        color: white;
-    }
-
-    /* -------------------------------------------------------
-       PAGINATION
-    ------------------------------------------------------- */
-
-    .pagination-area {
-        border-top: 1px solid var(--connector-border);
-        padding: 16px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-    }
-
-    .pagination-info {
-        color: var(--connector-muted);
-        font-size: 12px;
-    }
-
-    .pagination-info strong {
-        color: var(--connector-text);
-    }
-
-    .pagination-nav .pagination {
-        margin: 0;
-    }
-
-    .pagination-nav .page-link {
-        color: var(--connector-primary-dark);
-        border-color: var(--connector-border);
-        font-size: 12px;
-        font-weight: 700;
-        border-radius: 8px !important;
-        margin: 0 2px;
-    }
-
-    .pagination-nav .page-item.active .page-link {
-        background: var(--connector-primary);
-        border-color: var(--connector-primary);
-        color: white;
-    }
-
-    /* -------------------------------------------------------
-       RIGHT DETAILS PANEL
-    ------------------------------------------------------- */
-
-    .details-panel {
-        background: white;
-        border: 1px solid var(--connector-border);
-        border-radius: 20px;
-        box-shadow: var(--connector-shadow);
-        position: sticky;
-        top: 20px;
-        min-height: 500px;
-        overflow: hidden;
-    }
-
-    .details-empty {
-        min-height: 500px;
-        padding: 45px 30px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
-
-    .empty-icon {
-        width: 66px;
-        height: 66px;
-        border-radius: 18px;
-        background: var(--connector-soft);
-        color: var(--connector-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 18px;
-    }
-
-    .details-empty h3 {
-        margin: 0 0 8px;
-        color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 800;
-    }
-
-    .details-empty p {
-        max-width: 270px;
-        margin: 0;
-        color: var(--connector-muted);
-        font-size: 13px;
-        line-height: 1.6;
-    }
-
-    .details-content {
-        display: none;
-    }
-
-    .details-content.active {
-        display: block;
-        animation: panelIn .22s ease;
-    }
-
-    @keyframes panelIn {
-        from {
-            opacity: 0;
-            transform: translateX(8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    .details-header {
-        position: relative;
-        padding: 20px;
-        background: linear-gradient(135deg, #F2F7F4 0%, #FFFFFF 100%);
-        border-bottom: 1px solid var(--connector-border);
-    }
-
-    .details-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 12px;
-    }
-
-    .details-category-info {
-        display: flex;
-        gap: 12px;
-        min-width: 0;
-    }
-
-    .details-image {
-        width: 62px;
-        height: 62px;
-        border-radius: 13px;
-        overflow: hidden;
-        flex-shrink: 0;
-        background: var(--connector-soft);
-        border: 1px solid var(--connector-border);
-    }
-
-    .details-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .details-category-name {
-        margin: 0;
-        color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 850;
-        line-height: 1.3;
-    }
-
-    .details-category-slug {
-        color: var(--connector-muted);
-        font-size: 11px;
-        margin-top: 5px;
-    }
-
-    .close-details {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--connector-border);
-        border-radius: 9px;
-        background: white;
-        color: var(--connector-muted);
-        cursor: pointer;
-        flex-shrink: 0;
-    }
-
-    .close-details:hover {
-        background: var(--connector-soft);
-        color: var(--connector-text);
-    }
-
-    .details-stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 9px;
-        margin-top: 18px;
-    }
-
-    .details-stat {
-        background: rgba(255,255,255,.75);
-        border: 1px solid var(--connector-border);
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    .details-stat-label {
-        color: var(--connector-muted);
-        font-size: 10px;
-        font-weight: 700;
-    }
-
-    .details-stat-value {
-        color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 850;
-        margin-top: 2px;
-    }
-
-    .details-actions {
-        display: flex;
-        gap: 7px;
-        margin-top: 15px;
-    }
-
-    .details-actions .btn-connector {
-        flex: 1;
-        padding: 9px 10px;
-        font-size: 11px;
-    }
-
-    .subcategories-section {
-        padding: 20px;
-    }
-
-    .subcategories-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 13px;
-    }
-
-    .subcategories-heading h4 {
-        margin: 0;
-        color: var(--connector-text);
-        font-size: 14px;
-        font-weight: 800;
-    }
-
-    .sub-count {
-        color: var(--connector-muted);
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .subcategories-list {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .subcategory-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 11px;
-        border: 1px solid var(--connector-border);
-        border-radius: 11px;
-        background: #FAFCFB;
-    }
-
-    .subcategory-left {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        min-width: 0;
-    }
-
-    .subcategory-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--connector-soft);
-        color: var(--connector-primary);
-        flex-shrink: 0;
-    }
-
-    .subcategory-name {
-        margin: 0;
-        color: var(--connector-text);
-        font-size: 12px;
-        font-weight: 750;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .subcategory-slug {
-        color: var(--connector-muted);
-        font-size: 9px;
-        margin-top: 2px;
-    }
-
-    .subcategory-actions {
-        display: flex;
-        gap: 4px;
-        flex-shrink: 0;
-    }
-
-    .sub-action {
-        width: 27px;
-        height: 27px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 7px;
-        border: 1px solid var(--connector-border);
-        background: white;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    .sub-edit {
-        color: var(--connector-primary-dark);
-    }
-
-    .sub-edit:hover {
-        background: var(--connector-primary);
-        border-color: var(--connector-primary);
-        color: white;
-    }
-
-    .sub-delete {
-        color: var(--connector-danger);
-    }
-
-    .sub-delete:hover {
-        background: var(--connector-danger);
-        border-color: var(--connector-danger);
-        color: white;
-    }
-
-    .no-subcategories {
-        text-align: center;
-        padding: 30px 15px;
-        border: 1px dashed #CCDAD4;
-        border-radius: 12px;
-        background: #FAFCFB;
-    }
-
-    .no-subcategories svg {
-        color: var(--connector-primary);
-        margin-bottom: 8px;
-    }
-
-    .no-subcategories p {
-        margin: 0 0 12px;
-        color: var(--connector-muted);
-        font-size: 12px;
-    }
-
-    /* -------------------------------------------------------
-       MODAL
-    ------------------------------------------------------- */
-
-    .connector-modal .modal-content {
-        border: 0;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: var(--connector-shadow-lg);
-    }
-
-    .connector-modal .modal-header {
-        padding: 20px 22px;
-        background: linear-gradient(135deg, #F2F7F4, #fff);
-        border-bottom: 1px solid var(--connector-border);
-    }
-
-    .connector-modal .modal-title {
-        color: var(--connector-text);
-        font-size: 17px;
-        font-weight: 800;
-    }
-
-    .connector-modal .modal-body {
-        padding: 22px;
-    }
-
-    .connector-modal .modal-footer {
-        padding: 15px 22px;
-        border-top: 1px solid var(--connector-border);
-        background: #FAFCFB;
-    }
-
-    .form-label {
-        display: block;
-        color: var(--connector-text);
-        font-size: 12px;
-        font-weight: 800;
-        margin-bottom: 7px;
-    }
-
-    .form-control-connector,
-    .form-select-connector {
-        width: 100%;
-        min-height: 43px;
-        border: 1px solid var(--connector-border);
-        border-radius: 10px;
-        padding: 9px 12px;
-        color: var(--connector-text);
-        background: white;
-        font-size: 13px;
-        outline: none;
-        transition: .2s;
-    }
-
-    .form-control-connector:focus,
-    .form-select-connector:focus {
-        border-color: var(--connector-primary);
-        box-shadow: 0 0 0 3px rgba(107, 144, 128, .10);
-    }
-
-    .form-help {
-        font-size: 10px;
-        color: var(--connector-muted);
-        margin-top: 5px;
-    }
-
-    .required {
-        color: var(--connector-danger);
-    }
-
-    .image-upload {
-        border: 1px dashed #C9D8D2;
-        border-radius: 12px;
-        padding: 18px;
-        background: #FAFCFB;
-        text-align: center;
-    }
-
-    .image-upload svg {
-        color: var(--connector-primary);
-        margin-bottom: 7px;
-    }
-
-    .image-upload input {
-        font-size: 11px;
-        width: 100%;
-    }
-
-    /* -------------------------------------------------------
-       MOBILE DETAILS DRAWER
-    ------------------------------------------------------- */
-
-    .drawer-overlay {
-        display: none;
-    }
-
-    /* -------------------------------------------------------
-       RESPONSIVE
-    ------------------------------------------------------- */
-
-    @media (max-width: 1200px) {
-        .workspace {
-            grid-template-columns: minmax(0, 1fr) 370px;
-        }
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 992px) {
-        .category-page {
-            padding: 20px;
-        }
-
-        .workspace {
-            display: block;
-        }
-
-        .category-library {
-            margin-bottom: 20px;
-        }
-
-        .details-panel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: min(440px, 92vw);
-            z-index: 1050;
-            border-radius: 20px 0 0 20px;
-            transform: translateX(105%);
-            transition: transform .25s ease;
-            overflow-y: auto;
-        }
-
-        .details-panel.mobile-open {
-            transform: translateX(0);
-        }
-
-        .drawer-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1040;
-            background: rgba(24, 48, 40, .35);
-            backdrop-filter: blur(2px);
-        }
-
-        .drawer-overlay.active {
-            display: block;
-        }
-    }
-
-    @media (max-width: 700px) {
-        .category-page {
-            padding: 14px;
-        }
-
-        .page-header {
-            display: block;
-        }
-
-        .page-actions {
-            margin-top: 15px;
-        }
-
-        .page-actions .btn-connector {
-            width: 100%;
-        }
-
-        .stats-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .stat-card {
-            padding: 14px;
-        }
-
-        .stat-value {
-            font-size: 21px;
-        }
-
-        .category-grid {
-            grid-template-columns: 1fr;
-            padding: 14px;
-        }
-
-        .library-header {
-            padding: 15px;
-        }
-
-        .search-form {
-            flex-wrap: wrap;
-        }
-
-        .search-wrapper {
-            flex-basis: 100%;
-        }
-
-        .search-button,
-        .clear-search {
-            flex: 1;
-        }
-
-        .pagination-area {
-            display: block;
-        }
-
-        .pagination-info {
-            margin-bottom: 12px;
-        }
-
-        .pagination-nav {
-            overflow-x: auto;
-        }
-    }
-
-    @media (max-width: 450px) {
-        .stats-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .category-card-top {
-            padding: 13px;
-        }
-
-        .category-image {
-            width: 65px;
-            height: 65px;
-        }
-
-        .category-actions .action-button span {
-            display: none;
-        }
-
-        .action-button {
-            width: 30px;
-            padding: 6px;
-        }
-
-        .details-panel {
-            width: 100%;
-            border-radius: 0;
-        }
-    }
+  }
 </style>
 
-<div class="category-page">
-    <div class="category-container">
 
-        {{-- =====================================================
+<div class="category-page">
+
+  <div class="category-container">
+
+    {{-- =====================================================
              PAGE HEADER
         ====================================================== --}}
-        <div class="page-header">
-            <div class="page-header-left">
-                <div class="eyebrow">
-                    <span class="eyebrow-dot"></span>
-                    Marketplace
-                </div>
 
-                <h1 class="page-title">
-                    Service Categories
-                </h1>
+    <div class="page-header">
 
-                <p class="page-description">
-                    Organize the services available on Connector using categories
-                    and subcategories.
-                </p>
-            </div>
+      <div class="page-header-left">
 
-            <div class="page-actions">
-                <button
-                    type="button"
-                    class="btn-connector btn-primary"
-                    data-toggle="modal"
-                    data-target="#addCategoryModal"
-                >
-                    <i data-lucide="plus" width="16"></i>
-                    <span>Add Category</span>
-                </button>
-            </div>
+        <div class="page-eyebrow">
+          <span></span>
+          Marketplace
         </div>
 
-        {{-- =====================================================
+        <h1 class="page-title">
+          Service Categories
+        </h1>
+
+        <p class="page-description">
+          Organize services into clear categories and subcategories
+          to make your marketplace easier to discover and manage.
+        </p>
+
+      </div>
+
+      <div class="page-actions">
+
+        <button type="button"
+          class="btn-saas btn-saas-primary"
+          data-toggle="modal"
+          data-target="#CategoryModal">
+
+          <i class="fas fa-plus"></i>
+
+          Add Category
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    {{-- =====================================================
              SUCCESS MESSAGE
         ====================================================== --}}
-        @if(session('message'))
-            <div class="success-alert" id="successAlert">
-                <div class="success-alert-content">
-                    <i data-lucide="circle-check" width="17"></i>
-                    <span>{{ session('message') }}</span>
-                </div>
 
-                <button
-                    type="button"
-                    class="alert-close"
-                    onclick="document.getElementById('successAlert').remove()"
-                >
-                    <i data-lucide="x" width="16"></i>
-                </button>
-            </div>
-        @endif
+    @if(Session::has('message'))
 
-        {{-- =====================================================
-             STATISTICS
+    <div class="saas-alert">
+
+      <i class="fas fa-check-circle"></i>
+
+      <span>
+        {{ Session::get('message') }}
+      </span>
+
+    </div>
+
+    @endif
+
+
+    {{-- =====================================================
+             SUMMARY
         ====================================================== --}}
-        <div class="stats-grid">
 
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Total Categories</div>
-                    <div class="stat-value">
-                        {{ number_format($totalCategories ?? 0) }}
-                    </div>
-                </div>
+    @php
 
-                <div class="stat-icon">
-                    <i data-lucide="layers" width="20"></i>
-                </div>
-            </div>
+    $totalCategories = $scategories->count();
 
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Featured</div>
-                    <div class="stat-value">
-                        {{ number_format($featuredCategories ?? 0) }}
-                    </div>
-                </div>
+    $featuredCategories = $scategories->where('featured', true)->count();
 
-                <div class="stat-icon gold">
-                    <i data-lucide="star" width="20"></i>
-                </div>
-            </div>
+    $parentCategories = $scategories->filter(function ($category) {
+    return empty($category->service_category_id);
+    })->count();
 
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Parent Categories</div>
-                    <div class="stat-value">
-                        {{ number_format($parentCategories ?? 0) }}
-                    </div>
-                </div>
+    $totalSubcategories = $scategories->sum(function ($category) {
+    return $category->subcategories->count();
+    });
 
-                <div class="stat-icon dark">
-                    <i data-lucide="folder-tree" width="20"></i>
-                </div>
-            </div>
+    @endphp
 
-            <div class="stat-card">
-                <div>
-                    <div class="stat-label">Subcategories</div>
-                    <div class="stat-value">
-                        {{ number_format($totalSubcategories ?? 0) }}
-                    </div>
-                </div>
 
-                <div class="stat-icon">
-                    <i data-lucide="list-tree" width="20"></i>
-                </div>
-            </div>
+    <div class="stats-grid">
+
+      {{-- Total --}}
+      <div class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Total Categories
+          </span>
+
+          <div class="stat-icon">
+            <i class="fas fa-layer-group"></i>
+          </div>
 
         </div>
 
-        {{-- =====================================================
-             MAIN WORKSPACE
+        <div class="stat-value">
+          {{ number_format($totalCategories) }}
+        </div>
+
+        <div class="stat-description">
+          All service categories
+        </div>
+
+      </div>
+
+
+      {{-- Featured --}}
+      <div class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Featured
+          </span>
+
+          <div class="stat-icon">
+            <i class="fas fa-star"></i>
+          </div>
+
+        </div>
+
+        <div class="stat-value">
+          {{ number_format($featuredCategories) }}
+        </div>
+
+        <div class="stat-description">
+          Featured marketplace categories
+        </div>
+
+      </div>
+
+
+      {{-- Parent --}}
+      <div class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Main Categories
+          </span>
+
+          <div class="stat-icon">
+            <i class="fas fa-folder"></i>
+          </div>
+
+        </div>
+
+        <div class="stat-value">
+          {{ number_format($parentCategories) }}
+        </div>
+
+        <div class="stat-description">
+          Top-level categories
+        </div>
+
+      </div>
+
+
+      {{-- Subcategories --}}
+      <div class="stat-card">
+
+        <div class="stat-header">
+
+          <span class="stat-label">
+            Subcategories
+          </span>
+
+          <div class="stat-icon">
+            <i class="fas fa-sitemap"></i>
+          </div>
+
+        </div>
+
+        <div class="stat-value">
+          {{ number_format($totalSubcategories) }}
+        </div>
+
+        <div class="stat-description">
+          Organized service types
+        </div>
+
+      </div>
+
+    </div>
+
+
+    {{-- =====================================================
+             ADD CATEGORY MODAL
         ====================================================== --}}
-        <div class="workspace">
 
-            {{-- =================================================
-                 CATEGORY LIBRARY
-            ================================================== --}}
-            <section class="category-library">
+    <div class="modal fade saas-modal"
+      id="CategoryModal"
+      tabindex="-1"
+      role="dialog"
+      aria-hidden="true">
 
-                <div class="library-header">
+      <div class="modal-dialog modal-dialog-centered"
+        role="document">
 
-                    <div class="library-title-row">
-                        <div>
-                            <h2 class="library-title">
-                                Category Library
-                            </h2>
+        <div class="modal-content">
 
-                            <div class="library-count">
-                                {{ number_format($scategories->total()) }}
-                                {{ $scategories->total() === 1 ? 'category' : 'categories' }}
-                            </div>
-                        </div>
-                    </div>
+          <div class="modal-header">
 
-                    {{-- Search --}}
-                    <form
-                        method="GET"
-                        action="{{ route('admin.service_categories') }}"
-                        class="search-form"
-                    >
-                        <div class="search-wrapper">
-                            <i data-lucide="search" width="16"></i>
+            <div>
 
-                            <input
-                                type="search"
-                                name="search"
-                                class="search-input"
-                                value="{{ $search ?? request('search') }}"
-                                placeholder="Search categories by name or slug..."
-                                autocomplete="off"
-                            >
-                        </div>
+              <h5 class="modal-title">
+                Add service category
+              </h5>
 
-                        <button
-                            type="submit"
-                            class="search-button"
-                        >
-                            Search
-                        </button>
+              <div class="modal-subtitle">
+                Create a new category for your marketplace.
+              </div>
 
-                        @if(request('search'))
-                            <a
-                                href="{{ route('admin.service_categories') }}"
-                                class="clear-search"
-                            >
-                                Clear
-                            </a>
-                        @endif
-                    </form>
+            </div>
 
-                </div>
+            <button type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close">
 
-                {{-- =================================================
-                     CATEGORY CARDS
-                ================================================== --}}
-                <div class="category-grid">
+              <span aria-hidden="true">
+                &times;
+              </span>
 
-                    @forelse($scategories as $category)
+            </button>
 
-                        @php
-                            $subcategoryCount = $category->subcategories
-                                ? $category->subcategories->count()
-                                : 0;
+          </div>
 
-                            $imagePath = $category->image
-                                ? asset('image/categories/' . $category->image)
-                                : null;
-                        @endphp
 
-                        <article
-                            class="category-card"
-                            id="category-card-{{ $category->id }}"
-                            data-category-id="{{ $category->id }}"
-                            onclick="openCategory({{ $category->id }})"
-                        >
+          <form action="{{ route('admin.create_service_category') }}"
+            method="POST"
+            enctype="multipart/form-data">
 
-                            <div class="category-card-top">
+            @csrf
 
-                                <div class="category-image">
-                                    @if($imagePath)
-                                        <img
-                                            src="{{ $imagePath }}"
-                                            alt="{{ $category->name }}"
-                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                        >
+            <div class="modal-body">
 
-                                        <div
-                                            class="category-image-placeholder"
-                                            style="display:none;"
-                                        >
-                                            <i data-lucide="image-off" width="24"></i>
-                                        </div>
-                                    @else
-                                        <div class="category-image-placeholder">
-                                            <i data-lucide="layers" width="24"></i>
-                                        </div>
-                                    @endif
-                                </div>
+              {{-- Category name --}}
 
-                                <div class="category-main">
+              <div class="form-group">
 
-                                    <div class="category-heading">
+                <label class="form-label-saas"
+                  for="category_name">
 
-                                        <h3 class="category-name">
-                                            {{ $category->name }}
-                                        </h3>
+                  Category name
 
-                                        @if($category->featured)
-                                            <span class="featured-badge">
-                                                <i data-lucide="star" width="10"></i>
-                                                Featured
-                                            </span>
-                                        @endif
+                  <span class="required">*</span>
 
-                                    </div>
+                </label>
 
-                                    <div class="category-slug">
-                                        /{{ $category->slug }}
-                                    </div>
+                <input type="text"
+                  class="form-control-saas"
+                  id="category_name"
+                  name="name"
+                  value="{{ old('name') }}"
+                  placeholder="e.g. Home Services"
+                  required>
 
-                                    <div class="category-info">
+                @error('name')
+                <small class="text-danger">
+                  {{ $message }}
+                </small>
+                @enderror
 
-                                        <span class="category-info-item">
-                                            <i data-lucide="list-tree" width="13"></i>
+              </div>
 
-                                            {{ $subcategoryCount }}
-                                            {{ $subcategoryCount === 1 ? 'subcategory' : 'subcategories' }}
-                                        </span>
 
-                                        <span class="category-info-item">
-                                            <i data-lucide="calendar-days" width="13"></i>
+              {{-- Parent category --}}
 
-                                            {{ $category->created_at?->format('M d, Y') ?? '—' }}
-                                        </span>
+              <div class="form-group">
 
-                                    </div>
+                <label class="form-label-saas"
+                  for="service_category_id">
 
-                                </div>
+                  Parent category
 
-                            </div>
+                </label>
 
-                            <div class="category-card-footer">
+                <select class="form-control-saas"
+                  name="service_category_id"
+                  id="service_category_id">
 
-                                <button
-                                    type="button"
-                                    class="view-category"
-                                    onclick="event.stopPropagation(); openCategory({{ $category->id }})"
-                                >
-                                    <span>View Subcategories</span>
-                                    <i data-lucide="arrow-right" width="13"></i>
-                                </button>
+                  <option value="">
+                    None — Main Category
+                  </option>
 
-                                <div class="category-actions">
+                  @foreach($scategories as $category)
 
-                                    {{-- Edit --}}
-                                    <a
-                                        href="{{ route('admin.edit_service_category', $category->id) }}"
-                                        class="action-button action-edit"
-                                        onclick="event.stopPropagation();"
-                                        title="Edit Category"
-                                    >
-                                        <i data-lucide="pencil" width="13"></i>
-                                        <span>Edit</span>
-                                    </a>
+                  <option value="{{ $category->id }}"
+                    {{ old('service_category_id') == $category->id ? 'selected' : '' }}>
 
-                                    {{-- Delete --}}
-                                    <button
-                                        type="button"
-                                        class="action-button action-delete"
-                                        onclick="event.stopPropagation(); confirmDeleteCategory({{ $category->id }}, @js($category->name))"
-                                        title="Delete Category"
-                                    >
-                                        <i data-lucide="trash-2" width="13"></i>
-                                        <span>Delete</span>
-                                    </button>
+                    {{ $category->name }}
 
-                                </div>
+                  </option>
 
-                            </div>
+                  @endforeach
 
-                        </article>
+                </select>
 
-                    @empty
+                <small class="form-help">
+                  Select a parent if this should be a subcategory.
+                </small>
 
-                        <div
-                            style="
-                                grid-column:1/-1;
-                                text-align:center;
-                                padding:60px 20px;
-                            "
-                        >
-                            <div class="empty-icon" style="margin:0 auto 15px;">
-                                <i data-lucide="folder-search" width="28"></i>
-                            </div>
+              </div>
 
-                            <h3 style="
-                                margin:0 0 7px;
-                                color:var(--connector-text);
-                                font-size:16px;
-                                font-weight:800;
-                            ">
-                                No categories found
-                            </h3>
 
-                            <p style="
-                                margin:0 0 18px;
-                                color:var(--connector-muted);
-                                font-size:13px;
-                            ">
-                                @if(request('search'))
-                                    No categories match your search.
-                                @else
-                                    Start by creating your first service category.
-                                @endif
-                            </p>
+              {{-- Image --}}
 
-                            @if(request('search'))
-                                <a
-                                    href="{{ route('admin.service_categories') }}"
-                                    class="btn-connector btn-light"
-                                >
-                                    Clear Search
-                                </a>
-                            @else
-                                <button
-                                    type="button"
-                                    class="btn-connector btn-primary"
-                                    data-toggle="modal"
-                                    data-target="#addCategoryModal"
-                                >
-                                    <i data-lucide="plus" width="15"></i>
-                                    Add Category
-                                </button>
-                            @endif
-                        </div>
+              <div class="form-group mb-0">
 
-                    @endforelse
+                <label class="form-label-saas"
+                  for="image">
+
+                  Category image
+
+                  <span class="required">*</span>
+
+                </label>
+
+                <div class="image-upload">
+
+                  <input type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    required>
+
+                  <small class="form-help">
+                    Use a clear square image for the best marketplace appearance.
+                  </small>
 
                 </div>
 
-                {{-- =================================================
-                     PAGINATION
-                ================================================== --}}
-                @if($scategories->hasPages())
+                @error('image')
+                <small class="text-danger">
+                  {{ $message }}
+                </small>
+                @enderror
 
-                    <div class="pagination-area">
+              </div>
 
-                        <div class="pagination-info">
+            </div>
 
-                            Showing
-                            <strong>
-                                {{ $scategories->firstItem() ?? 0 }}
-                            </strong>
 
-                            to
+            <div class="modal-footer">
 
-                            <strong>
-                                {{ $scategories->lastItem() ?? 0 }}
-                            </strong>
+              <button type="button"
+                class="modal-btn"
+                data-dismiss="modal">
 
-                            of
+                Cancel
 
-                            <strong>
-                                {{ number_format($scategories->total()) }}
-                            </strong>
+              </button>
 
-                            categories
+              <button type="submit"
+                class="modal-btn modal-btn-primary">
 
-                        </div>
+                <i class="fas fa-plus mr-1"></i>
 
-                        <div class="pagination-nav">
-                            {{ $scategories->onEachSide(1)->links() }}
-                        </div>
+                Create category
 
+              </button>
+
+            </div>
+
+          </form>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    {{-- =====================================================
+             CATEGORY TABLE
+        ====================================================== --}}
+
+    <div class="main-card">
+
+      <div class="main-card-header">
+
+        <div class="card-heading">
+
+          <h2 class="card-title">
+            Category library
+          </h2>
+
+          <p class="card-description">
+            Manage categories, hierarchy and marketplace visibility.
+          </p>
+
+        </div>
+
+        <div class="toolbar-count">
+
+          {{ $totalCategories }}
+
+          {{ Str::plural('category', $totalCategories) }}
+
+        </div>
+
+      </div>
+
+
+      {{-- Search --}}
+
+      <div class="toolbar">
+
+        <div class="search-box">
+
+          <i class="fas fa-search"></i>
+
+          <input type="text"
+            id="categorySearch"
+            placeholder="Search categories...">
+
+        </div>
+
+        <div class="toolbar-count"
+          id="visibleCount">
+
+          Showing {{ $totalCategories }}
+
+        </div>
+
+      </div>
+
+
+      @if($scategories->count())
+
+      <div class="table-wrap">
+
+        <table class="category-table"
+          id="categoryTable">
+
+          <thead>
+
+            <tr>
+
+              <th>#</th>
+
+              <th>Category</th>
+
+              <th>Visibility</th>
+
+              <th>Parent</th>
+
+              <th>Subcategories</th>
+
+              <th class="text-right">
+                Actions
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @foreach($scategories as $scategory)
+
+            <tr class="category-row"
+              data-search="{{ strtolower(
+                                        $scategory->name . ' ' .
+                                        ($scategory->slug ?? '')
+                                    ) }}">
+
+              {{-- ID --}}
+
+              <td>
+
+                <span class="category-id">
+                  #{{ $scategory->id }}
+                </span>
+
+              </td>
+
+
+              {{-- Category --}}
+
+              <td>
+
+                <div class="category-info">
+
+                  @if(!empty($scategory->image))
+
+                  <img
+                    src="{{ asset('image/categories/' . $scategory->image) }}"
+                    alt="{{ $scategory->name }}"
+                    class="category-image"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+                  <div class="image-placeholder"
+                    style="display:none;">
+                    <i class="fas fa-image"></i>
+                  </div>
+
+                  @else
+
+                  <div class="image-placeholder">
+                    <i class="fas fa-image"></i>
+                  </div>
+
+                  @endif
+
+
+                  <div>
+
+                    <div class="category-name">
+                      {{ $scategory->name }}
                     </div>
+
+                    @if(!empty($scategory->slug))
+
+                    <div class="category-slug">
+                      /{{ $scategory->slug }}
+                    </div>
+
+                    @endif
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              {{-- Featured --}}
+
+              <td>
+
+                @if($scategory->featured)
+
+                <span class="status-badge status-featured">
+                  Featured
+                </span>
+
+                @else
+
+                <span class="status-badge status-normal">
+                  Standard
+                </span>
 
                 @endif
 
-            </section>
+              </td>
+
+
+              {{-- Parent --}}
+
+              <td>
+
+                @if(!empty($scategory->service_category_id))
+
+                @php
+
+                $parent = $scategories->firstWhere(
+                'id',
+                $scategory->service_category_id
+                );
+
+                @endphp
+
+                <span class="parent-badge">
+
+                  <i class="fas fa-level-up-alt"></i>
+
+                  {{ $parent->name ?? 'Parent category' }}
+
+                </span>
+
+                @else
+
+                <span style="color:#9aa9a2;font-size:11px;">
+                  Main category
+                </span>
+
+                @endif
+
+              </td>
+
+
+              {{-- Subcategories --}}
+
+              <td>
+
+                @php
+                $subCount = $scategory->subcategories->count();
+                @endphp
+
+                @if($subCount > 0)
+
+                <span class="sub-count">
+                  {{ $subCount }}
+                </span>
+
+                <button type="button"
+                  class="view-subcategories"
+                  data-toggle="modal"
+                  data-target="#subCategoryModal{{ $scategory->id }}">
+
+                  View
+
+                </button>
+
+                @else
+
+                <span style="color:#a1aea8;font-size:11px;">
+                  No subcategories
+                </span>
+
+                @endif
+
+              </td>
+
+
+              {{-- Actions --}}
+
+              <td>
+
+                <div class="action-group">
+
+                  {{-- View services --}}
+
+                  <a href="{{ route(
+                                                'admin.service_by_category',
+                                                ['category_slug' => $scategory->slug]
+                                            ) }}"
+                    class="action-btn"
+                    title="View services">
+
+                    <i class="fas fa-list"></i>
+
+                  </a>
+
+
+                  {{-- Edit --}}
+
+                  <a href="{{ route(
+                                                'admin.edit_service_category',
+                                                $scategory->id
+                                            ) }}"
+                    class="action-btn"
+                    title="Edit category">
+
+                    <i class="fas fa-pen"></i>
+
+                  </a>
+
+
+                  {{-- Delete --}}
+
+                  <form
+                    class="action-form"
+                    action="{{ route(
+                                                    'admin.delete_service_category',
+                                                    $scategory->id
+                                                ) }}"
+                    method="POST">
+
+                    @csrf
+
+                    @method('DELETE')
+
+                    <button type="submit"
+                      class="action-btn delete"
+                      title="Delete category"
+                      onclick="return confirm('Are you sure you want to delete {{ addslashes($scategory->name) }}?')">
+
+                      <i class="fas fa-trash-alt"></i>
+
+                    </button>
+
+                  </form>
+
+                </div>
+
+              </td>
+
+            </tr>
 
 
             {{-- =================================================
-                 RIGHT SIDE DETAILS PANEL
-            ================================================== --}}
-            <aside
-                class="details-panel"
-                id="detailsPanel"
-            >
+                                     SUBCATEGORY MODAL
+                                ================================================== --}}
 
-                {{-- Empty state --}}
-                <div
-                    class="details-empty"
-                    id="detailsEmpty"
-                >
+            @if($subCount > 0)
 
-                    <div class="empty-icon">
-                        <i data-lucide="mouse-pointer-click" width="28"></i>
-                    </div>
+            <div class="modal fade saas-modal"
+              id="subCategoryModal{{ $scategory->id }}"
+              tabindex="-1"
+              role="dialog"
+              aria-hidden="true">
 
-                    <h3>
-                        Select a category
-                    </h3>
+              <div class="modal-dialog modal-dialog-centered"
+                role="document">
 
-                    <p>
-                        Click any category card to view its subcategories,
-                        manage them, or add a new one.
-                    </p>
+                <div class="modal-content">
 
-                </div>
-
-
-                {{-- =================================================
-                     DYNAMIC CATEGORY DETAILS
-                ================================================== --}}
-                @foreach($scategories as $category)
-
-                    @php
-                        $subcategoryCount = $category->subcategories
-                            ? $category->subcategories->count()
-                            : 0;
-
-                        $imagePath = $category->image
-                            ? asset('image/categories/' . $category->image)
-                            : null;
-                    @endphp
-
-                    <div
-                        class="details-content"
-                        id="details-{{ $category->id }}"
-                    >
-
-                        {{-- Header --}}
-                        <div class="details-header">
-
-                            <div class="details-top">
-
-                                <div class="details-category-info">
-
-                                    <div class="details-image">
-
-                                        @if($imagePath)
-
-                                            <img
-                                                src="{{ $imagePath }}"
-                                                alt="{{ $category->name }}"
-                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                            >
-
-                                            <div
-                                                class="category-image-placeholder"
-                                                style="display:none;"
-                                            >
-                                                <i data-lucide="layers" width="22"></i>
-                                            </div>
-
-                                        @else
-
-                                            <div class="category-image-placeholder">
-                                                <i data-lucide="layers" width="22"></i>
-                                            </div>
-
-                                        @endif
-
-                                    </div>
-
-                                    <div>
-                                        <h3 class="details-category-name">
-                                            {{ $category->name }}
-                                        </h3>
-
-                                        <div class="details-category-slug">
-                                            /{{ $category->slug }}
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="close-details"
-                                    onclick="closeCategoryPanel()"
-                                    aria-label="Close"
-                                >
-                                    <i data-lucide="x" width="16"></i>
-                                </button>
-
-                            </div>
-
-
-                            {{-- Statistics --}}
-                            <div class="details-stats">
-
-                                <div class="details-stat">
-                                    <div class="details-stat-label">
-                                        Subcategories
-                                    </div>
-
-                                    <div class="details-stat-value">
-                                        {{ $subcategoryCount }}
-                                    </div>
-                                </div>
-
-                                <div class="details-stat">
-                                    <div class="details-stat-label">
-                                        Status
-                                    </div>
-
-                                    <div class="details-stat-value">
-                                        {{ $category->featured ? 'Featured' : 'Active' }}
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            {{-- Actions --}}
-                            <div class="details-actions">
-
-                                {{-- Add --}}
-                                <button
-                                    type="button"
-                                    class="btn-connector btn-primary"
-                                    onclick="openAddSubcategoryModal(
-                                        {{ $category->id }},
-                                        @js($category->name)
-                                    )"
-                                >
-                                    <i data-lucide="plus" width="14"></i>
-                                    <span>Add Subcategory</span>
-                                </button>
-
-                                {{-- Edit --}}
-                                <a
-                                    href="{{ route('admin.edit_service_category', $category->id) }}"
-                                    class="btn-connector btn-light"
-                                >
-                                    <i data-lucide="pencil" width="14"></i>
-                                    <span>Edit</span>
-                                </a>
-
-                            </div>
-
-                        </div>
-
-
-                        {{-- =================================================
-                             SUBCATEGORIES
-                        ================================================== --}}
-                        <div class="subcategories-section">
-
-                            <div class="subcategories-heading">
-
-                                <h4>
-                                    Subcategories
-                                </h4>
-
-                                <span class="sub-count">
-                                    {{ $subcategoryCount }}
-                                    {{ $subcategoryCount === 1 ? 'item' : 'items' }}
-                                </span>
-
-                            </div>
-
-
-                            @if($subcategoryCount > 0)
-
-                                <div class="subcategories-list">
-
-                                    @foreach($category->subcategories as $subcategory)
-
-                                        <div class="subcategory-item">
-
-                                            <div class="subcategory-left">
-
-                                                <div class="subcategory-icon">
-                                                    <i data-lucide="tag" width="14"></i>
-                                                </div>
-
-                                                <div style="min-width:0;">
-
-                                                    <p class="subcategory-name">
-                                                        {{ $subcategory->name }}
-                                                    </p>
-
-                                                    <div class="subcategory-slug">
-                                                        /{{ $subcategory->slug }}
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-
-
-                                            <div class="subcategory-actions">
-
-                                                {{-- Edit --}}
-                                                <button
-                                                    type="button"
-                                                    class="sub-action sub-edit"
-                                                    title="Edit Subcategory"
-                                                    onclick="openEditSubcategoryModal(
-                                                        {{ $subcategory->id }},
-                                                        @js($subcategory->name),
-                                                        {{ $category->id }}
-                                                    )"
-                                                >
-                                                    <i data-lucide="pencil" width="12"></i>
-                                                </button>
-
-
-                                                {{-- Delete --}}
-                                                <button
-                                                    type="button"
-                                                    class="sub-action sub-delete"
-                                                    title="Delete Subcategory"
-                                                    onclick="confirmDeleteSubcategory(
-                                                        {{ $subcategory->id }},
-                                                        @js($subcategory->name)
-                                                    )"
-                                                >
-                                                    <i data-lucide="trash-2" width="12"></i>
-                                                </button>
-
-                                            </div>
-
-                                        </div>
-
-                                    @endforeach
-
-                                </div>
-
-                            @else
-
-                                <div class="no-subcategories">
-
-                                    <i data-lucide="folder-plus" width="25"></i>
-
-                                    <p>
-                                        No subcategories have been added
-                                        to this category yet.
-                                    </p>
-
-                                    <button
-                                        type="button"
-                                        class="btn-connector btn-primary"
-                                        onclick="openAddSubcategoryModal(
-                                            {{ $category->id }},
-                                            @js($category->name)
-                                        )"
-                                    >
-                                        <i data-lucide="plus" width="14"></i>
-                                        Add Subcategory
-                                    </button>
-
-                                </div>
-
-                            @endif
-
-                        </div>
-
-                    </div>
-
-                @endforeach
-
-            </aside>
-
-        </div>
-
-    </div>
-</div>
-
-
-{{-- =============================================================
-     MOBILE OVERLAY
-============================================================= --}}
-<div
-    class="drawer-overlay"
-    id="drawerOverlay"
-    onclick="closeCategoryPanel()"
-></div>
-
-
-{{-- =============================================================
-     ADD CATEGORY MODAL
-============================================================= --}}
-<div
-    class="modal fade connector-modal"
-    id="addCategoryModal"
-    tabindex="-1"
-    role="dialog"
-    aria-hidden="true"
->
-    <div
-        class="modal-dialog modal-dialog-centered"
-        role="document"
-    >
-        <div class="modal-content">
-
-            <form
-                method="POST"
-                action="{{ route('admin.create_service_category') }}"
-                enctype="multipart/form-data"
-                id="addCategoryForm"
-            >
-
-                @csrf
-
-                <div class="modal-header">
+                  <div class="modal-header">
 
                     <div>
-                        <div class="eyebrow" style="margin-bottom:4px;">
-                            <span class="eyebrow-dot"></span>
-                            Marketplace
+
+                      <h5 class="modal-title">
+
+                        {{ $scategory->name }}
+
+                      </h5>
+
+                      <div class="modal-subtitle">
+
+                        {{ $subCount }}
+
+                        {{ Str::plural('subcategory', $subCount) }}
+
+                      </div>
+
+                    </div>
+
+                    <button type="button"
+                      class="close"
+                      data-dismiss="modal"
+                      aria-label="Close">
+
+                      <span aria-hidden="true">
+                        &times;
+                      </span>
+
+                    </button>
+
+                  </div>
+
+
+                  <div class="modal-body">
+
+                    <div class="subcategory-list">
+
+                      @foreach($scategory->subcategories as $index => $scat)
+
+                      <div class="subcategory-item">
+
+                        <div class="subcategory-number">
+                          {{ $index + 1 }}
                         </div>
 
-                        <h5 class="modal-title">
-                            Add Category
-                        </h5>
-                    </div>
-
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-
-                <div class="modal-body">
-
-                    {{-- Category type --}}
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Category Type
-                        </label>
-
-                        <select
-                            name="service_category_id"
-                            id="categoryParent"
-                            class="form-select-connector"
-                        >
-                            <option value="">
-                                Main Category
-                            </option>
-
-                            @foreach($categories ?? [] as $parentCategory)
-
-                                <option value="{{ $parentCategory->id }}">
-                                    Subcategory of {{ $parentCategory->name }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                        <div class="form-help">
-                            Choose Main Category to create a top-level category.
+                        <div class="subcategory-name">
+                          {{ $scat->name }}
                         </div>
 
-                    </div>
+                      </div>
 
-
-                    {{-- Name --}}
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Name
-                            <span class="required">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            class="form-control-connector"
-                            placeholder="e.g. Home Cleaning"
-                            value="{{ old('name') }}"
-                            required
-                        >
+                      @endforeach
 
                     </div>
 
-
-                    {{-- Image --}}
-                    <div
-                        class="form-group"
-                        id="categoryImageGroup"
-                    >
-
-                        <label class="form-label">
-                            Category Image
-                            <span
-                                class="required"
-                                id="imageRequired"
-                            >
-                                *
-                            </span>
-                        </label>
-
-                        <div class="image-upload">
-
-                            <i data-lucide="image-plus" width="23"></i>
-
-                            <input
-                                type="file"
-                                name="image"
-                                id="categoryImage"
-                                accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
-                            >
-
-                            <div class="form-help">
-                                JPG, PNG, GIF or SVG. Maximum 2MB.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                  </div>
 
 
-                <div class="modal-footer">
+                  <div class="modal-footer">
 
-                    <button
-                        type="button"
-                        class="btn-connector btn-light"
-                        data-dismiss="modal"
-                    >
-                        Cancel
+                    <button type="button"
+                      class="modal-btn"
+                      data-dismiss="modal">
+
+                      Close
+
                     </button>
 
-                    <button
-                        type="submit"
-                        class="btn-connector btn-primary"
-                    >
-                        <i data-lucide="plus" width="15"></i>
-                        Create Category
-                    </button>
+                  </div>
 
                 </div>
 
-            </form>
-
-        </div>
-    </div>
-</div>
-
-
-{{-- =============================================================
-     ADD SUBCATEGORY MODAL
-============================================================= --}}
-<div
-    class="modal fade connector-modal"
-    id="addSubcategoryModal"
-    tabindex="-1"
-    role="dialog"
-    aria-hidden="true"
->
-    <div
-        class="modal-dialog modal-dialog-centered"
-        role="document"
-    >
-
-        <div class="modal-content">
-
-            <form
-                method="POST"
-                action="{{ route('admin.create_service_category') }}"
-                id="addSubcategoryForm"
-            >
-
-                @csrf
-
-                <input
-                    type="hidden"
-                    name="service_category_id"
-                    id="addSubcategoryParentId"
-                >
-
-                <div class="modal-header">
-
-                    <div>
-                        <div class="eyebrow" style="margin-bottom:4px;">
-                            <span class="eyebrow-dot"></span>
-                            Subcategory
-                        </div>
-
-                        <h5 class="modal-title">
-                            Add Subcategory
-                        </h5>
-
-                        <div
-                            id="addSubcategoryParentName"
-                            style="
-                                font-size:11px;
-                                color:var(--connector-muted);
-                                margin-top:3px;
-                            "
-                        ></div>
-                    </div>
-
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Subcategory Name
-                            <span class="required">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            class="form-control-connector"
-                            placeholder="e.g. Deep Cleaning"
-                            required
-                        >
-
-                        <div class="form-help">
-                            A unique slug will be generated automatically.
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn-connector btn-light"
-                        data-dismiss="modal"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn-connector btn-primary"
-                    >
-                        <i data-lucide="plus" width="15"></i>
-                        Add Subcategory
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-</div>
-
-
-{{-- =============================================================
-     EDIT SUBCATEGORY MODAL
-============================================================= --}}
-<div
-    class="modal fade connector-modal"
-    id="editSubcategoryModal"
-    tabindex="-1"
-    role="dialog"
-    aria-hidden="true"
->
-    <div
-        class="modal-dialog modal-dialog-centered"
-        role="document"
-    >
-
-        <div class="modal-content">
-
-            <form
-                method="POST"
-                id="editSubcategoryForm"
-            >
-
-                @csrf
-                @method('PUT')
-
-                <div class="modal-header">
-
-                    <div>
-                        <div class="eyebrow" style="margin-bottom:4px;">
-                            <span class="eyebrow-dot"></span>
-                            Subcategory
-                        </div>
-
-                        <h5 class="modal-title">
-                            Edit Subcategory
-                        </h5>
-                    </div>
-
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                    >
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-
-                        <label class="form-label">
-                            Subcategory Name
-                            <span class="required">*</span>
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            id="editSubcategoryName"
-                            class="form-control-connector"
-                            required
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn-connector btn-light"
-                        data-dismiss="modal"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        class="btn-connector btn-primary"
-                    >
-                        <i data-lucide="save" width="15"></i>
-                        Save Changes
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-</div>
-
-
-{{-- =============================================================
-     DELETE CATEGORY FORM
-============================================================= --}}
-<form
-    method="POST"
-    id="deleteCategoryForm"
-    style="display:none;"
->
-    @csrf
-    @method('DELETE')
-</form>
-
-
-{{-- =============================================================
-     DELETE SUBCATEGORY FORM
-============================================================= --}}
-<form
-    method="POST"
-    id="deleteSubcategoryForm"
-    style="display:none;"
->
-    @csrf
-    @method('DELETE')
-</form>
-
-
-{{-- =============================================================
-     JAVASCRIPT
-============================================================= --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        /*
-        |--------------------------------------------------------------------------
-        | Lucide Icons
-        |--------------------------------------------------------------------------
-        */
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Category Parent / Image Handling
-        |--------------------------------------------------------------------------
-        */
-        const parentSelect = document.getElementById('categoryParent');
-        const imageInput = document.getElementById('categoryImage');
-        const imageGroup = document.getElementById('categoryImageGroup');
-        const imageRequired = document.getElementById('imageRequired');
-
-        function updateCategoryType() {
-
-            if (!parentSelect) {
-                return;
-            }
-
-            const isSubcategory = parentSelect.value !== '';
-
-            if (isSubcategory) {
-
-                if (imageGroup) {
-                    imageGroup.style.display = 'none';
-                }
-
-                if (imageInput) {
-                    imageInput.value = '';
-                    imageInput.removeAttribute('required');
-                }
-
-                if (imageRequired) {
-                    imageRequired.style.display = 'none';
-                }
-
-            } else {
-
-                if (imageGroup) {
-                    imageGroup.style.display = 'block';
-                }
-
-                if (imageInput) {
-                    imageInput.setAttribute('required', 'required');
-                }
-
-                if (imageRequired) {
-                    imageRequired.style.display = 'inline';
-                }
-            }
-        }
-
-        if (parentSelect) {
-            parentSelect.addEventListener(
-                'change',
-                updateCategoryType
-            );
-
-            updateCategoryType();
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Open Category
-        |--------------------------------------------------------------------------
-        */
-        window.openCategory = function (categoryId) {
-
-            const emptyState =
-                document.getElementById('detailsEmpty');
-
-            const panel =
-                document.getElementById('detailsPanel');
-
-            const overlay =
-                document.getElementById('drawerOverlay');
-
-            if (!emptyState || !panel) {
-                return;
-            }
-
-            /*
-             * Hide all detail contents
-             */
-            document
-                .querySelectorAll('.details-content')
-                .forEach(function (content) {
-                    content.classList.remove('active');
-                });
-
-            /*
-             * Remove active card
-             */
-            document
-                .querySelectorAll('.category-card')
-                .forEach(function (card) {
-                    card.classList.remove('active');
-                });
-
-            /*
-             * Show selected content
-             */
-            const details =
-                document.getElementById(
-                    'details-' + categoryId
-                );
-
-            const card =
-                document.getElementById(
-                    'category-card-' + categoryId
-                );
-
-            if (details) {
-                details.classList.add('active');
-            }
-
-            if (card) {
-                card.classList.add('active');
-            }
-
-            emptyState.style.display = 'none';
-
-            /*
-             * Mobile drawer
-             */
-            if (window.innerWidth <= 992) {
-
-                panel.classList.add('mobile-open');
-
-                if (overlay) {
-                    overlay.classList.add('active');
-                }
-
-                document.body.style.overflow = 'hidden';
-            }
-
-            /*
-             * Scroll selected category into view
-             */
-            if (card && window.innerWidth <= 992) {
-                card.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'nearest'
-                });
-            }
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Close Category Panel
-        |--------------------------------------------------------------------------
-        */
-        window.closeCategoryPanel = function () {
-
-            const panel =
-                document.getElementById('detailsPanel');
-
-            const overlay =
-                document.getElementById('drawerOverlay');
-
-            if (panel) {
-                panel.classList.remove('mobile-open');
-            }
-
-            if (overlay) {
-                overlay.classList.remove('active');
-            }
-
-            document.body.style.overflow = '';
-
-            document
-                .querySelectorAll('.category-card')
-                .forEach(function (card) {
-                    card.classList.remove('active');
-                });
-
-            document
-                .querySelectorAll('.details-content')
-                .forEach(function (content) {
-                    content.classList.remove('active');
-                });
-
-            const emptyState =
-                document.getElementById('detailsEmpty');
-
-            if (emptyState) {
-                emptyState.style.display = 'flex';
-            }
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Add Subcategory
-        |--------------------------------------------------------------------------
-        */
-        window.openAddSubcategoryModal = function (
-            categoryId,
-            categoryName
-        ) {
-
-            const parentId =
-                document.getElementById(
-                    'addSubcategoryParentId'
-                );
-
-            const parentName =
-                document.getElementById(
-                    'addSubcategoryParentName'
-                );
-
-            const form =
-                document.getElementById(
-                    'addSubcategoryForm'
-                );
-
-            if (parentId) {
-                parentId.value = categoryId;
-            }
-
-            if (parentName) {
-                parentName.textContent =
-                    'Adding to: ' + categoryName;
-            }
-
-            if (form) {
-                form.querySelector('input[name="name"]').value = '';
-            }
-
-            $('#addSubcategoryModal').modal('show');
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Edit Subcategory
-        |--------------------------------------------------------------------------
-        */
-        window.openEditSubcategoryModal = function (
-            subcategoryId,
-            subcategoryName,
-            categoryId
-        ) {
-
-            const form =
-                document.getElementById(
-                    'editSubcategoryForm'
-                );
-
-            const nameInput =
-                document.getElementById(
-                    'editSubcategoryName'
-                );
-
-            if (nameInput) {
-                nameInput.value = subcategoryName;
-            }
-
-            /*
-             * Change this route if your project uses
-             * another update route.
-             *
-             * Expected:
-             * PUT /admin/subcategory/{id}
-             */
-            if (form) {
-
-                form.action =
-                    "{{ url('/admin/subcategory') }}/" +
-                    subcategoryId;
-            }
-
-            $('#editSubcategoryModal').modal('show');
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Delete Category
-        |--------------------------------------------------------------------------
-        */
-        window.confirmDeleteCategory = function (
-            categoryId,
-            categoryName
-        ) {
-
-            const confirmed = confirm(
-                'Delete "' +
-                categoryName +
-                '"?\n\n' +
-                'This may also affect its related subcategories and services.'
-            );
-
-            if (!confirmed) {
-                return;
-            }
-
-            const form =
-                document.getElementById(
-                    'deleteCategoryForm'
-                );
-
-            if (!form) {
-                return;
-            }
-
-            form.action =
-                "{{ url('/admin/service-category') }}/" +
-                categoryId;
-
-            form.submit();
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Delete Subcategory
-        |--------------------------------------------------------------------------
-        */
-        window.confirmDeleteSubcategory = function (
-            subcategoryId,
-            subcategoryName
-        ) {
-
-            const confirmed = confirm(
-                'Delete subcategory "' +
-                subcategoryName +
-                '"?'
-            );
-
-            if (!confirmed) {
-                return;
-            }
-
-            const form =
-                document.getElementById(
-                    'deleteSubcategoryForm'
-                );
-
-            if (!form) {
-                return;
-            }
-
-            form.action =
-                "{{ url('/admin/subcategory') }}/" +
-                subcategoryId;
-
-            form.submit();
-        };
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ESC closes mobile panel
-        |--------------------------------------------------------------------------
-        */
-        document.addEventListener(
-            'keydown',
-            function (event) {
-
-                if (event.key === 'Escape') {
-
-                    const panel =
-                        document.getElementById(
-                            'detailsPanel'
-                        );
-
-                    if (
-                        panel &&
-                        panel.classList.contains(
-                            'mobile-open'
-                        )
-                    ) {
-                        closeCategoryPanel();
-                    }
-                }
-            }
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Re-render icons
-        |--------------------------------------------------------------------------
-        */
-        if (typeof lucide !== 'undefined') {
-            lucide.createIcons();
-        }
-
-    });
-</script>
-
-
-{{-- =============================================================
-     VALIDATION ERRORS
-============================================================= --}}
-@if($errors->any())
-
-    <div
-        class="modal fade connector-modal"
-        id="validationErrorModal"
-        tabindex="-1"
-        role="dialog"
-    >
-
-        <div
-            class="modal-dialog modal-dialog-centered"
-            role="document"
-        >
-
-            <div class="modal-content">
-
-                <div class="modal-header">
-
-                    <h5 class="modal-title">
-                        Please check your input
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                    >
-                        <span>&times;</span>
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div
-                        style="
-                            background:#FFF3F0;
-                            border:1px solid #F2D8D2;
-                            border-radius:11px;
-                            padding:14px;
-                        "
-                    >
-
-                        <ul
-                            style="
-                                margin:0;
-                                padding-left:18px;
-                                color:var(--connector-danger);
-                                font-size:12px;
-                            "
-                        >
-                            @foreach($errors->all() as $error)
-                                <li style="margin-bottom:5px;">
-                                    {{ $error }}
-                                </li>
-                            @endforeach
-                        </ul>
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button
-                        type="button"
-                        class="btn-connector btn-primary"
-                        data-dismiss="modal"
-                    >
-                        Close
-                    </button>
-
-                </div>
+              </div>
 
             </div>
 
+            @endif
+
+            @endforeach
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      {{-- Empty search state --}}
+
+      <div class="empty-state"
+        id="searchEmpty"
+        style="display:none;">
+
+        <div class="empty-icon">
+
+          <i class="fas fa-search"></i>
+
         </div>
+
+        <div class="empty-title">
+          No categories found
+        </div>
+
+        <div class="empty-description">
+          Try searching with a different category name.
+        </div>
+
+      </div>
+
+      @else
+
+      <div class="empty-state">
+
+        <div class="empty-icon">
+
+          <i class="fas fa-layer-group"></i>
+
+        </div>
+
+        <div class="empty-title">
+          No service categories yet
+        </div>
+
+        <div class="empty-description">
+          Create your first category to start organizing services.
+        </div>
+
+        <button type="button"
+          class="btn-saas btn-saas-primary"
+          data-toggle="modal"
+          data-target="#CategoryModal">
+
+          <i class="fas fa-plus"></i>
+
+          Create first category
+
+        </button>
+
+      </div>
+
+      @endif
 
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            $('#validationErrorModal').modal('show');
-        });
-    </script>
+  </div>
+
+</div>
+
+
+{{-- ===============================================================
+     SEARCH
+================================================================ --}}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    const searchInput = document.getElementById('categorySearch');
+    const rows = document.querySelectorAll('.category-row');
+    const visibleCount = document.getElementById('visibleCount');
+    const searchEmpty = document.getElementById('searchEmpty');
+
+    if (!searchInput) {
+      return;
+    }
+
+    searchInput.addEventListener('input', function() {
+
+      const search = this.value
+        .toLowerCase()
+        .trim();
+
+      let visible = 0;
+
+      rows.forEach(function(row) {
+
+        const searchableText =
+          row.getAttribute('data-search') || '';
+
+        const matches =
+          searchableText.includes(search);
+
+        row.style.display = matches ? '' : 'none';
+
+        if (matches) {
+          visible++;
+        }
+
+      });
+
+
+      if (visibleCount) {
+
+        visibleCount.innerText =
+          'Showing ' + visible;
+
+      }
+
+
+      if (searchEmpty) {
+
+        searchEmpty.style.display =
+          visible === 0 ? 'block' : 'none';
+
+      }
+
+    });
+
+  });
+</script>
+
+
+{{-- ===============================================================
+     REOPEN ADD MODAL AFTER VALIDATION ERROR
+================================================================ --}}
+
+@if($errors->any())
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+
+    $('#CategoryModal').modal('show');
+
+  });
+</script>
 
 @endif
 
