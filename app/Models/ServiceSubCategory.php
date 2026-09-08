@@ -13,7 +13,7 @@ class ServiceSubCategory extends Model
     ];
     public function subcategories()
     {
-        $this->belongsTo(ServiceCategory::class);
+        $this->belongsTo(ServiceCategory::class,);
     }
     
     public function services()
