@@ -16,17 +16,14 @@ return new class extends Migration
         Schema::create('service_providers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('sprovider_name')->nullable();
-            $table->string('proEmail')->nullable();
             $table->string('image')->nullable();
             $table->longText('about')->nullable();
             $table->longText('skills')->nullable();
             $table->longText('qualification')->nullable();
             $table->longText('experience')->nullable();
-            $table->string('city')->nullable();
             $table->foreignId('service_category_id')->nullable()->constrained('service_categories')->onDelete('set null');
             $table->string('service_locations')->nullable();
-            $table->string('status')->default('pending');
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

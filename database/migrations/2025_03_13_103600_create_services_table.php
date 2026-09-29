@@ -17,8 +17,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->foreignId('service_category_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('service_provider_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('service_category_id')->nullable()->constrained('service_categories')->onDelete('set null');
+            $table->foreignId('service_sub_category_id')->nullable()->constrained('service_sub_categories')->onDelete('set null');
+            $table->foreignId('service_provider_id')->nullable()->constrained('service_providers')->onDelete('set null');
             $table->decimal('price', 8, 2);
             $table->decimal('discount', 8, 2)->nullable();
             $table->enum('discount_type', ['fixed', 'percent'])->nullable();

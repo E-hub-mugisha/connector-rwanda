@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('working_hours', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sprovider_id')
+            $table->foreignId('service_provider_id')
                   ->constrained('service_providers')
                   ->onDelete('cascade'); // Adjust table name if necessary
             $table->string('day');

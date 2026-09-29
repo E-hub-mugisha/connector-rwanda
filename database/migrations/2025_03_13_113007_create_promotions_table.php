@@ -15,9 +15,7 @@ return new class extends Migration
     {
         Schema::create('promotions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_provider_id')->constrained('service_providers')->onDelete('cascade');
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained('service_categories')->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->decimal('discount', 5, 2);

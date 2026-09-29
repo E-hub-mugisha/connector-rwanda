@@ -15,16 +15,15 @@ return new class extends Migration
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('service_provider_id')->constrained('service_providers')->onDelete('cascade');
             $table->string('title');
             $table->text('description');
             $table->string('location');
-            $table->string('type'); // e.g., full-time, part-time, contract
+            $table->enum('type', ['full-time', 'part-time', 'contract']);
             $table->text('requirements');
             $table->text('responsibilities');
-            $table->unsignedBigInteger('company_id');
             $table->date('deadline')->nullable();
             $table->enum('status', ['open', 'closed'])->default('open');
-            $table->foreign('company_id')->references('id')->on('service_providers')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -5,7 +5,7 @@
 @section('content')
 
 @php
-    $defaultWhatsapp = config('services.whatsapp.default_number', '250780000000');
+$defaultWhatsapp = config('services.whatsapp.default_number', '250780000000');
 @endphp
 
 <style>
@@ -155,12 +155,10 @@
     .connector-hero {
         position: relative;
         background:
-            linear-gradient(
-                135deg,
+            linear-gradient(135deg,
                 #F4F8F6 0%,
                 #FFFFFF 52%,
-                #F1F7F4 100%
-            );
+                #F1F7F4 100%);
         border-bottom: 1px solid var(--connector-border);
     }
 
@@ -197,7 +195,7 @@
         gap: 8px;
         padding: 7px 11px;
         border: 1px solid #CBDCD5;
-        background: rgba(255,255,255,.85);
+        background: rgba(255, 255, 255, .85);
         color: var(--connector-forest);
         border-radius: 8px;
         font-size: 11px;
@@ -250,7 +248,7 @@
         border-radius: 14px;
         box-shadow: var(--connector-shadow);
         transition: border-color var(--connector-transition),
-                    box-shadow var(--connector-transition);
+            box-shadow var(--connector-transition);
     }
 
     .connector-main-search:focus-within {
@@ -319,7 +317,7 @@
         font-weight: 700;
         cursor: pointer;
         transition: background var(--connector-transition),
-                    transform var(--connector-transition);
+            transform var(--connector-transition);
     }
 
     .connector-search-button:hover {
@@ -420,11 +418,9 @@
         position: absolute;
         inset: 0;
         background:
-            linear-gradient(
-                180deg,
-                rgba(37,64,53,0) 45%,
-                rgba(37,64,53,.65) 100%
-            );
+            linear-gradient(180deg,
+                rgba(37, 64, 53, 0) 45%,
+                rgba(37, 64, 53, .65) 100%);
         pointer-events: none;
     }
 
@@ -468,7 +464,7 @@
         top: auto;
         bottom: 24px;
         border-radius: 8px;
-        background: rgba(255,255,255,.16);
+        background: rgba(255, 255, 255, .16);
         backdrop-filter: blur(8px);
         opacity: 1;
         z-index: 5;
@@ -615,7 +611,7 @@
         margin-bottom: 38px;
     }
 
-    .connector-section-header > div:first-child {
+    .connector-section-header>div:first-child {
         max-width: 650px;
     }
 
@@ -630,7 +626,7 @@
         padding-bottom: 6px;
         border-bottom: 1px solid var(--connector-primary);
         transition: gap var(--connector-transition),
-                    color var(--connector-transition);
+            color var(--connector-transition);
     }
 
     .connector-view-all:hover {
@@ -774,7 +770,7 @@
         right: 12px;
         padding: 5px 9px;
         border-radius: 6px;
-        background: rgba(37,64,53,.88);
+        background: rgba(37, 64, 53, .88);
         color: #fff;
         font-size: 10px;
         font-weight: 700;
@@ -972,12 +968,12 @@
         place-items: center;
         border: 0;
         border-radius: 8px;
-        background: rgba(255,255,255,.92);
+        background: rgba(255, 255, 255, .92);
         color: var(--connector-muted);
         cursor: pointer;
         z-index: 3;
         transition: color var(--connector-transition),
-                    background var(--connector-transition);
+            background var(--connector-transition);
     }
 
     .connector-provider-favorite:hover {
@@ -1249,7 +1245,7 @@
 
     .connector-how-description {
         margin-top: 14px;
-        color: rgba(255,255,255,.65);
+        color: rgba(255, 255, 255, .65);
         font-size: 15px;
         line-height: 1.7;
     }
@@ -1272,7 +1268,7 @@
         right: 42px;
         width: calc(100% - 110px);
         height: 1px;
-        background: rgba(255,255,255,.15);
+        background: rgba(255, 255, 255, .15);
         transform: translateX(50%);
     }
 
@@ -1283,9 +1279,9 @@
         height: 46px;
         display: grid;
         place-items: center;
-        border: 1px solid rgba(255,255,255,.25);
+        border: 1px solid rgba(255, 255, 255, .25);
         border-radius: 10px;
-        background: rgba(255,255,255,.08);
+        background: rgba(255, 255, 255, .08);
         color: #fff;
         font-size: 14px;
         font-weight: 800;
@@ -1302,7 +1298,7 @@
     .connector-step p {
         margin: 0;
         max-width: 260px;
-        color: rgba(255,255,255,.58);
+        color: rgba(255, 255, 255, .58);
         font-size: 12.5px;
         line-height: 1.65;
     }
@@ -1351,11 +1347,9 @@
         border: 1px solid var(--connector-border);
         border-radius: 20px;
         background:
-            linear-gradient(
-                135deg,
+            linear-gradient(135deg,
                 #F5F9F7,
-                #FFFFFF
-            );
+                #FFFFFF);
     }
 
     .connector-cta-card h2 {
@@ -1483,7 +1477,7 @@
         top: 13px;
         padding: 5px 8px;
         border-radius: 5px;
-        background: rgba(37,64,53,.92);
+        background: rgba(37, 64, 53, .92);
         color: #fff;
         font-size: 9px;
         font-weight: 800;
@@ -1749,23 +1743,21 @@
                 <form
                     class="connector-main-search"
                     action="{{ route('home.services') }}"
-                    method="GET"
-                >
+                    method="GET">
 
                     <div class="connector-search-field">
                         <svg width="18" height="18" viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor"
-                             stroke-width="2">
-                            <circle cx="11" cy="11" r="7"/>
-                            <path d="m21 21-4.3-4.3"/>
+                            fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m21 21-4.3-4.3" />
                         </svg>
 
                         <input
                             type="text"
                             name="q"
                             placeholder="What service do you need?"
-                            autocomplete="off"
-                        >
+                            autocomplete="off">
                     </div>
 
                     <div class="connector-search-category">
@@ -1773,17 +1765,16 @@
                             <option value="">All categories</option>
 
                             @foreach($scategories ?? [] as $scategory)
-                                <option value="{{ $scategory->slug }}">
-                                    {{ $scategory->name }}
-                                </option>
+                            <option value="{{ $scategory->slug }}">
+                                {{ $scategory->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
 
                     <button
                         type="submit"
-                        class="connector-search-button"
-                    >
+                        class="connector-search-button">
                         Search
                     </button>
 
@@ -1795,13 +1786,13 @@
                     </span>
 
                     @foreach(($scategories ?? collect())->take(4) as $popularCategory)
-                        <a href="{{ route('home.service_by_category', ['category_slug' => $popularCategory->slug]) }}">
-                            {{ $popularCategory->name }}
-                        </a>
+                    <a href="{{ route('home.service_by_category', ['category_slug' => $popularCategory->slug]) }}">
+                        {{ $popularCategory->name }}
+                    </a>
 
-                        @if(!$loop->last)
-                            <span style="color:#B8C6C0;">·</span>
-                        @endif
+                    @if(!$loop->last)
+                    <span style="color:#B8C6C0;">·</span>
+                    @endif
                     @endforeach
                 </div>
 
@@ -1849,51 +1840,48 @@
                     <div
                         id="connectorHeroCarousel"
                         class="carousel slide"
-                        data-bs-ride="carousel"
-                    >
+                        data-bs-ride="carousel">
 
                         <div class="carousel-inner">
 
                             @forelse($sliders as $index => $slider)
 
-                                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
 
-                                    <img
-                                        src="{{ asset('image/slider') }}/{{ $slider->image }}"
-                                        alt="{{ $slider->title ?? 'Connector service' }}"
-                                    >
+                                <img
+                                    src="{{ asset('image/slider') }}/{{ $slider->image }}"
+                                    alt="{{ $slider->title ?? 'Connector service' }}">
 
-                                    <div class="connector-slide-content">
+                                <div class="connector-slide-content">
 
-                                        <small>
-                                            Connector marketplace
-                                        </small>
+                                    <small>
+                                        Connector marketplace
+                                    </small>
 
-                                        <strong>
-                                            {{ $slider->title }}
-                                        </strong>
-
-                                    </div>
+                                    <strong>
+                                        {{ $slider->title }}
+                                    </strong>
 
                                 </div>
+
+                            </div>
 
                             @empty
 
-                                <div class="carousel-item active">
+                            <div class="carousel-item active">
 
-                                    <img
-                                        src="{{ asset('image/services/default.png') }}"
-                                        alt="Connector services"
-                                    >
+                                <img
+                                    src="{{ asset('image/services/default.png') }}"
+                                    alt="Connector services">
 
-                                    <div class="connector-slide-content">
-                                        <small>Connector marketplace</small>
-                                        <strong>
-                                            Trusted people. Better services.
-                                        </strong>
-                                    </div>
-
+                                <div class="connector-slide-content">
+                                    <small>Connector marketplace</small>
+                                    <strong>
+                                        Trusted people. Better services.
+                                    </strong>
                                 </div>
+
+                            </div>
 
                             @endforelse
 
@@ -1901,37 +1889,33 @@
 
                         @if(($sliders ?? collect())->count() > 1)
 
-                            <button
-                                class="carousel-control-prev"
-                                type="button"
-                                data-bs-target="#connectorHeroCarousel"
-                                data-bs-slide="prev"
-                            >
-                                <span
-                                    class="carousel-control-prev-icon"
-                                    aria-hidden="true"
-                                ></span>
+                        <button
+                            class="carousel-control-prev"
+                            type="button"
+                            data-bs-target="#connectorHeroCarousel"
+                            data-bs-slide="prev">
+                            <span
+                                class="carousel-control-prev-icon"
+                                aria-hidden="true"></span>
 
-                                <span class="visually-hidden">
-                                    Previous
-                                </span>
-                            </button>
+                            <span class="visually-hidden">
+                                Previous
+                            </span>
+                        </button>
 
-                            <button
-                                class="carousel-control-next"
-                                type="button"
-                                data-bs-target="#connectorHeroCarousel"
-                                data-bs-slide="next"
-                            >
-                                <span
-                                    class="carousel-control-next-icon"
-                                    aria-hidden="true"
-                                ></span>
+                        <button
+                            class="carousel-control-next"
+                            type="button"
+                            data-bs-target="#connectorHeroCarousel"
+                            data-bs-slide="next">
+                            <span
+                                class="carousel-control-next-icon"
+                                aria-hidden="true"></span>
 
-                                <span class="visually-hidden">
-                                    Next
-                                </span>
-                            </button>
+                            <span class="visually-hidden">
+                                Next
+                            </span>
+                        </button>
 
                         @endif
 
@@ -1950,10 +1934,9 @@
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="M12 3l7 4v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V7l7-4z"/>
-                            <path d="m9 12 2 2 4-4"/>
+                            stroke-width="2">
+                            <path d="M12 3l7 4v5c0 4.5-3 7.8-7 9-4-1.2-7-4.5-7-9V7l7-4z" />
+                            <path d="m9 12 2 2 4-4" />
                         </svg>
 
                     </div>
@@ -1997,8 +1980,7 @@
 
                 <a
                     href="{{ route('home.service_categories') }}"
-                    class="connector-view-all"
-                >
+                    class="connector-view-all">
                     View all categories
                     <span>→</span>
                 </a>
@@ -2008,39 +1990,37 @@
 
             @if(($scategories ?? collect())->count())
 
-                <div class="connector-category-grid">
+            <div class="connector-category-grid">
 
-                    @foreach($scategories as $scategory)
+                @foreach($scategories as $scategory)
 
-                        <a
-                            href="{{ route('home.service_by_category', ['category_slug' => $scategory->slug]) }}"
-                            class="connector-category-card"
-                        >
+                <a
+                    href="{{ route('home.service_by_category', ['category_slug' => $scategory->slug]) }}"
+                    class="connector-category-card">
 
-                            <div class="connector-category-icon">
+                    <div class="connector-category-icon">
 
-                                <img
-                                    src="{{ asset('image/categories') }}/{{ $scategory->image }}"
-                                    alt="{{ $scategory->name }}"
-                                >
+                        <img
+                            src="{{ asset('image/categories') }}/{{ $scategory->image }}"
+                            alt="{{ $scategory->name }}">
 
-                            </div>
+                    </div>
 
-                            <div class="connector-category-name">
-                                {{ $scategory->name }}
-                            </div>
+                    <div class="connector-category-name">
+                        {{ $scategory->name }}
+                    </div>
 
-                        </a>
+                </a>
 
-                    @endforeach
+                @endforeach
 
-                </div>
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    Service categories will appear here soon.
-                </div>
+            <div class="connector-empty">
+                Service categories will appear here soon.
+            </div>
 
             @endif
 
@@ -2075,8 +2055,7 @@
 
                 <a
                     href="{{ route('home.services') }}"
-                    class="connector-view-all"
-                >
+                    class="connector-view-all">
                     Browse all services
                     <span>→</span>
                 </a>
@@ -2086,179 +2065,171 @@
 
             @if(($services ?? collect())->count())
 
-                <div class="connector-service-grid">
+            <div class="connector-service-grid">
 
-                    @foreach($services as $service)
+                @foreach($services as $service)
 
-                        @php
+                @php
 
-                            $total = $service->price;
+                $total = $service->price;
 
-                            if ($service->discount) {
+                if ($service->discount) {
 
-                                if ($service->discount_type === 'fixed') {
-                                    $total = $total - $service->discount;
-                                }
+                if ($service->discount_type === 'fixed') {
+                $total = $total - $service->discount;
+                }
 
-                                if ($service->discount_type === 'percent') {
-                                    $total = $total -
-                                        ($total * $service->discount / 100);
-                                }
-                            }
+                if ($service->discount_type === 'percent') {
+                $total = $total -
+                ($total * $service->discount / 100);
+                }
+                }
 
-                            $waRawPhone =
-                                optional($service->sprovider ?? null)->phone
-                                ?? $defaultWhatsapp;
+                $waRawPhone =
+                optional($service->sprovider ?? null)->phone
+                ?? $defaultWhatsapp;
 
-                            $waPhone =
-                                preg_replace('/\D+/', '', $waRawPhone);
+                $waPhone =
+                preg_replace('/\D+/', '', $waRawPhone);
 
-                            $waMessage = rawurlencode(
-                                'Hello! I\'m interested in booking "' .
-                                $service->name .
-                                '" (' .
-                                number_format($total) .
-                                ' RWF). Is it available?'
-                            );
+                $waMessage = rawurlencode(
+                'Hello! I\'m interested in booking "' .
+                $service->name .
+                '" (' .
+                number_format($total) .
+                ' RWF). Is it available?'
+                );
 
-                        @endphp
+                @endphp
 
-                        <article class="connector-service-card">
+                <article class="connector-service-card">
 
-                            <div class="connector-service-image">
+                    <div class="connector-service-image">
 
-                                <a
-                                    href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                >
-                                    <img
-                                        src="{{ asset('image/services/' . ($service->image ?? 'default.png')) }}"
-                                        alt="{{ $service->name }}"
-                                    >
-                                </a>
+                        <a
+                            href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}">
+                            <img
+                                src="{{ asset('image/services/' . ($service->image ?? 'default.png')) }}"
+                                alt="{{ $service->name }}">
+                        </a>
 
-                                @if($service->duration)
+                        @if($service->duration)
 
-                                    <span class="connector-duration">
-                                        {{ $service->duration }}
-                                    </span>
+                        <span class="connector-duration">
+                            {{ $service->duration }}
+                        </span>
 
+                        @endif
+
+                    </div>
+
+
+                    <div class="connector-service-body">
+
+                        <div class="connector-service-category">
+                            {{ optional($service->category)->name }}
+                        </div>
+
+                        <a
+                            href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
+                            class="connector-service-name">
+                            {{ $service->name }}
+                        </a>
+
+
+                        <div class="connector-service-location">
+
+                            <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" />
+                                <circle cx="12" cy="10" r="3" />
+                            </svg>
+
+                            <a
+                                href="{{ route('home.service_location', ['service_location' => $service->location]) }}">
+                                {{ $service->location }}
+                            </a>
+
+                        </div>
+
+
+                        <div class="connector-service-price">
+
+                            <span class="connector-price-current">
+                                {{ number_format($total) }}
+                            </span>
+
+                            <span class="connector-price-currency">
+                                RWF
+                            </span>
+
+                            @if($service->discount)
+
+                            <span class="connector-price-original">
+                                {{ number_format($service->price) }}
+                            </span>
+
+                            <span class="connector-discount">
+
+                                @if($service->discount_type === 'fixed')
+                                -{{ number_format($service->discount) }}
+                                @else
+                                -{{ $service->discount }}%
                                 @endif
 
-                            </div>
+                            </span>
+
+                            @endif
+
+                        </div>
 
 
-                            <div class="connector-service-body">
+                        <div class="connector-service-actions">
 
-                                <div class="connector-service-category">
-                                    {{ optional($service->category)->name }}
-                                </div>
+                            <a
+                                href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
+                                class="connector-action connector-action-primary">
+                                View service
+                            </a>
 
-                                <a
-                                    href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                    class="connector-service-name"
-                                >
-                                    {{ $service->name }}
-                                </a>
+                            <a
+                                href="https://wa.me/{{ $waPhone }}?text={{ $waMessage }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="connector-action connector-action-whatsapp">
 
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z" />
+                                </svg>
 
-                                <div class="connector-service-location">
+                                WhatsApp
 
-                                    <svg
-                                        width="13"
-                                        height="13"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/>
-                                        <circle cx="12" cy="10" r="3"/>
-                                    </svg>
+                            </a>
 
-                                    <a
-                                        href="{{ route('home.service_location', ['service_location' => $service->location]) }}"
-                                    >
-                                        {{ $service->location }}
-                                    </a>
+                        </div>
 
-                                </div>
+                    </div>
 
+                </article>
 
-                                <div class="connector-service-price">
+                @endforeach
 
-                                    <span class="connector-price-current">
-                                        {{ number_format($total) }}
-                                    </span>
-
-                                    <span class="connector-price-currency">
-                                        RWF
-                                    </span>
-
-                                    @if($service->discount)
-
-                                        <span class="connector-price-original">
-                                            {{ number_format($service->price) }}
-                                        </span>
-
-                                        <span class="connector-discount">
-
-                                            @if($service->discount_type === 'fixed')
-                                                -{{ number_format($service->discount) }}
-                                            @else
-                                                -{{ $service->discount }}%
-                                            @endif
-
-                                        </span>
-
-                                    @endif
-
-                                </div>
-
-
-                                <div class="connector-service-actions">
-
-                                    <a
-                                        href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                        class="connector-action connector-action-primary"
-                                    >
-                                        View service
-                                    </a>
-
-                                    <a
-                                        href="https://wa.me/{{ $waPhone }}?text={{ $waMessage }}"
-                                        target="_blank"
-                                        rel="noopener"
-                                        class="connector-action connector-action-whatsapp"
-                                    >
-
-                                        <svg
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                        >
-                                            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z"/>
-                                        </svg>
-
-                                        WhatsApp
-
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-                        </article>
-
-                    @endforeach
-
-                </div>
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    No services are currently available.
-                </div>
+            <div class="connector-empty">
+                No services are currently available.
+            </div>
 
             @endif
 
@@ -2295,8 +2266,7 @@
 
                 <a
                     href="{{ route('home.service_provider') }}"
-                    class="connector-view-all"
-                >
+                    class="connector-view-all">
                     View providers
                     <span>→</span>
                 </a>
@@ -2306,153 +2276,143 @@
 
             @if(($sproviders ?? collect())->count())
 
-                <div class="connector-provider-grid">
+            <div class="connector-provider-grid">
 
-                    @foreach($sproviders as $sprovider)
+                @foreach($sproviders as $sprovider)
 
-                        @if(!empty($sprovider->sprovider_name))
+                @php
 
-                            @php
+                $provWaPhone =
+                preg_replace(
+                '/\D+/',
+                '',
+                $sprovider->phone ?? $defaultWhatsapp
+                );
 
-                                $provWaPhone =
-                                    preg_replace(
-                                        '/\D+/',
-                                        '',
-                                        $sprovider->phone ?? $defaultWhatsapp
-                                    );
+                $provWaMessage = rawurlencode(
+                'Hello ' .
+                $sprovider->user->name .
+                ', I found your profile on Connector and would like to get in touch.'
+                );
 
-                                $provWaMessage = rawurlencode(
-                                    'Hello ' .
-                                    $sprovider->sprovider_name .
-                                    ', I found your profile on Connector and would like to get in touch.'
-                                );
+                @endphp
 
-                            @endphp
+                <article class="connector-provider-card">
 
-                            <article class="connector-provider-card">
-
-                                <a
-                                    href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                    class="connector-provider-favorite"
-                                    aria-label="View provider profile"
-                                >
-                                    ♡
-                                </a>
+                    <a
+                        href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
+                        class="connector-provider-favorite"
+                        aria-label="View provider profile">
+                        ♡
+                    </a>
 
 
-                                <div class="connector-provider-image">
+                    <div class="connector-provider-image">
 
-                                    <a
-                                        href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                    >
-                                        <img
-                                            src="{{ asset('image/profile') }}/{{ $sprovider->image }}"
-                                            alt="{{ $sprovider->sprovider_name }}"
-                                        >
-                                    </a>
+                        <a
+                            href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}">
+                            <img
+                                src="{{ asset('image/profile') }}/{{ $sprovider->image }}"
+                                alt="{{ $sprovider->user->name }}">
+                        </a>
 
-                                </div>
+                    </div>
 
 
-                                <div class="connector-provider-body">
+                    <div class="connector-provider-body">
 
-                                    <div class="connector-provider-name">
-                                        {{ $sprovider->sprovider_name }}
-                                    </div>
+                        <div class="connector-provider-name">
+                            {{ $sprovider->user->name }}
+                        </div>
 
-                                    <div class="connector-provider-category">
+                        <div class="connector-provider-category">
 
-                                        @if($sprovider->service_category_id)
-                                            {{ optional($sprovider->category)->name }}
-                                        @else
-                                            Service provider
-                                        @endif
+                            @if($sprovider->service_category_id)
+                            {{ optional($sprovider->category)->name }}
+                            @else
+                            Service provider
+                            @endif
 
-                                    </div>
-
-
-                                    <div class="connector-provider-meta">
-
-                                        <div class="connector-provider-meta-item">
-
-                                            <span class="connector-provider-meta-label">
-                                                Category
-                                            </span>
-
-                                            <span class="connector-provider-meta-value">
-
-                                                @if($sprovider->service_category_id)
-                                                    {{ optional($sprovider->category)->name }}
-                                                @else
-                                                    —
-                                                @endif
-
-                                            </span>
-
-                                        </div>
+                        </div>
 
 
-                                        <div class="connector-provider-meta-item">
+                        <div class="connector-provider-meta">
 
-                                            <span class="connector-provider-meta-label">
-                                                Location
-                                            </span>
+                            <div class="connector-provider-meta-item">
 
-                                            <span class="connector-provider-meta-value">
-                                                {{ $sprovider->city ?? '—' }}
-                                            </span>
+                                <span class="connector-provider-meta-label">
+                                    Category
+                                </span>
 
-                                        </div>
+                                <span class="connector-provider-meta-value">
 
-                                    </div>
+                                    @if($sprovider->service_category_id)
+                                    {{ optional($sprovider->category)->name }}
+                                    @else
+                                    —
+                                    @endif
+
+                                </span>
+
+                            </div>
 
 
-                                    <div class="connector-provider-actions">
+                            <div class="connector-provider-meta-item">
 
-                                        <a
-                                            href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
-                                            class="connector-provider-view"
-                                        >
-                                            View profile
-                                        </a>
+                                <span class="connector-provider-meta-label">
+                                    Location
+                                </span>
 
-                                        <a
-                                            href="https://wa.me/{{ $provWaPhone }}?text={{ $provWaMessage }}"
-                                            target="_blank"
-                                            rel="noopener"
-                                            class="connector-provider-message"
-                                        >
+                                <span class="connector-provider-meta-value">
+                                    {{ $sprovider->service_locations ?? '—' }}
+                                </span>
 
-                                            <svg
-                                                width="14"
-                                                height="14"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z"/>
-                                            </svg>
+                            </div>
 
-                                            Message
+                        </div>
 
-                                        </a>
 
-                                    </div>
+                        <div class="connector-provider-actions">
 
-                                </div>
+                            <a
+                                href="{{ route('home.service-provider_profile', ['sprovider_id' => $sprovider->id]) }}"
+                                class="connector-provider-view">
+                                View profile
+                            </a>
 
-                            </article>
+                            <a
+                                href="https://wa.me/{{ $provWaPhone }}?text={{ $provWaMessage }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="connector-provider-message">
 
-                        @endif
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2z" />
+                                </svg>
 
-                    @endforeach
+                                Message
 
-                </div>
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+                @endforeach
+
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    No service providers are currently available.
-                </div>
+            <div class="connector-empty">
+                No service providers are currently available.
+            </div>
 
             @endif
 
@@ -2491,145 +2451,142 @@
 
 
             @php
-                $activePromotions = collect($promotions ?? [])
-                    ->filter(function ($promotion) {
-                        return \Carbon\Carbon::now()->lessThanOrEqualTo($promotion->end_date);
-                    });
+            $activePromotions = collect($promotions ?? [])
+            ->filter(function ($promotion) {
+            return \Carbon\Carbon::now()->lessThanOrEqualTo($promotion->end_date);
+            });
             @endphp
 
 
             @if($activePromotions->count())
 
-                <div class="connector-promotion-grid">
+            <div class="connector-promotion-grid">
 
-                    @foreach($activePromotions as $promotion)
+                @foreach($activePromotions as $promotion)
 
-                        @php
+                @php
 
-                            $promoTotal =
-                                $promotion->service->price -
-                                (
-                                    $promotion->service->price *
-                                    $promotion->discount /
-                                    100
-                                );
+                $promoTotal =
+                $promotion->service->price -
+                (
+                $promotion->service->price *
+                $promotion->discount /
+                100
+                );
 
-                            $promoWaPhone =
-                                preg_replace(
-                                    '/\D+/',
-                                    '',
-                                    optional(
-                                        $promotion->service->sprovider ?? null
-                                    )->phone ?? $defaultWhatsapp
-                                );
+                $promoWaPhone =
+                preg_replace(
+                '/\D+/',
+                '',
+                optional(
+                $promotion->service->sprovider ?? null
+                )->phone ?? $defaultWhatsapp
+                );
 
-                            $promoWaMessage = rawurlencode(
-                                'Hello! I\'d like to book the promotion "' .
-                                $promotion->title .
-                                '" for ' .
-                                number_format($promoTotal) .
-                                ' RWF.'
-                            );
+                $promoWaMessage = rawurlencode(
+                'Hello! I\'d like to book the promotion "' .
+                $promotion->title .
+                '" for ' .
+                number_format($promoTotal) .
+                ' RWF.'
+                );
 
-                        @endphp
-
-
-                        <article class="connector-promotion-card">
-
-                            <span class="connector-promotion-badge">
-                                {{ $promotion->discount }}% OFF
-                            </span>
+                @endphp
 
 
-                            <div class="connector-promotion-image">
+                <article class="connector-promotion-card">
 
-                                <img
-                                    src="{{ asset('image/services') }}/{{ $promotion->service->image }}"
-                                    alt="{{ $promotion->title }}"
-                                >
+                    <span class="connector-promotion-badge">
+                        {{ $promotion->discount }}% OFF
+                    </span>
 
+
+                    <div class="connector-promotion-image">
+
+                        <img
+                            src="{{ asset('image/services') }}/{{ $promotion->service->image }}"
+                            alt="{{ $promotion->title }}">
+
+                    </div>
+
+
+                    <div class="connector-promotion-body">
+
+                        <h3 class="connector-promotion-title">
+                            {{ $promotion->title }}
+                        </h3>
+
+                        <p class="connector-promotion-description">
+                            {{ Str::limit($promotion->description, 90) }}
+                        </p>
+
+
+                        <div class="connector-promotion-meta">
+
+                            <div>
+                                <span class="connector-promotion-meta-label">
+                                    Now
+                                </span>
+
+                                <span class="connector-promotion-meta-value">
+                                    {{ number_format($promoTotal) }} RWF
+                                </span>
                             </div>
 
+                            <div>
+                                <span class="connector-promotion-meta-label">
+                                    Duration
+                                </span>
 
-                            <div class="connector-promotion-body">
-
-                                <h3 class="connector-promotion-title">
-                                    {{ $promotion->title }}
-                                </h3>
-
-                                <p class="connector-promotion-description">
-                                    {{ Str::limit($promotion->description, 90) }}
-                                </p>
-
-
-                                <div class="connector-promotion-meta">
-
-                                    <div>
-                                        <span class="connector-promotion-meta-label">
-                                            Now
-                                        </span>
-
-                                        <span class="connector-promotion-meta-value">
-                                            {{ number_format($promoTotal) }} RWF
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <span class="connector-promotion-meta-label">
-                                            Duration
-                                        </span>
-
-                                        <span class="connector-promotion-meta-value">
-                                            {{ $promotion->service->duration }}
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <span class="connector-promotion-meta-label">
-                                            Ends
-                                        </span>
-
-                                        <span class="connector-promotion-meta-value connector-promotion-end">
-                                            {{ \Carbon\Carbon::parse($promotion->end_date)->format('d M') }}
-                                        </span>
-                                    </div>
-
-                                </div>
-
-
-                                <div class="connector-promotion-actions">
-
-                                    <a
-                                        href="{{ route('home.service_details', ['service_slug' => $promotion->service->slug]) }}"
-                                        class="connector-action connector-action-primary"
-                                    >
-                                        View offer
-                                    </a>
-
-                                    <a
-                                        href="https://wa.me/{{ $promoWaPhone }}?text={{ $promoWaMessage }}"
-                                        target="_blank"
-                                        rel="noopener"
-                                        class="connector-action connector-action-whatsapp"
-                                    >
-                                        WhatsApp
-                                    </a>
-
-                                </div>
-
+                                <span class="connector-promotion-meta-value">
+                                    {{ $promotion->service->duration }}
+                                </span>
                             </div>
 
-                        </article>
+                            <div>
+                                <span class="connector-promotion-meta-label">
+                                    Ends
+                                </span>
 
-                    @endforeach
+                                <span class="connector-promotion-meta-value connector-promotion-end">
+                                    {{ \Carbon\Carbon::parse($promotion->end_date)->format('d M') }}
+                                </span>
+                            </div>
 
-                </div>
+                        </div>
+
+
+                        <div class="connector-promotion-actions">
+
+                            <a
+                                href="{{ route('home.service_details', ['service_slug' => $promotion->service->slug]) }}"
+                                class="connector-action connector-action-primary">
+                                View offer
+                            </a>
+
+                            <a
+                                href="https://wa.me/{{ $promoWaPhone }}?text={{ $promoWaMessage }}"
+                                target="_blank"
+                                rel="noopener"
+                                class="connector-action connector-action-whatsapp">
+                                WhatsApp
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+                @endforeach
+
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    There are no active promotions right now.
-                </div>
+            <div class="connector-empty">
+                There are no active promotions right now.
+            </div>
 
             @endif
 
@@ -2765,15 +2722,13 @@
 
                     <a
                         href="{{ route('home.services') }}"
-                        class="connector-button connector-button-outline"
-                    >
+                        class="connector-button connector-button-outline">
                         Find a service
                     </a>
 
                     <a
                         href="{{ route('register') }}"
-                        class="connector-button connector-button-dark"
-                    >
+                        class="connector-button connector-button-dark">
                         Join Connector
                     </a>
 
@@ -2787,8 +2742,8 @@
 
 
     {{-- =====================================================
-         BLOG
-    ====================================================== --}}
+     BLOG
+====================================================== --}}
     <section class="connector-section connector-section-soft">
 
         <div class="connector-container">
@@ -2809,130 +2764,96 @@
 
                 <a
                     href="{{ route('home.blogs') }}"
-                    class="connector-view-all"
-                >
+                    class="connector-view-all">
                     View all articles
                     <span>→</span>
                 </a>
 
             </div>
 
-
             @if(($blogs ?? collect())->count())
 
-                <div class="connector-blog-grid">
+            <div class="connector-blog-grid">
 
-                    @foreach($blogs as $blog)
+                @foreach($blogs as $blog)
 
-                        <article class="connector-blog-card">
+                <article class="connector-blog-card">
 
-                            <div class="connector-blog-image">
+                    <div class="connector-blog-image">
 
-                                <a
-                                    href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}"
-                                >
+                        {{-- Blog image / detail --}}
+                        <a
+                            href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}">
 
-                                    <img
-                                        src="{{ asset('image/blog') }}/{{ $blog->image }}"
-                                        alt="{{ $blog->title }}"
-                                    >
+                            <img
+                                src="{{ asset('image/blog/' . $blog->image) }}"
+                                alt="{{ $blog->title }}">
 
-                                </a>
+                        </a>
 
+                        {{-- Category --}}
+                        @if(!empty($blog->blog_category))
 
-                                <a
-                                    href="{{ route('blogCategory.show', $blog->blog_category) }}"
-                                    class="connector-blog-category"
-                                >
-                                    {{ $blog->blog_category }}
-                                </a>
+                        <a
+                            href="{{ route('blogCategory.show', ['category' => $blog->blog_category]) }}"
+                            class="connector-blog-category">
+                            {{ $blog->blog_category }}
+                        </a>
 
-                            </div>
+                        @endif
 
+                    </div>
 
-                            <div class="connector-blog-body">
+                    <div class="connector-blog-body">
 
-                                <div class="connector-blog-author">
+                        <div class="connector-blog-author">
 
-                                    <svg
-                                        width="13"
-                                        height="13"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <circle cx="12" cy="8" r="4"/>
-                                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-                                    </svg>
+                            <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                            </svg>
 
-
-                                    @if($blog->author && $blog->author->utype === 'SVP')
-
-                                        @php
-                                            $blogProvider =
-                                                \App\Models\ServiceProvider::where(
-                                                    'user_id',
-                                                    $blog->author->id
-                                                )->first();
-                                        @endphp
-
-                                        @if($blogProvider)
-
-                                            <a
-                                                href="{{ url('/profile/' . $blogProvider->id) }}"
-                                            >
-                                                {{ $blog->author->name }}
-                                            </a>
-
-                                        @else
-
-                                            <span>
-                                                {{ $blog->author->name ?? 'Unknown' }}
-                                            </span>
-
-                                        @endif
-
-                                    @else
-
-                                        <span>
-                                            {{ $blog->author->name ?? 'Unknown' }}
-                                        </span>
-
-                                    @endif
-
-                                </div>
+                            <span>
+                                {{ $blog->user->name ?? 'Unknown' }}
+                            </span>
 
 
-                                <a
-                                    href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}"
-                                    class="connector-blog-title"
-                                >
-                                    {{ Str::limit($blog->title, 70) }}
-                                </a>
+                        </div>
 
+                        {{-- Blog title --}}
+                        <a
+                            href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}"
+                            class="connector-blog-title">
+                            {{ Str::limit($blog->title, 70) }}
+                        </a>
 
-                                <a
-                                    href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}"
-                                    class="connector-blog-read"
-                                >
-                                    Continue reading
-                                    <span>→</span>
-                                </a>
+                        {{-- Read more --}}
+                        <a
+                            href="{{ route('home.blog_detail', ['blog_slug' => $blog->slug]) }}"
+                            class="connector-blog-read">
+                            Continue reading
+                            <span>→</span>
+                        </a>
 
-                            </div>
+                    </div>
 
-                        </article>
+                </article>
 
-                    @endforeach
+                @endforeach
 
-                </div>
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    No blog articles are currently available.
-                </div>
+            <div class="connector-empty">
+                No blog articles are currently available.
+            </div>
 
             @endif
 
@@ -2967,43 +2888,42 @@
 
             @if(($feedbacks ?? collect())->count())
 
-                <div class="connector-testimonials">
+            <div class="connector-testimonials">
 
-                    @foreach($feedbacks as $feedback)
+                @foreach($feedbacks as $feedback)
 
-                        <article class="connector-testimonial">
+                <article class="connector-testimonial">
 
-                            <p class="connector-testimonial-quote">
-                                “{{ $feedback->message }}”
-                            </p>
+                    <p class="connector-testimonial-quote">
+                        “{{ $feedback->message }}”
+                    </p>
 
 
-                            <div class="connector-testimonial-footer">
+                    <div class="connector-testimonial-footer">
 
-                                <div class="connector-testimonial-name">
-                                    {{ $feedback->name }}
-                                </div>
+                        <div class="connector-testimonial-name">
+                            {{ $feedback->name }}
+                        </div>
 
-                                <div
-                                    class="connector-stars"
-                                    aria-label="4.5 out of 5 stars"
-                                >
-                                    ★★★★☆
-                                </div>
+                        <div
+                            class="connector-stars"
+                            aria-label="4.5 out of 5 stars">
+                            ★★★★☆
+                        </div>
 
-                            </div>
+                    </div>
 
-                        </article>
+                </article>
 
-                    @endforeach
+                @endforeach
 
-                </div>
+            </div>
 
             @else
 
-                <div class="connector-empty">
-                    Customer testimonials will appear here.
-                </div>
+            <div class="connector-empty">
+                Customer testimonials will appear here.
+            </div>
 
             @endif
 
@@ -3017,31 +2937,30 @@
     ====================================================== --}}
     @if(($partners ?? collect())->count())
 
-        <section class="connector-partners">
+    <section class="connector-partners">
 
-            <div class="connector-container">
+        <div class="connector-container">
 
-                <div class="connector-partners-label">
-                    Trusted by partners and organizations
-                </div>
+            <div class="connector-partners-label">
+                Trusted by partners and organizations
+            </div>
 
-                <div class="connector-partner-list">
+            <div class="connector-partner-list">
 
-                    @foreach($partners as $partner)
+                @foreach($partners as $partner)
 
-                        <img
-                            src="{{ asset('image/partner') }}/{{ $partner->image }}"
-                            alt="{{ $partner->name }}"
-                            loading="lazy"
-                        >
+                <img
+                    src="{{ asset('image/partner') }}/{{ $partner->image }}"
+                    alt="{{ $partner->name }}"
+                    loading="lazy">
 
-                    @endforeach
-
-                </div>
+                @endforeach
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
     @endif
 

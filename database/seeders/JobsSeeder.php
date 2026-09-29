@@ -1,0 +1,161 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+
+class JobsSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $now = Carbon::now();
+
+        $rows = [
+            [
+                'id' => 1,
+                'service_provider_id' => 1,
+                'title' => 'Hair Stylist',
+                'description' => 'Hair Stylist wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Kimironko, Kigali',
+                'type' => 'full-time',
+                'requirements' => '2+ years salon experience; knowledge of colour and treatments.',
+                'responsibilities' => 'Style clients, maintain station hygiene, upsell products.',
+                'deadline' => Carbon::now()->addDays(30)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 2,
+                'service_provider_id' => 2,
+                'title' => 'Braider',
+                'description' => 'Braider wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Remera, Kigali',
+                'type' => 'part-time',
+                'requirements' => 'Fast, neat braiding; portfolio of styles.',
+                'responsibilities' => 'Braid clients, manage bookings, keep tools clean.',
+                'deadline' => Carbon::now()->addDays(21)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 3,
+                'service_provider_id' => 3,
+                'title' => 'Barber',
+                'description' => 'Barber wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Kicukiro, Kigali',
+                'type' => 'full-time',
+                'requirements' => 'Barbering certificate; strong fade skills.',
+                'responsibilities' => 'Cuts, beard grooming, customer service.',
+                'deadline' => Carbon::now()->addDays(25)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 4,
+                'service_provider_id' => 4,
+                'title' => 'Nail Technician',
+                'description' => 'Nail Technician wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Nyarutarama, Kigali',
+                'type' => 'contract',
+                'requirements' => 'Certified in gel/acrylic; eye for detail.',
+                'responsibilities' => 'Manicures, pedicures, nail art.',
+                'deadline' => Carbon::now()->addDays(18)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 5,
+                'service_provider_id' => 5,
+                'title' => 'Junior Makeup Artist',
+                'description' => 'Junior Makeup Artist wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Kacyiru, Kigali',
+                'type' => 'part-time',
+                'requirements' => 'Portfolio and basic makeup training.',
+                'responsibilities' => 'Assist on events, prep kits, do client touch-ups.',
+                'deadline' => Carbon::now()->addDays(35)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 6,
+                'service_provider_id' => 6,
+                'title' => 'Skincare Therapist',
+                'description' => 'Skincare Therapist wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Kibagabaga, Kigali',
+                'type' => 'full-time',
+                'requirements' => 'Diploma in aesthetics; consultation skills.',
+                'responsibilities' => 'Facials, skin analysis, product advice.',
+                'deadline' => Carbon::now()->addDays(28)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 7,
+                'service_provider_id' => 7,
+                'title' => 'Massage Therapist',
+                'description' => 'Massage Therapist wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Nyamirambo, Kigali',
+                'type' => 'full-time',
+                'requirements' => 'Licensed massage therapist.',
+                'responsibilities' => 'Massage sessions, room prep, client care.',
+                'deadline' => Carbon::now()->addDays(40)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 8,
+                'service_provider_id' => 8,
+                'title' => 'Beauty Receptionist',
+                'description' => 'Beauty Receptionist wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Gikondo, Kigali',
+                'type' => 'full-time',
+                'requirements' => 'Good communication, basic computer skills.',
+                'responsibilities' => 'Front desk, booking, payments.',
+                'deadline' => Carbon::now()->addDays(15)->toDateString(),
+                'status' => 'closed',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 9,
+                'service_provider_id' => 9,
+                'title' => 'Bridal Styling Assistant',
+                'description' => 'Bridal Styling Assistant wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Gisozi, Kigali',
+                'type' => 'contract',
+                'requirements' => 'Experience in hair and makeup support.',
+                'responsibilities' => 'Assist stylists on wedding days.',
+                'deadline' => Carbon::now()->addDays(45)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 10,
+                'service_provider_id' => 10,
+                'title' => 'Lash Technician Trainee',
+                'description' => 'Lash Technician Trainee wanted at our studio. Join a friendly, growing beauty team.',
+                'location' => 'Kanombe, Kigali',
+                'type' => 'part-time',
+                'requirements' => 'Steady hands; willing to train.',
+                'responsibilities' => 'Assist with sets, sanitise tools, learn lashing.',
+                'deadline' => Carbon::now()->addDays(20)->toDateString(),
+                'status' => 'open',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ];
+
+        // insertOrIgnore => safe to re-run (explicit ids, duplicates are skipped)
+        DB::table('jobs')->insertOrIgnore($rows);
+    }
+}

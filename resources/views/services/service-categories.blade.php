@@ -1088,8 +1088,6 @@
 
                 @forelse($sproviders as $sprovider)
 
-                    @if(!empty($sprovider->sprovider_name))
-
                         <div class="provider-card">
 
                             {{-- Avatar --}}
@@ -1106,7 +1104,7 @@
                                         <img
                                             src="{{ asset('asset/images/lazy.svg') }}"
                                             data-src="{{ asset('image/profile') }}/{{ $sprovider->image }}"
-                                            alt="{{ $sprovider->sprovider_name }}"
+                                            alt="{{ $sprovider->user->name }}"
                                             class="lazy-img"
                                         >
 
@@ -1115,7 +1113,7 @@
                                         <img
                                             src="{{ asset('asset/images/lazy.svg') }}"
                                             data-src="{{ asset('asset/images/avatar.png') }}"
-                                            alt="{{ $sprovider->sprovider_name }}"
+                                            alt="{{ $sprovider->user->name }}"
                                             class="lazy-img"
                                         >
 
@@ -1136,7 +1134,7 @@
                                             'sprovider_id' => $sprovider->id
                                         ]) }}"
                                     >
-                                        {{ $sprovider->sprovider_name }}
+                                        {{ $sprovider->user->name }}
                                     </a>
 
                                 </h4>
@@ -1162,7 +1160,7 @@
                                     <i class="bi bi-geo-alt"></i>
 
                                     <span>
-                                        {{ $sprovider->city ?: 'Location not specified' }}
+                                        {{ $sprovider->service_locations ?: 'Location not specified' }}
                                     </span>
 
                                 </div>
@@ -1195,8 +1193,6 @@
                             </a>
 
                         </div>
-
-                    @endif
 
                 @empty
 

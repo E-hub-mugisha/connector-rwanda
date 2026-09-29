@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('tag');
             $table->string('image');
             $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('set null');
-            $table->foreignId('service_provider_id')->constrained('service_providers')->onDelete('cascade');
             $table->timestamps();
         });
     }

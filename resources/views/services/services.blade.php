@@ -1831,9 +1831,7 @@
 
     </main>
 
-    {{-- CTA --}}
-    @include('includes.call-to-action')
-
+    
 </div>
 
 <script>

@@ -15,14 +15,13 @@ return new class extends Migration
     {
         Schema::create('staff_members', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('service_provider_id')->constrained('service_providers')->onDelete('cascade');
             $table->foreignId('staff_service_id')->nullable()->constrained('services')->onDelete('set null');
-            $table->string('name');
-            $table->string('email');
             $table->string('phone')->nullable();
             $table->string('address')->nullable();
-            $table->string('role');
-            $table->string('status')->default('available');
+            $table->enum('role', ['admin', 'manager', 'staff'])->default('staff');
+            $table->enum('status', ['available', 'unavailable', 'terminated'])->default('available');
             $table->timestamps();
         });
     }

@@ -85,20 +85,7 @@ use Illuminate\Http\Request;
 use App\Models\Feedback;
 use Illuminate\Support\Facades\Artisan;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 Route::get('/', [App\Http\Controllers\HomeController::class, 'home'])->name('home');
 Route::get('/autocomplete', [SearchController::class, 'autocomplete'])->name('autocomplete');
 Route::post('/search', [SearchController::class, 'searchService'])->name('searchService');
@@ -106,7 +93,7 @@ Route::get('/contact', [App\Http\Controllers\HomeController::class, 'contact'])-
 Route::get('/blogs', [App\Http\Controllers\HomeController::class, 'blog'])->name('home.blogs');
 Route::get('/blog/{blog_slug}', [App\Http\Controllers\HomeController::class, 'blogDetail'])->name('home.blog_detail');
 Route::get('/search/blog', [App\Http\Controllers\HomeController::class, 'SearchBlog'])->name('searchBlog.home');
-Route::get('/category/{category}', [App\Http\Controllers\HomeController::class, 'showByCategory'])->name('blogCategory.show');
+Route::get('/blog/category/{category}', [App\Http\Controllers\HomeController::class, 'showByCategory'])->name('blogCategory.show');
 
 
 Route::get('/profile/{sprovider_id}', [App\Http\Controllers\service_providers\ServiceProvidersController::class, 'profile'])->name('home.service-provider_profile');

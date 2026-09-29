@@ -1,0 +1,161 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
+
+class ServiceProvidersSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $now = Carbon::now();
+
+        $rows = [
+            [
+                'id' => 1,
+                'user_id' => 2,
+                'image' => 'uploads/providers/provider-1.jpg',
+                'about' => 'Full-service hair salon in Kimironko offering cuts, blow-dries, treatments and colour for women and children.',
+                'skills' => 'Haircuts, Blow-dry, Keratin treatment, Hair colouring',
+                'qualification' => 'Diploma in Hairdressing, VTC Kicukiro',
+                'experience' => '8 years',
+                'service_category_id' => 1,
+                'service_locations' => 'Kimironko, Remera, Kibagabaga',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 2,
+                'user_id' => 3,
+                'image' => 'uploads/providers/provider-2.jpg',
+                'about' => 'Braiding studio specialising in knotless braids, cornrows, twists and protective styles using quality hair.',
+                'skills' => 'Knotless braids, Cornrows, Senegalese twists, Crochet styles',
+                'qualification' => 'Certificate in Hair Braiding',
+                'experience' => '6 years',
+                'service_category_id' => 2,
+                'service_locations' => 'Remera, Kacyiru, Gisozi',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 3,
+                'user_id' => 4,
+                'image' => 'uploads/providers/provider-3.jpg',
+                'about' => 'Neighbourhood barbershop delivering sharp fades, beard grooming and hot-towel shaves.',
+                'skills' => 'Fades, Line-ups, Beard sculpting, Hot-towel shave',
+                'qualification' => 'Certificate in Barbering, Rwanda TVET',
+                'experience' => '10 years',
+                'service_category_id' => 3,
+                'service_locations' => 'Kicukiro, Gikondo, Kanombe',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 4,
+                'user_id' => 5,
+                'image' => 'uploads/providers/provider-4.jpg',
+                'about' => 'Nail bar offering gel, acrylic and classic manicures and pedicures in a relaxed setting.',
+                'skills' => 'Gel polish, Acrylic extensions, Nail art, Pedicure',
+                'qualification' => 'Certified Nail Technician',
+                'experience' => '5 years',
+                'service_category_id' => 4,
+                'service_locations' => 'Nyarutarama, Kimihurura, Kacyiru',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 5,
+                'user_id' => 6,
+                'image' => 'uploads/providers/provider-5.jpg',
+                'about' => 'Professional makeup artist for weddings, photoshoots, events and everyday glam.',
+                'skills' => 'Bridal makeup, Soft glam, Editorial, Skin prep',
+                'qualification' => 'Diploma in Makeup Artistry',
+                'experience' => '7 years',
+                'service_category_id' => 5,
+                'service_locations' => 'Kacyiru, Kigali City',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 6,
+                'user_id' => 7,
+                'image' => 'uploads/providers/provider-6.jpg',
+                'about' => 'Skincare clinic focused on facials, acne care and skin-health consultations.',
+                'skills' => 'Deep cleansing, Chemical peels, Hydrafacial, Acne treatment',
+                'qualification' => 'Diploma in Aesthetics & Skincare',
+                'experience' => '9 years',
+                'service_category_id' => 6,
+                'service_locations' => 'Kibagabaga, Kimironko',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 7,
+                'user_id' => 8,
+                'image' => 'uploads/providers/provider-7.jpg',
+                'about' => 'Day spa with massage therapy, aromatherapy and body treatments to help you unwind.',
+                'skills' => 'Swedish massage, Deep tissue, Aromatherapy, Body scrub',
+                'qualification' => 'Licensed Massage Therapist',
+                'experience' => '8 years',
+                'service_category_id' => 7,
+                'service_locations' => 'Nyamirambo, Kigali City',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 8,
+                'user_id' => 9,
+                'image' => 'uploads/providers/provider-8.jpg',
+                'about' => 'Hair-removal studio offering waxing, threading and sugaring with hygienic single-use supplies.',
+                'skills' => 'Full body waxing, Brow threading, Sugaring',
+                'qualification' => 'Certificate in Beauty Therapy',
+                'experience' => '4 years',
+                'service_category_id' => 8,
+                'service_locations' => 'Gikondo, Kicukiro',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 9,
+                'user_id' => 10,
+                'image' => 'uploads/providers/provider-9.jpg',
+                'about' => 'Bridal beauty team delivering hair and makeup packages for brides and their parties.',
+                'skills' => 'Bridal hair, Bridal makeup, Party styling, Trials',
+                'qualification' => 'Diploma in Bridal Styling',
+                'experience' => '11 years',
+                'service_category_id' => 9,
+                'service_locations' => 'Gisozi, Kigali City, Musanze',
+                'status' => 'approved',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+            [
+                'id' => 10,
+                'user_id' => 11,
+                'image' => 'uploads/providers/provider-10.jpg',
+                'about' => 'Lash and brow studio offering lash extensions, lifts, tints and brow shaping.',
+                'skills' => 'Classic lashes, Volume lashes, Lash lift, Brow lamination',
+                'qualification' => 'Certified Lash Technician',
+                'experience' => '3 years',
+                'service_category_id' => 10,
+                'service_locations' => 'Kanombe, Kicukiro',
+                'status' => 'pending',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ],
+        ];
+
+        // insertOrIgnore => safe to re-run (explicit ids, duplicates are skipped)
+        DB::table('service_providers')->insertOrIgnore($rows);
+    }
+}

@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('service_staff', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('staff_member_id')->constrained()->onDelete('cascade'); // Assuming staff_member_id refers to another table (e.g., staff_members)
-            $table->foreignId('service_id')->constrained()->onDelete('cascade'); // Assuming service_id refers to another table (e.g., services)
+            $table->foreignId('staff_member_id')->constrained('staff_members')->onDelete('cascade'); // Assuming staff_member_id refers to another table (e.g., staff_members)
+            $table->foreignId('service_id')->constrained('services')->onDelete('cascade'); // Assuming service_id refers to another table (e.g., services)
             $table->timestamps();
         });
     }

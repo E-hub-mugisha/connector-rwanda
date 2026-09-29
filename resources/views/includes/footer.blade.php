@@ -142,7 +142,7 @@
                     </a>
 
                     <a href="{{ route('faq') }}">
-                        How It Works
+                        FAQ
                     </a>
 
                     <a href="{{ route('home.blogs') }}">
@@ -265,106 +265,9 @@
                     No spam. Unsubscribe anytime.
                 </span>
 
-
-                {{-- Provider CTA --}}
-                <div class="cn-provider-card">
-
-                    <div class="cn-provider-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-8a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm0 10c-5 0-8 2.5-8 6v2h16v-2c0-3.5-3-6-8-6zm-5.9 6c.5-1.8 2.4-4 5.9-4s5.4 2.2 5.9 4H6.1z"/>
-                        </svg>
-                    </div>
-
-                    <div class="cn-provider-content">
-                        <strong>
-                            Offer your services
-                        </strong>
-
-                        <span>
-                            Join trusted providers on Connector.
-                        </span>
-                    </div>
-
-                    <a
-                        href="{{ route('register') }}"
-                        class="cn-provider-arrow"
-                        aria-label="Become a service provider"
-                    >
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M5 12h13M13 6l6 6-6 6"/>
-                        </svg>
-                    </a>
-
-                </div>
-
             </div>
 
         </div>
-    </div>
-
-
-    {{-- =========================================
-         CONTACT STRIP
-    ========================================== --}}
-    <div class="cn-footer-contact-strip">
-
-        <div class="cn-footer-container">
-
-            <div class="cn-contact-item">
-
-                <span class="cn-contact-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/>
-                    </svg>
-                </span>
-
-                <div>
-                    <span>Email</span>
-                    <a href="mailto:info@connector.rw">
-                        info@connector.rw
-                    </a>
-                </div>
-
-            </div>
-
-
-            <div class="cn-contact-item">
-
-                <span class="cn-contact-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6.62 10.79a15.46 15.46 0 0 0 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                    </svg>
-                </span>
-
-                <div>
-                    <span>Call us</span>
-                    <a href="tel:+250791957955">
-                        +250 791 957 955
-                    </a>
-                </div>
-
-            </div>
-
-
-            <div class="cn-contact-item">
-
-                <span class="cn-contact-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
-                    </svg>
-                </span>
-
-                <div>
-                    <span>Location</span>
-                    <strong>
-                        Kigali, Rwanda
-                    </strong>
-                </div>
-
-            </div>
-
-        </div>
-
     </div>
 
 

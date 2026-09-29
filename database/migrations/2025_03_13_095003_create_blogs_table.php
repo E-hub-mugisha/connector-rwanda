@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('sub_category_id')->constrained('sub_categories')->onDelete('cascade');
+            $table->foreignId('service_category_id')->constrained('service_categories')->onDelete('cascade');
+            $table->foreignId('service_sub_category_id')->constrained('service_sub_categories')->onDelete('cascade');
             $table->string('image')->nullable();
             $table->string('thumbnail')->nullable();
             $table->longText('content')->nullable();

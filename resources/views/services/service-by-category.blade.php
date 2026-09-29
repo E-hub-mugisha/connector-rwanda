@@ -54,11 +54,9 @@
         position: relative;
         overflow: hidden;
         background:
-            linear-gradient(
-                135deg,
+            linear-gradient(135deg,
                 rgba(37, 64, 53, .98),
-                rgba(37, 64, 53, .92)
-            );
+                rgba(37, 64, 53, .92));
         padding: 58px 0 62px;
     }
 
@@ -560,11 +558,9 @@
     .image-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-            to bottom,
-            rgba(37, 64, 53, .03),
-            rgba(37, 64, 53, .32)
-        );
+        background: linear-gradient(to bottom,
+                rgba(37, 64, 53, .03),
+                rgba(37, 64, 53, .32));
         pointer-events: none;
     }
 
@@ -1126,16 +1122,15 @@
             <button
                 type="button"
                 class="mobile-category-toggle"
-                id="mobileCategoryToggle"
-            >
+                id="mobileCategoryToggle">
                 <svg width="17" height="17"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2">
-                    <path d="M4 6h16"/>
-                    <path d="M7 12h10"/>
-                    <path d="M10 18h4"/>
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M4 6h16" />
+                    <path d="M7 12h10" />
+                    <path d="M10 18h4" />
                 </svg>
 
                 Browse Categories
@@ -1166,14 +1161,14 @@
                     <div class="sidebar-search">
 
                         <svg width="15"
-                             height="15"
-                             viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2">
+                            height="15"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2">
 
-                            <circle cx="11" cy="11" r="7"/>
-                            <path d="m21 21-4.3-4.3"/>
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m21 21-4.3-4.3" />
 
                         </svg>
 
@@ -1181,8 +1176,7 @@
                             type="text"
                             id="categorySearch"
                             placeholder="Search categories..."
-                            autocomplete="off"
-                        >
+                            autocomplete="off">
 
                     </div>
 
@@ -1191,93 +1185,89 @@
 
                         @foreach($scategories as $scateg)
 
-                            <li
-                                class="category-item {{ $scateg->slug === $scategory->slug ? 'active open' : '' }}"
-                                data-category-name="{{ strtolower($scateg->name) }}"
-                            >
+                        <li
+                            class="category-item {{ $scateg->slug === $scategory->slug ? 'active open' : '' }}"
+                            data-category-name="{{ strtolower($scateg->name) }}">
 
-                                <div class="category-row">
+                            <div class="category-row">
 
-                                    <a
-                                        href="{{ route('home.service_by_category', ['category_slug' => $scateg->slug]) }}"
-                                        class="category-link"
-                                    >
+                                <a
+                                    href="{{ route('home.service_by_category', ['category_slug' => $scateg->slug]) }}"
+                                    class="category-link">
 
-                                        <span class="category-icon">
+                                    <span class="category-icon">
 
-                                            <svg width="14"
-                                                 height="14"
-                                                 viewBox="0 0 24 24"
-                                                 fill="none"
-                                                 stroke="currentColor"
-                                                 stroke-width="2">
+                                        <svg width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
 
-                                                <rect x="3" y="3" width="7" height="7" rx="1"/>
-                                                <rect x="14" y="3" width="7" height="7" rx="1"/>
-                                                <rect x="3" y="14" width="7" height="7" rx="1"/>
-                                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                                            <rect x="3" y="3" width="7" height="7" rx="1" />
+                                            <rect x="14" y="3" width="7" height="7" rx="1" />
+                                            <rect x="3" y="14" width="7" height="7" rx="1" />
+                                            <rect x="14" y="14" width="7" height="7" rx="1" />
 
-                                            </svg>
+                                        </svg>
 
-                                        </span>
+                                    </span>
 
-                                        <span class="category-name">
-                                            {{ $scateg->name }}
-                                        </span>
+                                    <span class="category-name">
+                                        {{ $scateg->name }}
+                                    </span>
 
-                                    </a>
+                                </a>
 
 
-                                    @if(count($scateg->subcategories) > 0)
-
-                                        <button
-                                            type="button"
-                                            class="category-chevron"
-                                            aria-label="Show subcategories"
-                                        >
-
-                                            <svg width="14"
-                                                 height="14"
-                                                 viewBox="0 0 24 24"
-                                                 fill="none"
-                                                 stroke="currentColor"
-                                                 stroke-width="2.4">
-
-                                                <path d="m9 6 6 6-6 6"/>
-
-                                            </svg>
-
-                                        </button>
-
-                                    @endif
-
-                                </div>
-
-
-                                {{-- Subcategories --}}
                                 @if(count($scateg->subcategories) > 0)
 
-                                    <ul class="subcategory-list">
+                                <button
+                                    type="button"
+                                    class="category-chevron"
+                                    aria-label="Show subcategories">
 
-                                        @foreach($scateg->subcategories as $scat)
+                                    <svg width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.4">
 
-                                            <li>
+                                        <path d="m9 6 6 6-6 6" />
 
-                                                <a
-                                                    href="{{ route('home.service_by_subcategory', ['subcategory_slug' => $scat->slug]) }}"
-                                                >
-                                                    {{ $scat->name }}
-                                                </a>
+                                    </svg>
 
-                                            </li>
-
-                                        @endforeach
-
-                                    </ul>
+                                </button>
 
                                 @endif
 
-                            </li>
+                            </div>
+
+
+                            {{-- Subcategories --}}
+                            @if(count($scateg->subcategories) > 0)
+
+                            <ul class="subcategory-list">
+
+                                @foreach($scateg->subcategories as $scat)
+
+                                <li>
+
+                                    <a
+                                        href="{{ route('home.service_by_subcategory', ['subcategory_slug' => $scat->slug]) }}">
+                                        {{ $scat->name }}
+                                    </a>
+
+                                </li>
+
+                                @endforeach
+
+                            </ul>
+
+                            @endif
+
+                        </li>
 
                         @endforeach
 
@@ -1322,14 +1312,14 @@
                             <div class="service-search">
 
                                 <svg width="15"
-                                     height="15"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
+                                    height="15"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2">
 
-                                    <circle cx="11" cy="11" r="7"/>
-                                    <path d="m21 21-4.3-4.3"/>
+                                    <circle cx="11" cy="11" r="7" />
+                                    <path d="m21 21-4.3-4.3" />
 
                                 </svg>
 
@@ -1337,8 +1327,7 @@
                                     type="text"
                                     id="serviceSearch"
                                     placeholder="Search services..."
-                                    autocomplete="off"
-                                >
+                                    autocomplete="off">
 
                             </div>
 
@@ -1382,341 +1371,330 @@
 
                         @if($scategory->services->count() > 0)
 
-                            @foreach($scategory->services as $service)
+                        @foreach($scategory->services as $service)
 
-                                @php
+                        @php
 
-                                    $originalPrice = (float) $service->price;
-                                    $total = $originalPrice;
+                        $originalPrice = (float) $service->price;
+                        $total = $originalPrice;
 
-                                    if ($service->discount) {
+                        if ($service->discount) {
 
-                                        if ($service->discount_type === 'fixed') {
+                        if ($service->discount_type === 'fixed') {
 
-                                            $total = $originalPrice - (float) $service->discount;
+                        $total = $originalPrice - (float) $service->discount;
 
-                                        } elseif ($service->discount_type === 'percent') {
+                        } elseif ($service->discount_type === 'percent') {
 
-                                            $total = $originalPrice -
-                                                (
-                                                    $originalPrice *
-                                                    (float) $service->discount /
-                                                    100
-                                                );
+                        $total = $originalPrice -
+                        (
+                        $originalPrice *
+                        (float) $service->discount /
+                        100
+                        );
 
-                                        }
+                        }
 
-                                    }
+                        }
 
-                                    $total = max(0, $total);
+                        $total = max(0, $total);
 
 
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | WhatsApp
-                                    |--------------------------------------------------------------------------
-                                    */
+                        /*
+                        |--------------------------------------------------------------------------
+                        | WhatsApp
+                        |--------------------------------------------------------------------------
+                        */
 
-                                    $waRawPhone =
-                                        optional($service->sprovider ?? null)->phone
-                                        ?? config(
-                                            'services.whatsapp.default_number',
-                                            '250780000000'
-                                        );
+                        $waRawPhone = $service->provider?->phone
+                        ?? config(
+                        'services.whatsapp.default_number',
+                        '250780000000'
+                        );
 
-                                    $waPhone = preg_replace(
-                                        '/\D+/',
-                                        '',
-                                        $waRawPhone
-                                    );
+                        $waPhone = preg_replace(
+                        '/\D+/',
+                        '',
+                        $waRawPhone
+                        );
 
-                                    $waMessage = rawurlencode(
-                                        'Hello! I\'m interested in booking "' .
-                                        $service->name .
-                                        '" (' .
-                                        number_format($total) .
-                                        ' RWF). Is it available?'
-                                    );
+                        $waMessage = rawurlencode(
+                        'Hello! I\'m interested in booking "' .
+                        $service->name .
+                        '" (' .
+                        number_format($total) .
+                        ' RWF). Is it available?'
+                        );
 
 
-                                    /*
-                                    |--------------------------------------------------------------------------
-                                    | Provider
-                                    |--------------------------------------------------------------------------
-                                    */
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Provider
+                        |--------------------------------------------------------------------------
+                        */
 
-                                    $provider =
-                                        optional($service->sprovider ?? null)->name
-                                        ?? 'Service Provider';
+                        $provider = $service->provider?->user?->name ?? 'Service Provider';
 
-                                @endphp
+                        @endphp
 
 
-                                <article
-                                    class="service-card"
-                                    data-service-name="{{ strtolower($service->name) }}"
-                                    data-service-price="{{ $total }}"
-                                >
+                        <article
+                            class="service-card"
+                            data-service-name="{{ strtolower($service->name) }}"
+                            data-service-price="{{ $total }}">
 
-                                    {{-- Image --}}
-                                    <div class="service-image">
+                            {{-- Image --}}
+                            <div class="service-image">
 
-                                        <a
-                                            href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                        >
+                                <a
+                                    href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}">
 
-                                            <img
-                                                src="{{ asset('image/services/' . ($service->image ?? 'default.png')) }}"
-                                                alt="{{ $service->name }}"
-                                                loading="lazy"
-                                            >
+                                    <img
+                                        src="{{ asset('image/services/' . ($service->image ?? 'default.png')) }}"
+                                        alt="{{ $service->name }}"
+                                        loading="lazy">
 
-                                        </a>
+                                </a>
 
-                                        <div class="image-overlay"></div>
+                                <div class="image-overlay"></div>
 
 
-                                        @if($service->duration)
+                                @if($service->duration)
 
-                                            <span class="duration-badge">
+                                <span class="duration-badge">
 
-                                                <svg width="11"
-                                                     height="11"
-                                                     viewBox="0 0 24 24"
-                                                     fill="none"
-                                                     stroke="currentColor"
-                                                     stroke-width="2">
+                                    <svg width="11"
+                                        height="11"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
 
-                                                    <circle cx="12" cy="12" r="9"/>
-                                                    <path d="M12 7v5l3 2"/>
-
-                                                </svg>
-
-                                                {{ $service->duration }}
-
-                                            </span>
-
-                                        @endif
-
-                                    </div>
-
-
-                                    {{-- Content --}}
-                                    <div class="service-content">
-
-                                        <span class="service-category">
-                                            {{ $service->category->name ?? $scategory->name }}
-                                        </span>
-
-
-                                        <a
-                                            href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                            class="service-name"
-                                        >
-                                            {{ $service->name }}
-                                        </a>
-
-
-                                        {{-- Price --}}
-                                        <div class="service-price">
-
-                                            @if($service->discount)
-
-                                                <span class="price-original">
-                                                    {{ number_format($originalPrice) }}
-                                                </span>
-
-                                                @if($service->discount_type === 'fixed')
-
-                                                    <span class="discount">
-                                                        -{{ number_format($service->discount) }}
-                                                    </span>
-
-                                                @else
-
-                                                    <span class="discount">
-                                                        -{{ $service->discount }}%
-                                                    </span>
-
-                                                @endif
-
-                                            @endif
-
-                                            <span class="price-main">
-                                                {{ number_format($total) }}
-                                            </span>
-
-                                            <span class="price-currency">
-                                                RWF
-                                            </span>
-
-                                        </div>
-
-
-                                        {{-- Location --}}
-                                        <div class="service-location">
-
-                                            <svg width="13"
-                                                 height="13"
-                                                 viewBox="0 0 24 24"
-                                                 fill="none"
-                                                 stroke="currentColor"
-                                                 stroke-width="2">
-
-                                                <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/>
-                                                <circle cx="12" cy="10" r="3"/>
-
-                                            </svg>
-
-                                            <a
-                                                href="{{ route('home.service_location', ['service_location' => $service->location]) }}"
-                                            >
-                                                {{ $service->location }}
-                                            </a>
-
-                                        </div>
-
-
-                                        {{-- Provider --}}
-                                        <div class="provider-row">
-
-                                            <div class="provider-avatar">
-
-                                                {{ strtoupper(substr($provider, 0, 1)) }}
-
-                                            </div>
-
-                                            <div class="provider-info">
-
-                                                <span class="provider-label">
-                                                    Provided by
-                                                </span>
-
-                                                <span class="provider-name">
-                                                    {{ $provider }}
-                                                </span>
-
-                                            </div>
-
-                                        </div>
-
-
-                                        {{-- Actions --}}
-                                        <div class="service-actions">
-
-                                            <a
-                                                href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
-                                                class="service-btn service-btn-detail"
-                                            >
-
-                                                <svg width="13"
-                                                     height="13"
-                                                     viewBox="0 0 24 24"
-                                                     fill="none"
-                                                     stroke="currentColor"
-                                                     stroke-width="2">
-
-                                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
-                                                    <circle cx="12" cy="12" r="3"/>
-
-                                                </svg>
-
-                                                View Details
-
-                                            </a>
-
-
-                                            <a
-                                                href="https://wa.me/{{ $waPhone }}?text={{ $waMessage }}"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                class="service-btn service-btn-whatsapp"
-                                            >
-
-                                                <svg width="14"
-                                                     height="14"
-                                                     viewBox="0 0 24 24"
-                                                     fill="currentColor">
-
-                                                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.13-4.9-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.73-2.09 1-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.32.07.12.07.68-.17 1.36z"/>
-
-                                                </svg>
-
-                                                WhatsApp
-
-                                            </a>
-
-                                        </div>
-
-                                    </div>
-
-                                </article>
-
-                            @endforeach
-
-
-                            {{-- Search empty state --}}
-                            <div
-                                class="search-empty"
-                                id="searchEmpty"
-                            >
-
-                                <div class="empty-icon">
-
-                                    <svg width="24"
-                                         height="24"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
-
-                                        <circle cx="11" cy="11" r="7"/>
-                                        <path d="m21 21-4.3-4.3"/>
+                                        <circle cx="12" cy="12" r="9" />
+                                        <path d="M12 7v5l3 2" />
 
                                     </svg>
 
-                                </div>
+                                    {{ $service->duration }}
 
-                                <h4>
-                                    No matching services
-                                </h4>
+                                </span>
 
-                                <p>
-                                    Try another service name or clear your search.
-                                </p>
+                                @endif
 
                             </div>
+
+
+                            {{-- Content --}}
+                            <div class="service-content">
+
+                                <span class="service-category">
+                                    {{ $service->category->name ?? $scategory->name }}
+                                </span>
+
+
+                                <a
+                                    href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
+                                    class="service-name">
+                                    {{ $service->name }}
+                                </a>
+
+
+                                {{-- Price --}}
+                                <div class="service-price">
+
+                                    @if($service->discount)
+
+                                    <span class="price-original">
+                                        {{ number_format($originalPrice) }}
+                                    </span>
+
+                                    @if($service->discount_type === 'fixed')
+
+                                    <span class="discount">
+                                        -{{ number_format($service->discount) }}
+                                    </span>
+
+                                    @else
+
+                                    <span class="discount">
+                                        -{{ $service->discount }}%
+                                    </span>
+
+                                    @endif
+
+                                    @endif
+
+                                    <span class="price-main">
+                                        {{ number_format($total) }}
+                                    </span>
+
+                                    <span class="price-currency">
+                                        RWF
+                                    </span>
+
+                                </div>
+
+
+                                {{-- Location --}}
+                                <div class="service-location">
+
+                                    <svg width="13"
+                                        height="13"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2">
+
+                                        <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" />
+                                        <circle cx="12" cy="10" r="3" />
+
+                                    </svg>
+
+                                    <a
+                                        href="{{ route('home.service_location', ['service_location' => $service->location]) }}">
+                                        {{ $service->location }}
+                                    </a>
+
+                                </div>
+
+
+                                {{-- Provider --}}
+                                <div class="provider-row">
+
+                                    <div class="provider-avatar">
+
+                                        {{ strtoupper(substr($provider, 0, 1)) }}
+
+                                    </div>
+
+                                    <div class="provider-info">
+
+                                        <span class="provider-label">
+                                            Provided by
+                                        </span>
+
+                                        <span class="provider-name">
+                                            {{ $provider }}
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- Actions --}}
+                                <div class="service-actions">
+
+                                    <a
+                                        href="{{ route('home.service_details', ['service_slug' => $service->slug]) }}"
+                                        class="service-btn service-btn-detail">
+
+                                        <svg width="13"
+                                            height="13"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2">
+
+                                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+                                            <circle cx="12" cy="12" r="3" />
+
+                                        </svg>
+
+                                        View Details
+
+                                    </a>
+
+
+                                    <a
+                                        href="https://wa.me/{{ $waPhone }}?text={{ $waMessage }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="service-btn service-btn-whatsapp">
+
+                                        <svg width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="currentColor">
+
+                                            <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.87 9.87 0 004.74 1.21h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm5.8 14.1c-.24.68-1.4 1.3-1.93 1.38-.5.08-1.12.11-1.8-.11-.42-.13-.95-.31-1.64-.6-2.88-1.24-4.76-4.13-4.9-4.32-.14-.19-1.17-1.55-1.17-2.96 0-1.4.73-2.09 1-2.38.26-.28.57-.35.76-.35h.55c.18 0 .42-.07.65.5.24.58.82 2 .89 2.15.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.16-.29.36-.42.49-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.68-.79.87-1.06.18-.28.36-.23.6-.14.24.09 1.55.73 1.82.86.27.14.44.2.51.32.07.12.07.68-.17 1.36z" />
+
+                                        </svg>
+
+                                        WhatsApp
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                        @endforeach
+
+
+                        {{-- Search empty state --}}
+                        <div
+                            class="search-empty"
+                            id="searchEmpty">
+
+                            <div class="empty-icon">
+
+                                <svg width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2">
+
+                                    <circle cx="11" cy="11" r="7" />
+                                    <path d="m21 21-4.3-4.3" />
+
+                                </svg>
+
+                            </div>
+
+                            <h4>
+                                No matching services
+                            </h4>
+
+                            <p>
+                                Try another service name or clear your search.
+                            </p>
+
+                        </div>
 
                         @else
 
-                            <div class="empty-state">
+                        <div class="empty-state">
 
-                                <div class="empty-icon">
+                            <div class="empty-icon">
 
-                                    <svg width="25"
-                                         height="25"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
+                                <svg width="25"
+                                    height="25"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2">
 
-                                        <circle cx="11" cy="11" r="7"/>
-                                        <path d="m21 21-4.3-4.3"/>
+                                    <circle cx="11" cy="11" r="7" />
+                                    <path d="m21 21-4.3-4.3" />
 
-                                    </svg>
-
-                                </div>
-
-                                <h3>
-                                    No services available yet
-                                </h3>
-
-                                <p>
-                                    There are currently no services listed in this category.
-                                    Please check back soon or explore another category.
-                                </p>
+                                </svg>
 
                             </div>
+
+                            <h3>
+                                No services available yet
+                            </h3>
+
+                            <p>
+                                There are currently no services listed in this category.
+                                Please check back soon or explore another category.
+                            </p>
+
+                        </div>
 
                         @endif
 
@@ -1749,15 +1727,13 @@
 
                     <a
                         href="{{ route('home.services') }}"
-                        class="cta-btn cta-btn-light"
-                    >
+                        class="cta-btn cta-btn-light">
                         Explore Services
                     </a>
 
                     <a
                         href="{{ route('register') }}"
-                        class="cta-btn cta-btn-outline"
-                    >
+                        class="cta-btn cta-btn-outline">
                         Join as Provider
                     </a>
 
@@ -1773,92 +1749,92 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
 
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORY SIDEBAR
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORY SIDEBAR
+        |--------------------------------------------------------------------------
+        */
 
-    document.querySelectorAll('.category-chevron').forEach(function (button) {
+        document.querySelectorAll('.category-chevron').forEach(function(button) {
 
-        button.addEventListener('click', function (event) {
+            button.addEventListener('click', function(event) {
 
-            event.preventDefault();
-            event.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
 
-            const item = this.closest('.category-item');
+                const item = this.closest('.category-item');
 
-            if (item) {
-                item.classList.toggle('open');
-            }
+                if (item) {
+                    item.classList.toggle('open');
+                }
+
+            });
 
         });
 
-    });
 
+        /*
+        |--------------------------------------------------------------------------
+        | CATEGORY SEARCH
+        |--------------------------------------------------------------------------
+        */
 
-    /*
-    |--------------------------------------------------------------------------
-    | CATEGORY SEARCH
-    |--------------------------------------------------------------------------
-    */
+        const categorySearch =
+            document.getElementById('categorySearch');
 
-    const categorySearch =
-        document.getElementById('categorySearch');
+        if (categorySearch) {
 
-    if (categorySearch) {
+            categorySearch.addEventListener('input', function() {
 
-        categorySearch.addEventListener('input', function () {
-
-            const term =
-                this.value
+                const term =
+                    this.value
                     .trim()
                     .toLowerCase();
 
-            document
-                .querySelectorAll('.category-item')
-                .forEach(function (item) {
+                document
+                    .querySelectorAll('.category-item')
+                    .forEach(function(item) {
 
-                    const name =
-                        item.dataset.categoryName || '';
+                        const name =
+                            item.dataset.categoryName || '';
 
-                    item.style.display =
-                        name.includes(term)
-                            ? ''
-                            : 'none';
+                        item.style.display =
+                            name.includes(term) ?
+                            '' :
+                            'none';
 
-                });
+                    });
 
-        });
+            });
 
-    }
+        }
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | MOBILE CATEGORY SIDEBAR
-    |--------------------------------------------------------------------------
-    */
+        /*
+        |--------------------------------------------------------------------------
+        | MOBILE CATEGORY SIDEBAR
+        |--------------------------------------------------------------------------
+        */
 
-    const mobileToggle =
-        document.getElementById('mobileCategoryToggle');
+        const mobileToggle =
+            document.getElementById('mobileCategoryToggle');
 
-    const categorySidebar =
-        document.getElementById('categorySidebar');
+        const categorySidebar =
+            document.getElementById('categorySidebar');
 
-    if (mobileToggle && categorySidebar) {
+        if (mobileToggle && categorySidebar) {
 
-        mobileToggle.addEventListener('click', function () {
+            mobileToggle.addEventListener('click', function() {
 
-            categorySidebar.classList.toggle('show');
+                categorySidebar.classList.toggle('show');
 
-            const isOpen =
-                categorySidebar.classList.contains('show');
+                const isOpen =
+                    categorySidebar.classList.contains('show');
 
-            this.innerHTML = isOpen
-                ? `
+                this.innerHTML = isOpen ?
+                    `
                     <svg width="17" height="17"
                          viewBox="0 0 24 24"
                          fill="none"
@@ -1868,8 +1844,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <path d="m6 6 12 12"/>
                     </svg>
                     Close Categories
-                  `
-                : `
+                  ` :
+                    `
                     <svg width="17" height="17"
                          viewBox="0 0 24 24"
                          fill="none"
@@ -1882,145 +1858,145 @@ document.addEventListener('DOMContentLoaded', function () {
                     Browse Categories
                   `;
 
-        });
+            });
 
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SERVICE SEARCH
-    |--------------------------------------------------------------------------
-    */
-
-    const serviceSearch =
-        document.getElementById('serviceSearch');
-
-    const serviceCards =
-        Array.from(
-            document.querySelectorAll('.service-card')
-        );
-
-    const searchEmpty =
-        document.getElementById('searchEmpty');
+        }
 
 
-    function filterServices() {
+        /*
+        |--------------------------------------------------------------------------
+        | SERVICE SEARCH
+        |--------------------------------------------------------------------------
+        */
 
-        const term =
-            serviceSearch
-                ? serviceSearch.value.trim().toLowerCase()
-                : '';
+        const serviceSearch =
+            document.getElementById('serviceSearch');
 
-        let visibleCount = 0;
+        const serviceCards =
+            Array.from(
+                document.querySelectorAll('.service-card')
+            );
 
-        serviceCards.forEach(function (card) {
+        const searchEmpty =
+            document.getElementById('searchEmpty');
 
-            const name =
-                card.dataset.serviceName || '';
 
-            const matches =
-                name.includes(term);
+        function filterServices() {
 
-            card.style.display =
-                matches ? '' : 'none';
+            const term =
+                serviceSearch ?
+                serviceSearch.value.trim().toLowerCase() :
+                '';
 
-            if (matches) {
-                visibleCount++;
+            let visibleCount = 0;
+
+            serviceCards.forEach(function(card) {
+
+                const name =
+                    card.dataset.serviceName || '';
+
+                const matches =
+                    name.includes(term);
+
+                card.style.display =
+                    matches ? '' : 'none';
+
+                if (matches) {
+                    visibleCount++;
+                }
+
+            });
+
+            if (searchEmpty) {
+
+                searchEmpty.classList.toggle(
+                    'show',
+                    term.length > 0 && visibleCount === 0
+                );
+
             }
 
-        });
+        }
 
-        if (searchEmpty) {
 
-            searchEmpty.classList.toggle(
-                'show',
-                term.length > 0 && visibleCount === 0
+        if (serviceSearch) {
+
+            serviceSearch.addEventListener(
+                'input',
+                filterServices
             );
 
         }
 
-    }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SORT SERVICES
+        |--------------------------------------------------------------------------
+        */
+
+        const sortServices =
+            document.getElementById('sortServices');
 
 
-    if (serviceSearch) {
+        if (sortServices) {
 
-        serviceSearch.addEventListener(
-            'input',
-            filterServices
-        );
+            sortServices.addEventListener('change', function() {
 
-    }
+                const grid =
+                    document.getElementById('servicesGrid');
 
+                if (!grid) return;
 
-    /*
-    |--------------------------------------------------------------------------
-    | SORT SERVICES
-    |--------------------------------------------------------------------------
-    */
-
-    const sortServices =
-        document.getElementById('sortServices');
-
-
-    if (sortServices) {
-
-        sortServices.addEventListener('change', function () {
-
-            const grid =
-                document.getElementById('servicesGrid');
-
-            if (!grid) return;
-
-            const cards =
-                Array.from(
-                    grid.querySelectorAll('.service-card')
-                );
-
-            const sort =
-                this.value;
-
-
-            cards.sort(function (a, b) {
-
-                if (sort === 'price-low') {
-
-                    return Number(a.dataset.servicePrice)
-                        - Number(b.dataset.servicePrice);
-
-                }
-
-                if (sort === 'price-high') {
-
-                    return Number(b.dataset.servicePrice)
-                        - Number(a.dataset.servicePrice);
-
-                }
-
-                if (sort === 'name') {
-
-                    return (
-                        a.dataset.serviceName || ''
-                    ).localeCompare(
-                        b.dataset.serviceName || ''
+                const cards =
+                    Array.from(
+                        grid.querySelectorAll('.service-card')
                     );
 
-                }
+                const sort =
+                    this.value;
 
-                return 0;
+
+                cards.sort(function(a, b) {
+
+                    if (sort === 'price-low') {
+
+                        return Number(a.dataset.servicePrice) -
+                            Number(b.dataset.servicePrice);
+
+                    }
+
+                    if (sort === 'price-high') {
+
+                        return Number(b.dataset.servicePrice) -
+                            Number(a.dataset.servicePrice);
+
+                    }
+
+                    if (sort === 'name') {
+
+                        return (
+                            a.dataset.serviceName || ''
+                        ).localeCompare(
+                            b.dataset.serviceName || ''
+                        );
+
+                    }
+
+                    return 0;
+
+                });
+
+
+                cards.forEach(function(card) {
+                    grid.appendChild(card);
+                });
 
             });
 
+        }
 
-            cards.forEach(function (card) {
-                grid.appendChild(card);
-            });
-
-        });
-
-    }
-
-});
+    });
 </script>
 
 @endsection

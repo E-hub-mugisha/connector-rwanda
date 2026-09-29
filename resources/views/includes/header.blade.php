@@ -151,10 +151,10 @@
             </a>
 
             <a
-                href="{{ route('home.jobs') }}"
-                class="cn-nav-link {{ request()->routeIs('home.jobs') ? 'active' : '' }}"
+                href="{{ route('home.services') }}"
+                class="cn-nav-link {{ request()->routeIs('home.services') ? 'active' : '' }}"
             >
-                Jobs
+                Services
             </a>
 
 
@@ -198,8 +198,8 @@
                             </a>
 
                             <a href="{{ route('faq') }}">
-                                <span>How It Works</span>
-                                <small>Discover how Connector works</small>
+                                <span>FAQ</span>
+                                <small>Discover frequently asked questions</small>
                             </a>
 
                             <a href="{{ route('home.jobs') }}">

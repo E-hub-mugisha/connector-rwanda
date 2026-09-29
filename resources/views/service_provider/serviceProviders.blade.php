@@ -113,6 +113,7 @@
     .provider-hero-content {
         position: relative;
         z-index: 2;
+        margin-top: 30px;
     }
 
     .provider-eyebrow {
@@ -1575,12 +1576,12 @@
                         @forelse($sproviders as $sprovider)
 
                             @php
-                                $providerName = trim($sprovider->sprovider_name ?? '');
+                                $providerName = trim($sprovider->user->name ?? '');
 
                                 $categoryName = optional($sprovider->category)->name
                                     ?? 'Service Provider';
 
-                                $city = trim($sprovider->city ?? '');
+                                $city = trim($sprovider->service_locations ?? '');
 
                                 $serviceLocations = trim(
                                     $sprovider->service_locations ?? ''
@@ -1651,18 +1652,6 @@
 
 
                                     <div class="provider-meta">
-
-                                        @if($city)
-                                            <div class="provider-meta-item">
-
-                                                <i class="fa-solid fa-location-dot"></i>
-
-                                                <span title="{{ $city }}">
-                                                    {{ $city }}
-                                                </span>
-
-                                            </div>
-                                        @endif
 
 
                                         @if($serviceLocations)

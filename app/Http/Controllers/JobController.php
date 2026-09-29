@@ -15,10 +15,81 @@ class JobController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = Job::where('status', 'open')->orderBy('created_at', 'desc')->get();
-        return view('pages.jobs.index', compact('jobs'));
+        $query = Job::with([
+            'serviceProvider',
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('query')) {
+
+            $search = trim($request->query('query'));
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%')
+                    ->orWhere('location', 'like', '%' . $search . '%')
+                    ->orWhere('type', 'like', '%' . $search . '%')
+
+                    ->orWhereHas('serviceProvider', function ($providerQuery) use ($search) {
+                        $providerQuery->where(
+                            'name',
+                            'like',
+                            '%' . $search . '%'
+                        );
+                    });
+            });
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Sorting
+    |--------------------------------------------------------------------------
+    */
+        switch ($request->query('sort')) {
+
+            case 'deadline':
+
+                $query->orderByRaw(
+                    'CASE WHEN deadline IS NULL THEN 1 ELSE 0 END'
+                )
+                    ->orderBy('deadline', 'asc');
+
+                break;
+
+            case 'title':
+
+                $query->orderBy('title', 'asc');
+
+                break;
+
+            case 'latest':
+            default:
+
+                $query->latest();
+
+                break;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pagination
+    |--------------------------------------------------------------------------
+    */
+        $jobs = $query
+            ->paginate(12)
+            ->withQueryString();
+
+        return view(
+            'pages.jobs.index',
+            compact('jobs')
+        );
     }
 
     /**
@@ -50,46 +121,16 @@ class JobController extends Controller
      */
     public function show($id)
     {
-        // Find the job by ID
-        $job = Job::findOrFail($id);
-        // related jobs
-        $relatedJobs = Job::where('company_id', '==', $job->company_id)->take(5)->get();
+        $job = Job::with('serviceProvider')->findOrFail($id);
+
+        $relatedJobs = Job::with('serviceProvider')
+            ->where('service_provider_id', $job->service_provider_id)
+            ->where('id', '!=', $job->id)
+            ->latest()
+            ->take(5)
+            ->get();
 
         return view('pages.jobs.show', compact('job', 'relatedJobs'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Job  $job
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Job $job)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Job  $job
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Job $job)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Job  $job
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Job $job)
-    {
-        //
     }
 
     public function storeApplication(Request $request)

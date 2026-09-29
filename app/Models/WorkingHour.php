@@ -19,6 +19,6 @@ class WorkingHour extends Model
 
     public function serviceProvider()
     {
-        return $this->belongsTo(ServiceProvider::class, 'sprovider_id');
+        return $this->belongsTo(ServiceProvider::class, 'service_provider_id');
     }
 }

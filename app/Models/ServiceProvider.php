@@ -9,41 +9,78 @@ class ServiceProvider extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'image'];
+    protected $fillable = [
+        'user_id',
+        'image',
+    ];
 
     public function category()
     {
-        return $this->belongsTo(ServiceCategory::class, 'service_category_id');
+        return $this->belongsTo(
+            ServiceCategory::class,
+            'service_category_id'
+        );
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(
+            User::class,
+            'user_id'
+        );
     }
 
     public function services()
     {
-        return $this->hasMany(Service::class, 'service_provider_id', 'id');
+        return $this->hasMany(
+            Service::class,
+            'service_provider_id',
+            'id'
+        );
     }
 
     public function feedback()
     {
-        return $this->hasMany(Feedback::class);
+        return $this->hasMany(
+            Feedback::class,
+            'Service_Provider_ID',
+            'id'
+        );
     }
+
     public function ratings()
     {
-        return $this->hasMany(Rating::class);
+        return $this->hasMany(
+            ServiceProviderRating::class,
+            'Service_provider_ID',
+            'id'
+        );
     }
-    public function portfolios()
-    {
-        return $this->hasMany(Portfolio::class);
-    }
-    public function serviceBookings()
-    {
-        return $this->hasMany(ServiceBooking::class);
-    }
+
     public function staffMembers()
     {
-        return $this->hasMany(StaffMember::class);
+        return $this->hasMany(
+            StaffMember::class,
+            'service_provider_id',
+            'id'
+        );
+    }
+
+    public function workingHours()
+    {
+        return $this->hasMany(
+            WorkingHour::class,
+            'service_provider_id',
+            'id'
+        );
+    }
+
+    public function promotions()
+    {
+        return $this->hasMany(
+            Promotion::class,
+            'service_provider_id',
+            'id'
+        );
     }
 }
