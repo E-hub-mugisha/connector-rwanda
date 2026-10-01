@@ -8,10 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class ServiceMedia extends Model
 {
     use HasFactory;
-    protected $fillable = ['service_id', 'file_path', 'type'];
+
+    protected $table = 'service_media';
+
+    protected $fillable = [
+        'service_id',
+        'file_path',
+        'type',
+    ];
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(
+            Service::class,
+            'service_id',
+            'id'
+        );
     }
 }

@@ -8,9 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Rating extends Model
 {
     use HasFactory;
-    
-    public function ServiceProvider()
+
+    protected $table = 'ratings';
+
+    protected $casts = [
+        'approved' => 'boolean',
+        'rating' => 'integer',
+    ];
+
+    public function serviceProvider()
     {
-        return $this->belongsTo(ServiceProvider::class);
+        return $this->belongsTo(
+            ServiceProvider::class,
+            'Service_Provider_ID',
+            'id'
+        );
     }
 }

@@ -29,7 +29,8 @@ class Job extends Model
     {
         return $this->belongsTo(
             ServiceProvider::class,
-            'service_provider_id'
+            'service_provider_id',
+            'id'
         );
     }
 
@@ -37,7 +38,8 @@ class Job extends Model
     {
         return $this->hasMany(
             JobApplication::class,
-            'job_id'
+            'job_id',
+            'id'
         );
     }
 }

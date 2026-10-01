@@ -9,8 +9,18 @@ class Feedback extends Model
 {
     use HasFactory;
 
-    public function ServiceProvider()
+    protected $table = 'feedback';
+
+    protected $casts = [
+        'approved' => 'boolean',
+    ];
+
+    public function serviceProvider()
     {
-        return $this->belongsTo(ServiceProvider::class);
+        return $this->belongsTo(
+            ServiceProvider::class,
+            'Service_Provider_ID',
+            'id'
+        );
     }
 }

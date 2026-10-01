@@ -211,10 +211,10 @@ Route::middleware([
     'authsprovider',
     'verified'
 ])->group(function () {
-    Route::get('/sprovider/dashboard', [App\Http\Controllers\stadmin\StadminController::class, 'SDashboard'])->name('sprovider.dashboard');
+    Route::get('/service/provider/dashboard', [App\Http\Controllers\stadmin\StadminController::class, 'index'])->name('sprovider.dashboard');
     Route::get('/service/provider/service', [App\Http\Controllers\stadmin\ServiceController::class, 'index'])->name('serviceProvider.index');
     Route::get('/service/provider/service/{slug}', [App\Http\Controllers\stadmin\ServiceController::class, 'show'])->name('serviceProvider.show');
-    Route::get('/service/provider/serviceEdit/{slug}', [App\Http\Controllers\stadmin\ServiceController::class, 'edit'])->name('serviceProvider.edit');
+    Route::get('/service/provider/service/edit/{slug}', [App\Http\Controllers\stadmin\ServiceController::class, 'edit'])->name('serviceProvider.edit');
     Route::get('/service/provider/new/service/add', [App\Http\Controllers\stadmin\ServiceController::class, 'create'])->name('serviceProvider.create');
     Route::post('/service/provider/addService', [App\Http\Controllers\stadmin\ServiceController::class, 'store'])->name('serviceProvider.store');
     Route::put('/service/provider/serviceUpdate/{id}', [App\Http\Controllers\stadmin\ServiceController::class, 'update'])->name('serviceProvider.update');
@@ -241,12 +241,9 @@ Route::middleware([
 
     // exceptionnnnn
     // Route::get('/sprovider/dashboard', SproviderDashboardComponent::class)->name('sprovider.dashboard');
-    Route::get('/serviceprovider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
-    Route::get('/serviceprovider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
-    // Update profile
-    // Update profile
-    Route::match(['post', 'put'],'/service-provider/profile/update',[App\Http\Controllers\stadmin\ProfileController::class, 'ajaxUpdate'])->name('sprovider.profile.ajaxUpdate');
-
+    Route::get('/service/provider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'index'])->name('sprovider.profile');
+    Route::get('/service/provider/profile/edit', [App\Http\Controllers\stadmin\ProfileController::class, 'edit'])->name('sprovider.edit_profile');
+    Route::put('/service/provider/profile', [App\Http\Controllers\stadmin\ProfileController::class, 'updateProfile'])->name('sprovider.update_profile');
 
     // Route::get('/offering', ServicesProviderServiceOfferingComponent::class)->name('offerings.service');
     Route::get('/sprovider/order', SproviderOrderComponent::class)->name('sprovider.order');
@@ -256,7 +253,7 @@ Route::middleware([
 
     Route::get('/sprovider/portfolios', [App\Http\Controllers\stadmin\PortfolioController::class, 'index'])->name('sprovider.portfolio');
     Route::get('/sprovider/portfolio/{id}', [App\Http\Controllers\stadmin\PortfolioController::class, 'show'])->name('sprovider.ShowPortfolio');
-    Route::post('/createPortfolioService', [App\Http\Controllers\stadmin\PortfolioController::class, 'store']);
+    Route::post('/createPortfolioService', [App\Http\Controllers\stadmin\PortfolioController::class, 'store'])->name('portfolios.store');
     Route::put('/updatePortfolio/{id}', [App\Http\Controllers\stadmin\PortfolioController::class, 'update'])->name('portfolios.update');
     Route::delete('/deletePortfolio/{id}', [App\Http\Controllers\stadmin\PortfolioController::class, "destroy"])->name('portfolios.destroy');
     Route::post('/images/upload', [App\Http\Controllers\service_providers\ServicesController::class, 'upload']);
@@ -296,6 +293,7 @@ Route::middleware([
     Route::get('/ServiceProvider/feedbacks', [App\Http\Controllers\stadmin\ProfileController::class, 'UserFeedback'])->name('serviceProvider.feedback');
 
     Route::get('/ServiceProvider/jobs', [App\Http\Controllers\stadmin\JobController::class, 'index'])->name('provider.jobs.index');
+    Route::get('/serviceProvider/jobs/details/{job}', [App\Http\Controllers\stadmin\JobController::class, 'show'])->name('provider.jobs.show');
     Route::post('/ServiceProvider/jobs/create', [App\Http\Controllers\stadmin\JobController::class, 'store'])->name('provider.jobs.store');
     Route::put('/ServiceProvider/jobs/{job}', [App\Http\Controllers\stadmin\JobController::class, 'update'])->name('provider.jobs.update');
     Route::delete('/ServiceProvider/jobs/{job}', [App\Http\Controllers\stadmin\JobController::class, 'destroy'])->name('provider.jobs.destroy');
@@ -303,6 +301,10 @@ Route::middleware([
     Route::post('/ServiceProvider/applications/{id}/accept', [App\Http\Controllers\stadmin\JobController::class, 'acceptApplicant'])->name('provider.applications.accept');
     Route::post('/ServiceProvider/applications/{id}/reject', [App\Http\Controllers\stadmin\JobController::class, 'rejectApplicant'])->name('provider.applications.reject');
     Route::post('/ServiceProvider/jobs/{id}/status', [App\Http\Controllers\stadmin\JobController::class, 'updateStatus'])->name('provider.jobs.updateStatus');
+    Route::put(
+    '/service-provider/job-applications/{application}/status',
+    [App\Http\Controllers\stadmin\JobController::class, 'updateApplicationStatus']
+)->name('provider.jobs.applications.updateStatus');
 });
 
 Route::middleware([

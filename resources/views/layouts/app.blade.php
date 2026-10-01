@@ -2,589 +2,511 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
+    <meta charset="UTF-8">
 
-    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta
-        http-equiv="X-UA-Compatible"
-        content="IE=edge"
-    >
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    >
-
-    <meta
-        name="description"
-        content="Connector Administration Portal"
-    >
-
-    <meta
-        name="author"
-        content="Connector"
-    >
-
-    <meta
-        name="csrf-token"
-        content="{{ csrf_token() }}"
-    >
-
+    <meta name="csrf-token"
+        content="{{ csrf_token() }}">
 
     <title>
-        @yield('title', 'Dashboard') | Connector Admin
+        @yield('title', 'Connector')
     </title>
 
-
-    {{-- =====================================================
-         FAVICON
-    ====================================================== --}}
-
+    {{-- Bootstrap --}}
     <link
-        rel="icon"
-        type="image/png"
-        sizes="32x32"
-        href="{{ asset('asset/images/fav-icon/fav-connector.png') }}"
-    >
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 
+    {{-- Bootstrap Icons --}}
     <link
-        rel="icon"
-        type="image/png"
-        sizes="16x16"
-        href="{{ asset('asset/images/fav-icon/fav-connector.png') }}"
-    >
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet">
 
+    {{-- Google Font --}}
     <link
-        rel="shortcut icon"
-        href="{{ asset('asset/images/fav-icon/fav-connector.png') }}"
-    >
-
-
-    {{-- =====================================================
-         FONTS
-    ====================================================== --}}
-
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
-
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-
-    {{-- =====================================================
-         FONT AWESOME
-    ====================================================== --}}
-
-    <link
-        href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}"
-        rel="stylesheet"
-    >
-
-
-    {{-- =====================================================
-         SB ADMIN
-    ====================================================== --}}
-
-    <link
-        href="{{ asset('admin/css/sb-admin-2.min.css') }}"
-        rel="stylesheet"
-    >
-
-
-    {{-- =====================================================
-         DATATABLES
-    ====================================================== --}}
-
-    <link
-        href="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.css') }}"
-        rel="stylesheet"
-    >
-
-
-    {{-- =====================================================
-         SUMMERNOTE
-    ====================================================== --}}
-
-    <link
-        href="{{ asset('admin/vendor/summernote/summernote.min.css') }}"
-        rel="stylesheet"
-    >
-
-
-    {{-- =====================================================
-         GLOBAL CONNECTOR ADMIN OVERRIDES
-    ====================================================== --}}
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <style>
-
         :root {
-            --connector-primary: #6B9080;
-            --connector-dark: #254035;
-            --connector-soft: #EEF4F1;
-            --connector-bg: #F6F8F7;
-            --connector-border: #E5ECE8;
-            --connector-text: #253A32;
-            --connector-muted: #78857F;
+            --primary: #6B9080;
+            --primary-dark: #254035;
+            --primary-light: #E8F0ED;
+            --body-bg: #F6F8F7;
+            --sidebar-width: 260px;
+            --header-height: 72px;
+            --border-color: #E5EAE7;
+            --text-dark: #17221E;
+            --text-muted: #7A8580;
         }
 
+        * {
+            box-sizing: border-box;
+        }
 
-        html,
         body {
-            font-family: "DM Sans", sans-serif;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--body-bg);
+            color: var(--text-dark);
         }
 
-
-        body {
-            background: var(--connector-bg);
-            color: var(--connector-text);
+        a {
+            text-decoration: none;
         }
 
+        /* =========================
+           APP WRAPPER
+        ========================= */
 
-        #content-wrapper {
-            background: var(--connector-bg);
+        .app-wrapper {
+            min-height: 100vh;
         }
 
+        /* =========================
+           SIDEBAR
+        ========================= */
 
-        main {
-            min-height: calc(100vh - 150px);
+        .app-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid var(--border-color);
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            transition: transform .3s ease;
         }
 
-
-        .sticky-footer {
-            border-top: 1px solid var(--connector-border);
-            background: #fff !important;
+        .sidebar-brand {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            border-bottom: 1px solid var(--border-color);
         }
 
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--primary-dark);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 700;
+            margin-right: 11px;
+        }
 
-        .sticky-footer .copyright {
-            color: #8A9791;
+        .brand-name {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .brand-subtitle {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin: 2px 0 0;
+        }
+
+        .sidebar-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 14px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-title {
+            padding: 0 12px;
+            margin-bottom: 8px;
+            color: #9AA39F;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 13px;
+            margin-bottom: 3px;
+            color: #59655F;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: all .2s ease;
+        }
+
+        .sidebar-link i {
+            width: 20px;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        .sidebar-link:hover {
+            color: var(--primary-dark);
+            background: var(--primary-light);
+        }
+
+        .sidebar-link.active {
+            background: var(--primary-dark);
+            color: #fff;
+        }
+
+        .sidebar-link.active i {
+            color: #fff;
+        }
+
+        .sidebar-user {
+            padding: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-user-box {
+            background: var(--body-bg);
+            padding: 11px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .user-role {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .app-main {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .app-header {
+            height: var(--header-height);
+            background: #fff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sidebar-toggle {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            border-radius: 10px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+        }
+
+        .page-heading h5 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .page-heading small {
+            color: var(--text-muted);
             font-size: 11px;
         }
 
-
-        /* =====================================================
-           CARDS
-        ====================================================== */
-
-        .card {
-            border: 1px solid var(--connector-border);
-            border-radius: 15px;
-
-            box-shadow:
-                0 5px 20px rgba(37, 64, 53, .045);
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-
-        .card-header {
-            border-bottom: 1px solid var(--connector-border);
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #56625C;
             background: #fff;
         }
 
-
-        /* =====================================================
-           BUTTONS
-        ====================================================== */
-
-        .btn-primary {
-            border-color: var(--connector-primary);
-            background: var(--connector-primary);
+        .header-icon:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
         }
 
-
-        .btn-primary:hover,
-        .btn-primary:focus {
-            border-color: var(--connector-dark);
-            background: var(--connector-dark);
+        .header-profile {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-left: 6px;
+            padding-left: 12px;
+            border-left: 1px solid var(--border-color);
         }
 
-
-        /* =====================================================
-           LINKS
-        ====================================================== */
-
-        a {
-            color: var(--connector-primary);
-        }
-
-
-        a:hover {
-            color: var(--connector-dark);
-        }
-
-
-        /* =====================================================
-           FORMS
-        ====================================================== */
-
-        .form-control {
-            border-color: var(--connector-border);
-            border-radius: 9px;
-        }
-
-
-        .form-control:focus {
-            border-color: var(--connector-primary);
-
-            box-shadow:
-                0 0 0 3px rgba(107, 144, 128, .10);
-        }
-
-
-        /* =====================================================
-           TABLES
-        ====================================================== */
-
-        .table thead th {
-            border-bottom: 1px solid var(--connector-border);
-
-            color: #728079;
-
-            font-size: 11px;
+        .header-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
             font-weight: 700;
-
-            text-transform: uppercase;
-            letter-spacing: .4px;
         }
 
-
-        .table td {
-            vertical-align: middle;
-
-            border-color: #EDF1EF;
-
-            font-size: 13px;
+        .header-user-name {
+            font-size: 12px;
+            font-weight: 600;
         }
 
-
-        /* =====================================================
-           SCROLL TO TOP
-        ====================================================== */
-
-        .scroll-to-top {
-            background: var(--connector-dark);
-
-            box-shadow:
-                0 8px 20px rgba(37, 64, 53, .15);
+        .header-user-role {
+            color: var(--text-muted);
+            font-size: 10px;
         }
 
+        /* =========================
+           CONTENT
+        ========================= */
 
-        .scroll-to-top:hover {
-            background: var(--connector-primary);
+        .app-content {
+            flex: 1;
+            padding: 28px;
         }
 
+        /* =========================
+           FOOTER
+        ========================= */
 
-        /* =====================================================
-           SWEET ALERT
-        ====================================================== */
-
-        .swal2-popup {
-            border-radius: 16px !important;
-            font-family: "DM Sans", sans-serif !important;
+        .app-footer {
+            padding: 18px 28px;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-muted);
         }
 
+        .footer-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        /* =====================================================
-           MOBILE
-        ====================================================== */
+        /* =========================
+           MOBILE OVERLAY
+        ========================= */
 
-        @media (max-width: 767.98px) {
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .35);
+            z-index: 1040;
+            display: none;
+        }
 
-            main {
-                min-height: calc(100vh - 120px);
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 991.98px) {
+
+            .app-sidebar {
+                transform: translateX(-100%);
             }
 
+            .app-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .app-main {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle {
+                display: flex;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .header-user-info {
+                display: none;
+            }
+
+            .app-content {
+                padding: 20px;
+            }
         }
 
+        @media (max-width: 575.98px) {
+
+            .app-header {
+                padding: 0 15px;
+            }
+
+            .app-content {
+                padding: 15px;
+            }
+
+            .header-icon.notification {
+                display: none;
+            }
+
+            .app-footer {
+                padding: 15px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+        }
     </style>
 
-
     @stack('styles')
-
 </head>
 
+<body>
 
-<body id="page-top">
+    <div class="app-wrapper">
 
+        {{-- Sidebar --}}
+        @include('layouts.partials.sidebar')
 
-{{-- =========================================================
-     PAGE WRAPPER
-========================================================= --}}
+        {{-- Mobile overlay --}}
+        <div
+            class="sidebar-overlay"
+            id="sidebarOverlay">
+        </div>
 
-<div id="wrapper">
+        <div class="app-main">
 
+            {{-- Header --}}
+            @include('layouts.partials.header')
 
-    {{-- =====================================================
-         SIDEBAR
-    ====================================================== --}}
+            {{-- Main content --}}
+            <main class="app-content">
 
-    @include('admin.includes.sidebar')
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-4">
+                    <i class="bi bi-check-circle me-2"></i>
+                    {{ session('success') }}
 
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                    </button>
+                </div>
+                @endif
 
-    {{-- =====================================================
-         CONTENT WRAPPER
-    ====================================================== --}}
+                @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mb-4">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    {{ session('error') }}
 
-    <div id="content-wrapper" class="d-flex flex-column">
-
-
-        {{-- =================================================
-             MAIN CONTENT
-        ================================================== --}}
-
-        <div id="content">
-
-
-            {{-- Navbar --}}
-
-            @include('admin.includes.navbar')
-
-
-            {{-- Page content --}}
-
-            <main>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="alert">
+                    </button>
+                </div>
+                @endif
 
                 @yield('content')
 
             </main>
 
-
-            {{-- SweetAlert --}}
-
-            @include('sweetalert::alert')
-
+            {{-- Footer --}}
+            @include('layouts.partials.footer')
 
         </div>
 
-
-        {{-- =================================================
-             FOOTER
-        ================================================== --}}
-
-        <footer class="sticky-footer">
-
-            <div class="container my-auto">
-
-                <div class="copyright text-center my-auto">
-
-                    <span>
-                        © {{ date('Y') }}
-                        <strong>Connector</strong>.
-                        All rights reserved.
-                    </span>
-
-                </div>
-
-            </div>
-
-        </footer>
-
-
     </div>
 
-</div>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
 
+    <script>
+        const sidebar = document.getElementById('appSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggle = document.getElementById('sidebarToggle');
 
-{{-- =========================================================
-     SCROLL TO TOP
-========================================================= --}}
-
-<a
-    class="scroll-to-top rounded"
-    href="#page-top"
-    aria-label="Back to top"
->
-
-    <i class="fas fa-angle-up"></i>
-
-</a>
-
-
-{{-- =========================================================
-     JQUERY
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
-
-
-{{-- =========================================================
-     BOOTSTRAP
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-
-{{-- =========================================================
-     JQUERY EASING
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
-
-
-{{-- =========================================================
-     SB ADMIN
-========================================================= --}}
-
-<script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
-
-
-{{-- =========================================================
-     DATATABLES
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/datatables/jquery.dataTables.min.js') }}"></script>
-
-<script src="{{ asset('admin/vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
-
-
-{{-- =========================================================
-     DATATABLE DEMO
-========================================================= --}}
-
-<script src="{{ asset('admin/js/demo/datatables-demo.js') }}"></script>
-
-
-{{-- =========================================================
-     SUMMERNOTE
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/summernote/summernote.min.js') }}"></script>
-
-
-{{-- =========================================================
-     TINYMCE
-========================================================= --}}
-
-<script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script>
-
-
-<script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-
-
-        /* =====================================================
-           TINYMCE
-        ====================================================== */
-
-        if (typeof tinymce !== 'undefined') {
-
-            tinymce.init({
-                selector: 'textarea#content',
-
-                plugins: 'code table lists',
-
-                toolbar:
-                    'undo redo | blocks | bold italic | ' +
-                    'alignleft aligncenter alignright | ' +
-                    'indent outdent | bullist numlist | ' +
-                    'code | table'
+        if (toggle) {
+            toggle.addEventListener('click', function() {
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
             });
-
         }
 
-
-        /* =====================================================
-           SUMMERNOTE
-        ====================================================== */
-
-        if (
-            typeof jQuery !== 'undefined' &&
-            typeof jQuery.fn.summernote !== 'undefined'
-        ) {
-
-            jQuery('#summernote').summernote();
-
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
         }
+    </script>
 
-
-        /* =====================================================
-           SEARCH SHORTCUT
-           "/" focuses desktop search
-        ====================================================== */
-
-        document.addEventListener('keydown', function (event) {
-
-            const target = event.target;
-
-            const isTyping =
-                target.tagName === 'INPUT' ||
-                target.tagName === 'TEXTAREA' ||
-                target.isContentEditable;
-
-            if (
-                event.key === '/' &&
-                !isTyping
-            ) {
-
-                event.preventDefault();
-
-                const searchInput =
-                    document.querySelector(
-                        '.connector-admin-search input'
-                    );
-
-                if (searchInput) {
-                    searchInput.focus();
-                }
-
-            }
-
-        });
-
-    });
-
-</script>
-
-
-{{-- =========================================================
-     GOOGLE ANALYTICS
-========================================================= --}}
-
-<script
-    async
-    src="https://www.googletagmanager.com/gtag/js?id=G-HWQ435LMGE"
-></script>
-
-<script>
-
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-        dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag(
-        'config',
-        'G-HWQ435LMGE'
-    );
-
-</script>
-
-
-{{-- =========================================================
-     GOOGLE API
-========================================================= --}}
-
-<script
-    async
-    defer
-    src="https://apis.google.com/js/api.js"
-></script>
-
-
-@stack('scripts')
+    @stack('scripts')
 
 </body>
 

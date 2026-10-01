@@ -1,4 +1,4 @@
-@extends('layouts.staradmin')
+@extends('layouts.app')
 @section('title', 'Job Applications')
 @section('content')
 

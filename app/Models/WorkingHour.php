@@ -10,7 +10,7 @@ class WorkingHour extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sprovider_id',
+        'service_provider_id',
         'day',
         'start_time',
         'end_time',

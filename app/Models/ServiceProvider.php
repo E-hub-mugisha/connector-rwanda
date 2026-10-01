@@ -12,6 +12,12 @@ class ServiceProvider extends Model
     protected $fillable = [
         'user_id',
         'image',
+        'service_category_id',
+        'service_locations',
+        'about',
+        'skills',
+        'qualification',
+        'experience',
     ];
 
     public function category()
@@ -70,15 +76,6 @@ class ServiceProvider extends Model
     {
         return $this->hasMany(
             WorkingHour::class,
-            'service_provider_id',
-            'id'
-        );
-    }
-
-    public function promotions()
-    {
-        return $this->hasMany(
-            Promotion::class,
             'service_provider_id',
             'id'
         );

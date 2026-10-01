@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class JobApplication extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'job_id',
         'user_id',
@@ -15,13 +16,26 @@ class JobApplication extends Model
         'resume',
         'status',
     ];
+
+    protected $casts = [
+        'status' => 'string',
+    ];
+
     public function job()
     {
-        return $this->belongsTo(Job::class, 'job_id');
+        return $this->belongsTo(
+            Job::class,
+            'job_id',
+            'id'
+        );
     }
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(
+            User::class,
+            'user_id',
+            'id'
+        );
     }
-    
 }

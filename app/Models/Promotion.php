@@ -8,15 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Promotion extends Model
 {
     use HasFactory;
+
+    protected $table = 'promotions';
+
     protected $fillable = [
-        'service_provider_id',
         'service_id',
-        'category_id',
         'title',
         'description',
         'discount',
         'start_date',
         'end_date',
+    ];
+
+    protected $casts = [
+        'discount'  => 'decimal:2',
+        'start_date' => 'date',
+        'end_date'   => 'date',
     ];
 
     public function service()
@@ -26,15 +33,5 @@ class Promotion extends Model
             'service_id',
             'id'
         );
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(ServiceCategory::class);
-    }
-
-    public function serviceProvider()
-    {
-        return $this->belongsTo(ServiceProvider::class);
     }
 }

@@ -9,6 +9,7 @@ use App\Models\ServiceProvider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 
 class ServiceMediaController extends Controller
 {
@@ -20,43 +21,169 @@ class ServiceMediaController extends Controller
         return view('stadmin.media.index', compact('services', 'medias'));
     }
 
-    public function store(Request $request)
+     /**
+     * Get the authenticated service provider.
+     */
+    private function provider(): ServiceProvider
     {
-        $request->validate([
-            'service_id' => 'required|exists:services,id',
-            'files.*' => 'required|mimes:jpg,png,jpeg,mp4,mov,avi',
-        ]);
-
-        $files = $request->file('files');
-
-        if ($files) {
-            foreach ($files as $file) {
-                $destinationPath = 'image/services/';
-                $fileName = date('YmdHis') . '_' . uniqid() . "." . $file->getClientOriginalExtension();
-                $file->move(public_path($destinationPath), $fileName);
-
-                // Determine file type
-                $type = in_array(strtolower($file->getClientOriginalExtension()), ['mp4', 'mov', 'avi']) ? 'video' : 'image';
-
-                // Save to database
-                ServiceMedia::create([
-                    'service_id' => $request->service_id,
-                    'file_path' => $fileName, // Only filename stored
-                    'type' => $type,
-                ]);
-            }
-        }
-
-        return back()->with('success', 'Media uploaded successfully.');
+        return ServiceProvider::where(
+            'user_id',
+            Auth::id()
+        )->firstOrFail();
     }
 
+    /**
+     * Upload service media.
+     */
+    public function store(Request $request)
+    {
+        $provider = $this->provider();
 
+        $validated = $request->validate([
+            'service_id' => [
+                'required',
+                'integer',
+                'exists:services,id',
+            ],
+
+            'files' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'files.*' => [
+                'required',
+                'file',
+                'mimes:jpg,jpeg,png,webp,mp4,mov,avi',
+                'max:51200', // 50 MB per file
+            ],
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Verify service belongs to authenticated provider
+        |--------------------------------------------------------------------------
+        */
+
+        $service = Service::where('id', $validated['service_id'])
+            ->where(
+                'service_provider_id',
+                $provider->id
+            )
+            ->firstOrFail();
+
+        $destinationPath = public_path(
+            'image/services/media'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Create directory if it doesn't exist
+        |--------------------------------------------------------------------------
+        */
+
+        if (!File::exists($destinationPath)) {
+            File::makeDirectory(
+                $destinationPath,
+                0755,
+                true
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload files
+        |--------------------------------------------------------------------------
+        */
+
+        foreach ($validated['files'] as $file) {
+
+            $extension = strtolower(
+                $file->getClientOriginalExtension()
+            );
+
+            $type = in_array(
+                $extension,
+                ['mp4', 'mov', 'avi']
+            )
+                ? 'video'
+                : 'image';
+
+            $fileName = date('YmdHis')
+                . '_'
+                . uniqid()
+                . '.'
+                . $extension;
+
+            $file->move(
+                $destinationPath,
+                $fileName
+            );
+
+            ServiceMedia::create([
+                'service_id' => $service->id,
+                'file_path'  => $fileName,
+                'type'       => $type,
+            ]);
+        }
+
+        return back()->with(
+            'success',
+            'Service media uploaded successfully.'
+        );
+    }
+
+    /**
+     * Delete service media.
+     */
     public function destroy($id)
     {
-        $media = ServiceMedia::findOrFail($id);
+        $provider = $this->provider();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Find media belonging to provider's service
+        |--------------------------------------------------------------------------
+        */
+
+        $media = ServiceMedia::whereKey($id)
+            ->whereHas('service', function ($query) use ($provider) {
+                $query->where(
+                    'service_provider_id',
+                    $provider->id
+                );
+            })
+            ->firstOrFail();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete physical file
+        |--------------------------------------------------------------------------
+        */
+
+        $filePath = public_path(
+            'image/services/media/' . $media->file_path
+        );
+
+        if (
+            $media->file_path &&
+            File::exists($filePath)
+        ) {
+            File::delete($filePath);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete database record
+        |--------------------------------------------------------------------------
+        */
+
         $media->delete();
 
-        // Redirect to the previous page with success message
-        return back()->with('success', 'Media deleted successfully.');
+        return back()->with(
+            'success',
+            'Media deleted successfully.'
+        );
     }
 }

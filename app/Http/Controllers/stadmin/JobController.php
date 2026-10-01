@@ -14,17 +14,102 @@ class JobController extends Controller
     // List all jobs posted by the company
     public function index()
     {
-        $company = ServiceProvider::where('user_id', Auth::id())->first();
+        $user = Auth::user();
 
-        if (!$company) {
-            // Optional: redirect with message if no company found
-            return redirect()->back()->with('error', 'You have not set up your company profile yet.');
-        }
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
 
-        // Fetch jobs for this company
-        $jobs = Job::with('applications.user')->where('company_id', $company->id)->get();
+        $baseQuery = Job::where(
+            'service_provider_id',
+            $sprovider->id
+        );
 
-        return view('stadmin.jobs.index', compact('jobs'));
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+
+            'open' => (clone $baseQuery)
+                ->where('status', 'open')
+                ->count(),
+
+            'closed' => (clone $baseQuery)
+                ->where('status', 'closed')
+                ->count(),
+
+            'applications' => JobApplication::whereHas('job', function ($query) use ($sprovider) {
+                $query->where(
+                    'service_provider_id',
+                    $sprovider->id
+                );
+            })->count(),
+        ];
+
+        $jobs = $baseQuery
+            ->withCount('applications')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'stadmin.jobs.index',
+            compact(
+                'jobs',
+                'sprovider',
+                'stats'
+            )
+        );
+    }
+
+    public function show($id)
+    {
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where(
+            'user_id',
+            $user->id
+        )->firstOrFail();
+
+        $job = Job::where(
+            'service_provider_id',
+            $sprovider->id
+        )
+            ->with([
+                'serviceProvider.user',
+                'applications' => function ($query) {
+                    $query->with('user')
+                        ->latest('created_at');
+                },
+            ])
+            ->withCount('applications')
+            ->findOrFail($id);
+
+        $applicationStats = [
+            'total' => $job->applications_count,
+
+            'pending' => $job->applications
+                ->where('status', 'pending')
+                ->count(),
+
+            'shortlisted' => $job->applications
+                ->where('status', 'shortlisted')
+                ->count(),
+
+            'accepted' => $job->applications
+                ->where('status', 'accepted')
+                ->count(),
+
+            'rejected' => $job->applications
+                ->where('status', 'rejected')
+                ->count(),
+        ];
+
+        return view(
+            'stadmin.jobs.show',
+            compact(
+                'job',
+                'sprovider',
+                'applicationStats'
+            )
+        );
     }
 
     // store a new job

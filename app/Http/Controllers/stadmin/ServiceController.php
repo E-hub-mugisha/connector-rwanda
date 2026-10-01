@@ -20,9 +20,38 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        $services = Service::where('service_provider_id', $sprovider->id)->get();
-        return view('stadmin.services.index', compact('services'));
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where('user_id', $user->id)->first();
+
+        if (!$sprovider) {
+            return redirect()
+                ->back()
+                ->with('error', 'Service provider profile not found.');
+        }
+
+        $baseQuery = Service::where('service_provider_id', $sprovider->id);
+
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+            'active' => (clone $baseQuery)->where('status', true)->count(),
+            'inactive' => (clone $baseQuery)->where('status', false)->count(),
+            'categories' => (clone $baseQuery)
+                ->whereNotNull('service_category_id')
+                ->distinct('service_category_id')
+                ->count('service_category_id'),
+        ];
+
+        $services = $baseQuery
+            ->with('category')
+            ->latest()
+            ->get();
+
+        return view('stadmin.services.index', compact(
+            'services',
+            'sprovider',
+            'stats'
+        ));
     }
 
     /**
@@ -32,9 +61,20 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        $categories = ServiceCategory::all();
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        return view('stadmin.services.create', compact('categories', 'sprovider'));
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
+
+        $categories = ServiceCategory::orderBy('name')->get();
+
+        $subcategories = ServiceSubCategory::orderBy('name')->get();
+
+        return view('stadmin.services.create', compact(
+            'sprovider',
+            'categories',
+            'subcategories'
+        ));
     }
 
     /**
@@ -45,58 +85,140 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        $subcategory = ServiceSubCategory::where('name', $request->input('sub_category'))
-            ->where('service_category_id', $request->input('service_category_id'))
-            ->first();
+        $user = Auth::user();
 
-        if (!$subcategory) {
-            // Create a new subcategory if not found
-            $subcategory = new ServiceSubCategory();
-            $subcategory->name = $request->input('sub_category');
-            $subcategory->service_category_id = $request->input('service_category_id');
-            $subcategory->slug = Str::slug($request->input('sub_category'));
-            $subcategory->save();
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+
+            'service_category_id' => [
+                'required',
+                'exists:service_categories,id',
+            ],
+
+            'sub_category_id' => [
+                'nullable',
+                'exists:service_sub_categories,id',
+            ],
+
+            'description' => 'required|string',
+
+            'inclusion' => 'nullable|string',
+
+            'exclusion' => 'nullable|string',
+
+            'price' => 'required|numeric|min:0',
+
+            'discount' => 'nullable|numeric|min:0',
+
+            'discount_type' => [
+                'nullable',
+                'in:percentage,fixed',
+            ],
+
+            'location' => 'nullable|string|max:255',
+
+            'duration' => 'nullable|string|max:100',
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
+
+            'status' => 'nullable|boolean',
+        ]);
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Generate Slug
+    |--------------------------------------------------------------------------
+    */
+
+        $slug = Str::slug($request->name);
+
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (
+            Service::where('slug', $slug)->exists()
+        ) {
+            $slug = $originalSlug . '-' . $counter++;
         }
-        $subcategoryId = $subcategory->id;
 
-        $service = new Service();
-        $image = $request->file('image');
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
+        $validated['slug'] = $slug;
 
-        $serviceName = $request->input('name');
-        $providerName = $sprovider->sprovider_name; // Assuming `name` is a field in ServiceProvider
 
-        // Generate slug combining service name and provider name
-        $serviceSlug = Str::slug($serviceName . '-' . $providerName);
+        /*
+    |--------------------------------------------------------------------------
+    | Provider
+    |--------------------------------------------------------------------------
+    */
 
-        $service->name = $serviceName;
-        $service->slug = $serviceSlug;
-        $service->service_category_id = $request->input('service_category_id');
-        $service->sub_category_id = $subcategoryId;
-        $service->service_provider_id = $sprovider->id;
-        $service->price = $request->input('price');
-        $service->discount = $request->input('discount');
-        $service->discount_type = $request->input('discount_type');
-        $service->duration = $request->input('duration');
-        $service->description = $request->input('description');
-        $service->location = $request->input('location');
-        $service->inclusion = str_replace("\n", '|', trim($request->input('inclusion')));
-        $service->exclusion = str_replace("\n", '|', trim($request->input('exclusion')));
+        $validated['service_provider_id'] = $sprovider->id;
 
-        if ($image) {
-            $destinationPath = 'image/services/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $service->image = $profileImage;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Status
+    |--------------------------------------------------------------------------
+    */
+
+        $validated['status'] =
+            $request->boolean('status');
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Image
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->hasFile('image')) {
+
+            $image = $request->file('image');
+
+            $imageName =
+                time() .
+                '_' .
+                uniqid() .
+                '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                public_path('image/services'),
+                $imageName
+            );
+
+            $validated['image'] = $imageName;
+        } else {
+
+            $validated['image'] = 'default.png';
         }
 
-        $service->save();
 
-        alert()->success('SuccessAlert', 'Thank you for reaching out; we will get back to you soon');
+        /*
+    |--------------------------------------------------------------------------
+    | Create Service
+    |--------------------------------------------------------------------------
+    */
 
-        session()->flash('message', 'Service created successfully!');
+        $service = Service::create($validated);
 
-        return redirect()->route('serviceProvider.index');
+
+        return redirect()
+            ->route(
+                'serviceProvider.show',
+                $service->slug
+            )
+            ->with(
+                'success',
+                'Service created successfully.'
+            );
     }
 
     /**
@@ -107,7 +229,24 @@ class ServiceController extends Controller
      */
     public function show($slug)
     {
-        $details = Service::where('slug', $slug)->first();
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where('user_id', $user->id)->firstOrFail();
+
+        $details = Service::with([
+            'category',
+            'subcategory',
+            'provider',
+            'ratings',
+            'media',
+            'portfolios',
+            'staffMembers',
+            'promotions',
+        ])
+            ->where('service_provider_id', $sprovider->id)
+            ->where('slug', $slug)
+            ->firstOrFail();
+
         return view('stadmin.services.show', compact('details'));
     }
 
@@ -119,9 +258,28 @@ class ServiceController extends Controller
      */
     public function edit($id)
     {
-        $service = Service::where('id', $id)->first();
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        return view('stadmin.services.edit', compact('service', 'sprovider'));
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
+
+        $service = Service::with([
+            'category',
+            'subcategory',
+            'provider',
+        ])
+            ->where('service_provider_id', $sprovider->id)
+            ->findOrFail($id);
+
+        $categories = ServiceCategory::orderBy('name')->get();
+
+        $subcategories = ServiceSubCategory::orderBy('name')->get();
+
+        return view('stadmin.services.edit', compact(
+            'service',
+            'categories',
+            'subcategories'
+        ));
     }
 
     /**
@@ -133,60 +291,109 @@ class ServiceController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $service = Service::findOrFail($id);
-        $image = $request->file('image');
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
+        $user = Auth::user();
 
-        $serviceName = $request->input('name');
-        $providerName = $sprovider->sprovider_name; // Assuming `name` is a field in ServiceProvider
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
 
-        // Generate slug combining service name and provider name
-        $serviceSlug = Str::slug($serviceName . '-' . $providerName);
+        $service = Service::where('service_provider_id', $sprovider->id)
+            ->findOrFail($id);
 
-        $service->name = $serviceName;
-        $service->slug = $serviceSlug;
-        $service->service_category_id = $request->input('service_category_id');
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
 
-        // Find or create the subcategory
-        $subcategory = ServiceSubCategory::where('name', $request->input('sub_category'))
-            ->where('service_category_id', $request->input('service_category_id'))
-            ->first();
+            'service_category_id' => [
+                'required',
+                'exists:service_categories,id',
+            ],
 
-        if (!$subcategory) {
-            $subcategory = new ServiceSubCategory();
-            $subcategory->name = $request->input('sub_category');
-            $subcategory->service_category_id = $request->input('service_category_id');
-            $subcategory->slug = Str::slug($request->input('sub_category'));
-            $subcategory->save();
+            'sub_category_id' => [
+                'nullable',
+                'exists:service_sub_categories,id',
+            ],
+
+            'description' => 'required|string',
+
+            'inclusion' => 'nullable|string',
+
+            'exclusion' => 'nullable|string',
+
+            'price' => 'required|numeric|min:0',
+
+            'discount' => 'nullable|numeric|min:0',
+
+            'discount_type' => 'nullable|in:percentage,fixed',
+
+            'location' => 'nullable|string|max:255',
+
+            'duration' => 'nullable|string|max:100',
+
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+
+            'status' => 'nullable|boolean',
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Status
+    |--------------------------------------------------------------------------
+    */
+
+        $validated['status'] = $request->boolean('status');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Image
+    |--------------------------------------------------------------------------
+    */
+
+        if ($request->hasFile('image')) {
+
+            $image = $request->file('image');
+
+            $imageName = time() . '_' . uniqid() . '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                public_path('image/services'),
+                $imageName
+            );
+
+            /*
+         * Delete old image
+         */
+
+            if (
+                $service->image &&
+                $service->image !== 'default.png'
+            ) {
+
+                $oldImage = public_path(
+                    'image/services/' . $service->image
+                );
+
+                if (file_exists($oldImage)) {
+                    @unlink($oldImage);
+                }
+            }
+
+            $validated['image'] = $imageName;
         }
-        $subcategoryId = $subcategory->id;
 
-        $service->sub_category_id = $subcategoryId;
-        $service->service_provider_id = $sprovider->id;
-        $service->price = $request->input('price');
-        $service->discount = $request->input('discount');
-        $service->discount_type = $request->input('discount_type');
-        $service->duration = $request->input('duration');
-        $service->description = $request->input('description');
-        $service->location = $request->input('location');
-        $service->inclusion = str_replace("\n", '|', trim($request->input('inclusion')));
-        $service->exclusion = str_replace("\n", '|', trim($request->input('exclusion')));
+        /*
+    |--------------------------------------------------------------------------
+    | Update
+    |--------------------------------------------------------------------------
+    */
 
-        // Handle image update if a new image is provided
-        if ($image) {
-            $destinationPath = 'image/services/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $service->image = $profileImage;
-        }
+        $service->update($validated);
 
-        $service->save();
-
-        alert()->success('SuccessAlert', 'Service updated successfully!');
-
-        session()->flash('message', 'Service updated successfully!');
-
-        return redirect()->route('serviceProvider.index');
+        return redirect()
+            ->route('serviceProvider.show', $service->slug)
+            ->with(
+                'success',
+                'Service updated successfully.'
+            );
     }
 
     /**

@@ -9,78 +9,206 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class PromotionsController extends Controller
 {
+    /**
+     * Get the authenticated service provider.
+     */
+    private function provider(): ServiceProvider
+    {
+        return ServiceProvider::where(
+            'user_id',
+            Auth::id()
+        )->firstOrFail();
+    }
+
+    /**
+     * Display promotions belonging to the provider's services.
+     */
     public function index()
     {
-        $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        $promotions = Promotion::where('service_provider_id', $sprovider->id)->get();
-        $services = Service::where('service_provider_id', $sprovider->id)->get();
-        $categories = ServiceCategory::all();
-        return view('stadmin.promotions.index', compact('promotions','services','categories','sprovider'));
+        $sprovider = $this->provider();
+
+        /*
+         * Get promotions only through services owned
+         * by the authenticated service provider.
+         */
+        $promotions = Promotion::query()
+            ->whereHas('service', function ($query) use ($sprovider) {
+                $query->where(
+                    'service_provider_id',
+                    $sprovider->id
+                );
+            })
+            ->with([
+                'service:id,name,price,service_category_id',
+                'service.category:id,name',
+            ])
+            ->latest()
+            ->get();
+
+        /*
+         * Only services belonging to this provider
+         * can be selected for a promotion.
+         */
+        $services = Service::query()
+            ->where(
+                'service_provider_id',
+                $sprovider->id
+            )
+            ->with('category:id,name')
+            ->select([
+                'id',
+                'name',
+                'price',
+                'service_category_id',
+            ])
+            ->orderBy('name')
+            ->get();
+
+        return view(
+            'stadmin.promotions.index',
+            compact(
+                'promotions',
+                'services',
+                'sprovider'
+            )
+        );
     }
+
+    /**
+     * Create a promotion.
+     */
     public function storePromotion(Request $request)
     {
-        $request->validate([
-            'service_id' => 'required',
-            'category_id' => 'required',
-            'title' => 'required',
-            'description' => 'required',
-            'discount' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
+        $sprovider = $this->provider();
+
+        $validated = $request->validate([
+            'service_id' => [
+                'required',
+                'integer',
+                Rule::exists('services', 'id')
+                    ->where(function ($query) use ($sprovider) {
+                        $query->where(
+                            'service_provider_id',
+                            $sprovider->id
+                        );
+                    }),
+            ],
+
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'description' => [
+                'required',
+                'string',
+            ],
+
+            'discount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:100',
+            ],
+
+            'start_date' => [
+                'required',
+                'date',
+            ],
+
+            'end_date' => [
+                'required',
+                'date',
+                'after_or_equal:start_date',
+            ],
         ]);
 
-        $promotion = new Promotion();
-        // $sprovider = ServiceProvider::where('user_id', Auth::user()->id)->first();
-        $promotion->service_provider_id = $request->input('service_provider_id');
-        $promotion->service_id = $request->input('service_id');
-        $promotion->category_id = $request->input('category_id');
-        $promotion->title = $request->input('title');
-        $promotion->description = $request->input('description');
-        $promotion->discount = $request->input('discount');
-        $promotion->start_date = $request->input('start_date');
-        $promotion->end_date = $request->input('end_date');
-        
-        $promotion->save();
+        Promotion::create($validated);
 
-        return redirect()->back()->with('success', 'Promotion created successfully!');
+        return redirect()
+            ->route('promotions.index')
+            ->with(
+                'success',
+                'Promotion created successfully.'
+            );
     }
+
+    /**
+     * Update a promotion.
+     */
     public function update(Request $request, $id)
-{
-    // Validate incoming data
-    $request->validate([
-        'service_id' => 'required',
-            'category_id' => 'required',
-            'title' => 'required',
-            'description' => 'required',
-            'discount' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
-    ]);
+    {
+        $sprovider = $this->provider();
 
-    // Retrieve the promotion
-    $promotion = Promotion::findOrFail($id);
+        /*
+         * Find the promotion only if its service belongs
+         * to the currently authenticated provider.
+         */
+        $promotion = Promotion::query()
+            ->whereKey($id)
+            ->whereHas('service', function ($query) use ($sprovider) {
+                $query->where(
+                    'service_provider_id',
+                    $sprovider->id
+                );
+            })
+            ->firstOrFail();
 
-    if (!$promotion) {
-        return redirect()->back()->withErrors('Promotion not found.');
+        $validated = $request->validate([
+            'service_id' => [
+                'required',
+                'integer',
+                Rule::exists('services', 'id')
+                    ->where(function ($query) use ($sprovider) {
+                        $query->where(
+                            'service_provider_id',
+                            $sprovider->id
+                        );
+                    }),
+            ],
+
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'description' => [
+                'required',
+                'string',
+            ],
+
+            'discount' => [
+                'required',
+                'numeric',
+                'min:0.01',
+                'max:100',
+            ],
+
+            'start_date' => [
+                'required',
+                'date',
+            ],
+
+            'end_date' => [
+                'required',
+                'date',
+                'after_or_equal:start_date',
+            ],
+        ]);
+
+        $promotion->update($validated);
+
+        return redirect()
+            ->route('promotions.index')
+            ->with(
+                'success',
+                'Promotion updated successfully.'
+            );
     }
-
-    // Update the promotion fields
-    $promotion->service_id = $request->service_id;
-    $promotion->category_id = $request->category_id;
-    $promotion->title = $request->title;
-    $promotion->description = $request->description;
-    $promotion->discount = $request->discount;
-    $promotion->start_date = $request->start_date;
-    $promotion->end_date = $request->end_date;
-
-    // Save and check for success
-    if ($promotion->save()) {
-        return redirect()->route('promotions.index')->with('success', 'Promotion updated successfully.');
-    } else {
-        return redirect()->back()->withErrors('Failed to update promotion.');
-    }
-}
 }

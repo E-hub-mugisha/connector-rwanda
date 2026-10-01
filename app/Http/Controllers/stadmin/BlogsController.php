@@ -5,6 +5,7 @@ namespace App\Http\Controllers\stadmin;
 use App\Http\Controllers\Controller;
 use App\Models\Blogs;
 use App\Models\ServiceCategory;
+use App\Models\ServiceProvider;
 use App\Models\ServiceSubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +18,87 @@ class BlogsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $blogs = Blogs::where('user_id', Auth::user()->id)->get();
-        return view('stadmin.blog.index', compact('blogs'));
+        $user = Auth::user();
+
+        $sprovider = ServiceProvider::where('user_id', $user->id)
+            ->firstOrFail();
+
+        $query = Blogs::query()
+            ->where('user_id', $user->id)
+            ->with([
+                'category:id,name',
+                'subcategory:id,name',
+            ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('search')) {
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%")
+                    ->orWhere('blog_category', 'like', "%{$search}%");
+            });
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Status filter
+    |--------------------------------------------------------------------------
+    */
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Statistics
+    |--------------------------------------------------------------------------
+    */
+        $baseQuery = Blogs::where('user_id', $user->id);
+
+        $stats = [
+            'total' => (clone $baseQuery)->count(),
+
+            'published' => (clone $baseQuery)
+                ->where('status', 'published')
+                ->count(),
+
+            'pending' => (clone $baseQuery)
+                ->where('status', 'pending')
+                ->count(),
+
+            'draft' => (clone $baseQuery)
+                ->where('status', 'draft')
+                ->count(),
+
+            'views' => (clone $baseQuery)->sum('views'),
+        ];
+
+        /*
+    |--------------------------------------------------------------------------
+    | Blogs
+    |--------------------------------------------------------------------------
+    */
+        $blogs = $query
+            ->latest('created_at')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'stadmin.blog.index',
+            compact(
+                'blogs',
+                'stats',
+                'sprovider'
+            )
+        );
     }
 
     /**
@@ -30,10 +108,19 @@ class BlogsController extends Controller
      */
     public function create()
     {
-        //
-        $categories = ServiceCategory::all();
-        $subcategory = ServiceSubCategory::all();
-        return view('stadmin.blog.create', compact('categories','subcategory'));
+        $categories = ServiceCategory::orderBy('name')
+            ->get();
+
+        $subcategory = ServiceSubCategory::orderBy('name')
+            ->get();
+
+        return view(
+            'stadmin.blog.create',
+            compact(
+                'categories',
+                'subcategory'
+            )
+        );
     }
 
     /**
@@ -44,39 +131,189 @@ class BlogsController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
-            'title' => 'required',
-            'blog_category' => 'required',
-            'content' => 'required',
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'service_category_id' => [
+                'required',
+                'exists:service_categories,id',
+            ],
+
+            'service_sub_category_id' => [
+                'required',
+                'exists:service_sub_categories,id',
+            ],
+
+            'content' => [
+                'required',
+                'string',
+            ],
+
+            'image' => [
+                'required',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
+
+            'thumbnail' => [
+                'required',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
         ]);
 
-        $blog = new Blogs();
-        $slugTitle = Str::slug($request->input("title"));
-        $blog->slug = $slugTitle;
-        $blog->title = $request->input('title');
-        $blog->user_id = Auth::user()->id;
-        $blog->blog_category = $request->input('blog_category');
-        $blog->sub_category = $request->input('sub_category');
-        $blog->content = $request->input('content');
-        $blog->featured = '0';
 
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/blog/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $blog['image'] = "$profileImage";
-        }
-        if ($thumbnail = $request->file('thumbnail')) {
-            $destinationPath = 'thumbnail/blog/';
-            $profileThumbnail = date('YmdHis') . "." . $thumbnail->getClientOriginalExtension();
-            $thumbnail->move($destinationPath, $profileThumbnail);
-            $blog['thumbnail'] = "$profileThumbnail";
+        /*
+    |--------------------------------------------------------------------------
+    | Verify that the selected subcategory belongs to selected category
+    |--------------------------------------------------------------------------
+    */
+
+        $subcategory = ServiceSubCategory::where(
+            'id',
+            $validated['service_sub_category_id']
+        )
+            ->where(
+                'service_category_id',
+                $validated['service_category_id']
+            )
+            ->firstOrFail();
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Generate unique slug
+    |--------------------------------------------------------------------------
+    */
+
+        $slug = Str::slug($validated['title']);
+
+        $originalSlug = $slug;
+
+        $counter = 1;
+
+        while (
+            Blogs::where('slug', $slug)->exists()
+        ) {
+            $slug = $originalSlug . '-' . $counter++;
         }
 
-        $blog->save();
-        session()->flash('message', 'blog saved');
-        return redirect()->route('serviceProviderBlog.index');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Image directories
+    |--------------------------------------------------------------------------
+    */
+
+        $imageDirectory =
+            public_path('image/blogs');
+
+        $thumbnailDirectory =
+            public_path('image/blogs/thumbnails');
+
+
+        if (!is_dir($imageDirectory)) {
+            mkdir(
+                $imageDirectory,
+                0755,
+                true
+            );
+        }
+
+        if (!is_dir($thumbnailDirectory)) {
+            mkdir(
+                $thumbnailDirectory,
+                0755,
+                true
+            );
+        }
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Upload main image
+    |--------------------------------------------------------------------------
+    */
+
+        $imageName =
+            time() . '_' .
+            Str::random(10) . '.' .
+            $request->file('image')
+            ->getClientOriginalExtension();
+
+        $request->file('image')
+            ->move(
+                $imageDirectory,
+                $imageName
+            );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Upload thumbnail
+    |--------------------------------------------------------------------------
+    */
+
+        $thumbnailName =
+            time() . '_thumb_' .
+            Str::random(10) . '.' .
+            $request->file('thumbnail')
+            ->getClientOriginalExtension();
+
+        $request->file('thumbnail')
+            ->move(
+                $thumbnailDirectory,
+                $thumbnailName
+            );
+
+
+        /*
+    |--------------------------------------------------------------------------
+    | Create blog
+    |--------------------------------------------------------------------------
+    */
+
+        Blogs::create([
+
+            'user_id' => Auth::id(),
+
+            'title' => $validated['title'],
+
+            'slug' => $slug,
+
+            'content' => $validated['content'],
+
+            'image' => $imageName,
+
+            'thumbnail' => $thumbnailName,
+
+            'service_category_id' =>
+            $validated['service_category_id'],
+
+            'service_sub_category_id' =>
+            $validated['service_sub_category_id'],
+
+            /*
+        | Change these according to your approval workflow.
+        */
+            'status' => 'pending',
+
+            'views' => 0,
+        ]);
+
+
+        return redirect()
+            ->route('serviceProviderBlog.index')
+            ->with(
+                'message',
+                'Blog created successfully and submitted for review.'
+            );
     }
 
     /**
@@ -101,10 +338,10 @@ class BlogsController extends Controller
     public function edit($id)
     {
         //
-        $categories = ServiceCategory::all();
-        $subcategory = ServiceSubCategory::all();
+        $categories = ServiceCategory::orderBy('name')->get();
+        $subcategory = ServiceSubCategory::orderBy('name')->get();
         $blog = Blogs::findOrFail($id);
-        return view('stadmin.blog.edit', compact('categories', 'blog','subcategory'));
+        return view('stadmin.blog.edit', compact('categories', 'blog', 'subcategory'));
     }
 
     /**

@@ -8,14 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Portfolio extends Model
 {
     use HasFactory;
-    protected $table = "portfolios";
-    
+
+    protected $table = 'portfolios';
+
+    protected $fillable = [
+        'tag',
+        'image',
+        'service_id',
+    ];
+
     public function service()
     {
-       return $this->belongsTo(Service::class);
-    }
-    public function serviceProvider()
-    {
-        return $this->belongsTo(ServiceProvider::class);
+        return $this->belongsTo(Service::class, 'service_id', 'id');
     }
 }
