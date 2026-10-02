@@ -1,284 +1,778 @@
+{{-- ============================================================
+    CONNECTOR HEADER
+    ============================================================ --}}
+
 @php
-    $exploreCategories = $exploreCategories ?? [
-        [
-            'name' => 'Home Services',
-            'icon' => 'home',
-            'subcategories' => [
-                ['name' => 'Cleaning', 'locations' => ['Kigali', 'Musanze', 'Huye']],
-                ['name' => 'Plumbing', 'locations' => ['Kigali', 'Rubavu']],
-                ['name' => 'Electrical', 'locations' => ['Kigali', 'Muhanga']],
-            ],
-        ],
-        [
-            'name' => 'Events',
-            'icon' => 'calendar',
-            'subcategories' => [
-                ['name' => 'Photography', 'locations' => ['Kigali', 'Huye']],
-                ['name' => 'Catering', 'locations' => ['Kigali', 'Rubavu', 'Musanze']],
-            ],
-        ],
-        [
-            'name' => 'Professional',
-            'icon' => 'briefcase',
-            'subcategories' => [
-                ['name' => 'Accounting', 'locations' => ['Kigali']],
-                ['name' => 'Legal Consulting', 'locations' => ['Kigali', 'Huye']],
-            ],
-        ],
-        [
-            'name' => 'Beauty & Wellness',
-            'icon' => 'sparkle',
-            'subcategories' => [
-                ['name' => 'Hair & Makeup', 'locations' => ['Kigali', 'Musanze']],
-                ['name' => 'Massage Therapy', 'locations' => ['Kigali']],
-            ],
-        ],
-    ];
+    use App\Models\ServiceCategory;
 
-    $providerCategories = $providerCategories ?? [
-        [
-            'name' => 'Home Services Providers',
-            'locations' => ['Kigali', 'Musanze', 'Huye', 'Rubavu']
-        ],
-        [
-            'name' => 'Event Providers',
-            'locations' => ['Kigali', 'Huye']
-        ],
-        [
-            'name' => 'Professional Providers',
-            'locations' => ['Kigali', 'Muhanga']
-        ],
-        [
-            'name' => 'Beauty & Wellness Providers',
-            'locations' => ['Kigali', 'Musanze']
-        ],
-    ];
+    /*
+    |--------------------------------------------------------------------------
+    | Load real service categories
+    |--------------------------------------------------------------------------
+    |
+    | ServiceCategory
+    |      └── subcategories
+    |              └── services
+    |
+    */
 
-    $latestNews = $latestNews ?? [
-        [
-            'title' => 'Connector launches verified provider badges',
-            'url' => '#',
-            'date' => 'Aug 2026'
-        ],
-        [
-            'title' => 'How to price your services competitively',
-            'url' => '#',
-            'date' => 'Jul 2026'
-        ],
-        [
-            'title' => 'New payment options now supported',
-            'url' => '#',
-            'date' => 'Jul 2026'
-        ],
-    ];
+    $exploreCategories = ServiceCategory::query()
+        ->with([
+            'subcategories' => function ($query) {
+                $query->orderBy('name');
+            },
+            'subcategories.services',
+        ])
+        ->withCount('services')
+        ->orderByDesc('featured')
+        ->orderBy('name')
+        ->get();
 
-    $latestJobs = $latestJobs ?? [
-        [
-            'title' => 'Field Operations Coordinator',
-            'url' => '#',
-            'location' => 'Kigali'
-        ],
-        [
-            'title' => 'Customer Support Associate',
-            'url' => '#',
-            'location' => 'Remote'
-        ],
-        [
-            'title' => 'Partnerships Manager',
-            'url' => '#',
-            'location' => 'Kigali'
-        ],
-    ];
+    $user = auth()->user();
+
+    $role = strtoupper($user?->utype ?? $user?->role ?? '');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Initials
+    |--------------------------------------------------------------------------
+    */
+
+    $initials = collect(
+        preg_split('/\s+/', trim($user?->name ?? 'User'))
+    )
+        ->filter()
+        ->take(2)
+        ->map(fn ($name) => strtoupper(substr($name, 0, 1)))
+        ->implode('');
+
+    /*
+    |--------------------------------------------------------------------------
+    | Helper for service locations
+    |--------------------------------------------------------------------------
+    */
+
+    $getLocations = function ($subcategory) {
+        return $subcategory->services
+            ->map(function ($service) {
+                return $service->location ?? null;
+            })
+            ->filter()
+            ->map(fn ($location) => trim($location))
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+    };
 @endphp
 
 
-<header class="cn-header" id="cn-header">
+<header class="cn-header" id="connectorHeader">
 
-    <div class="cn-container">
+    {{-- ========================================================
+        TOP / MAIN HEADER
+        ======================================================== --}}
+    <div class="cn-header-main">
+        <div class="container-fluid px-lg-4 px-xl-5">
 
-        {{-- ==========================================================
-             BRAND
-        =========================================================== --}}
-        <a href="{{ route('home') }}" class="cn-brand" aria-label="Connector home">
-            <img
-                src="{{ asset('asset/images/logo/logo-connector-header.png') }}"
-                alt="Connector"
-                class="cn-brand-logo"
-            >
-        </a>
+            <div class="cn-header-inner">
 
+                {{-- BRAND --}}
+                <a href="{{ route('home') }}" class="cn-brand">
+                    <span class="cn-brand-mark">
+                        <i class="bi bi-link-45deg"></i>
+                    </span>
 
-        {{-- ==========================================================
-             PRIMARY NAVIGATION
-        =========================================================== --}}
-        <nav class="cn-primary-nav" id="cn-primary-nav">
-
-            {{-- Explore --}}
-            <button
-                type="button"
-                class="cn-explore-trigger"
-                id="cnfExploreBtn"
-                aria-haspopup="true"
-                aria-expanded="false"
-                aria-controls="cnf-offcanvas"
-                onclick="cnfOpenOffcanvas()"
-            >
-                <span class="cn-explore-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-                        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-                        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-                        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-                    </svg>
-                </span>
-
-                <span>Explore</span>
-
-                <svg class="cn-chevron" width="12" height="12"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
-                    <path d="m6 9 6 6 6-6"/>
-                </svg>
-            </button>
+                    <span class="cn-brand-text">
+                        <strong>Connector</strong>
+                        <small>Services made simple</small>
+                    </span>
+                </a>
 
 
-            <a
-                href="{{ route('home.service_provider') }}"
-                class="cn-nav-link {{ request()->routeIs('home.service_provider') ? 'active' : '' }}"
-            >
-                Providers
-            </a>
+                {{-- DESKTOP NAVIGATION --}}
+                <nav class="cn-desktop-nav" id="cnDesktopNav">
 
-            <a
-                href="{{ route('home.services') }}"
-                class="cn-nav-link {{ request()->routeIs('home.services') ? 'active' : '' }}"
-            >
-                Services
-            </a>
+                    <a href="{{ route('home') }}"
+                       class="cn-nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                        Home
+                    </a>
 
+                    <a href="{{ route('home.service_categories') }}"
+                       class="cn-nav-link {{ request()->routeIs('home.service_categories') ? 'active' : '' }}">
+                        Categories
+                    </a>
 
-            {{-- ======================================================
-                 COMPANY
-            ======================================================= --}}
-            <div class="cn-company">
+                    <a href="{{ route('home.services') }}"
+                       class="cn-nav-link {{ request()->routeIs('home.services') ? 'active' : '' }}">
+                        Services
+                    </a>
 
-                <button
-                    type="button"
-                    class="cn-nav-link cn-company-trigger"
-                    id="cncTrigger"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                >
-                    Company
+                    {{-- COMPANY --}}
+                    <div class="cn-nav-dropdown">
 
-                    <svg width="12" height="12"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2.5">
-                        <path d="m6 9 6 6 6-6"/>
-                    </svg>
-                </button>
+                        <button type="button"
+                                class="cn-nav-link cn-dropdown-trigger">
+                            Company
+                            <i class="bi bi-chevron-down"></i>
+                        </button>
 
-
-                <div class="cn-company-menu" id="cncPanel">
-
-                    <div class="cn-company-grid">
-
-                        <div class="cn-company-column">
-
-                            <span class="cn-menu-label">
-                                Company
-                            </span>
+                        <div class="cn-dropdown-menu">
 
                             <a href="{{ route('about') }}">
-                                <span>About Us</span>
-                                <small>Learn about Connector</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-building"></i>
+                                </span>
+                                <span>
+                                    <strong>About Us</strong>
+                                    <small>Learn about Connector</small>
+                                </span>
                             </a>
 
                             <a href="{{ route('faq') }}">
-                                <span>FAQ</span>
-                                <small>Discover frequently asked questions</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-question-circle"></i>
+                                </span>
+                                <span>
+                                    <strong>FAQ</strong>
+                                    <small>Frequently asked questions</small>
+                                </span>
                             </a>
 
                             <a href="{{ route('home.jobs') }}">
-                                <span>Careers</span>
-                                <small>Join our growing team</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-briefcase"></i>
+                                </span>
+                                <span>
+                                    <strong>Jobs</strong>
+                                    <small>Explore job opportunities</small>
+                                </span>
                             </a>
 
                             <a href="{{ route('home.blogs') }}">
-                                <span>Blog</span>
-                                <small>Insights and updates</small>
-                            </a>
-
-                        </div>
-
-
-                        <div class="cn-company-column">
-
-                            <span class="cn-menu-label">
-                                Support
-                            </span>
-
-                            <a href="{{ route('faq') }}">
-                                <span>Help Center</span>
-                                <small>Find answers quickly</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-journal-text"></i>
+                                </span>
+                                <span>
+                                    <strong>Blog</strong>
+                                    <small>Ideas and useful insights</small>
+                                </span>
                             </a>
 
                             <a href="{{ route('home.contact') }}">
-                                <span>Contact Us</span>
-                                <small>Talk to our team</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <span>
+                                    <strong>Contact</strong>
+                                    <small>Get in touch with us</small>
+                                </span>
                             </a>
+
+                            <div class="cn-dropdown-divider"></div>
 
                             <a href="{{ route('policy') }}">
-                                <span>Trust & Safety</span>
-                                <small>Our safety standards</small>
+                                <span class="cn-dropdown-icon">
+                                    <i class="bi bi-shield-check"></i>
+                                </span>
+                                <span>
+                                    <strong>Privacy Policy</strong>
+                                    <small>Your privacy matters</small>
+                                </span>
                             </a>
 
                         </div>
+                    </div>
+
+                </nav>
 
 
-                        <div class="cn-provider-promo">
+                {{-- SEARCH --}}
+                <form action="{{ route('services.search') }}"
+                      method="GET"
+                      class="cn-header-search">
 
-                            <div class="cn-promo-icon">
-                                <svg width="20" height="20"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
-                                    <path d="M12 5v14"/>
-                                    <path d="M5 12h14"/>
-                                </svg>
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="search"
+                        name="query"
+                        value="{{ request('query') }}"
+                        placeholder="Search services..."
+                        autocomplete="off"
+                    >
+
+                    <button type="submit">
+                        Search
+                    </button>
+                </form>
+
+
+                {{-- RIGHT ACTIONS --}}
+                <div class="cn-header-actions">
+
+                    {{-- EXPLORE --}}
+                    <button type="button"
+                            class="cn-explore-btn"
+                            id="cnExploreBtn"
+                            aria-controls="cnExplorePanel"
+                            aria-expanded="false">
+
+                        <span class="cn-explore-icon">
+                            <i class="bi bi-grid-3x3-gap"></i>
+                        </span>
+
+                        <span class="d-none d-xl-inline">
+                            Explore
+                        </span>
+                    </button>
+
+
+                    {{-- USER --}}
+                    @auth
+
+                        <div class="cn-user-dropdown">
+
+                            <button type="button"
+                                    class="cn-user-btn"
+                                    id="cnUserBtn"
+                                    aria-expanded="false">
+
+                                <span class="cn-avatar">
+                                    {{ $initials ?: 'U' }}
+                                </span>
+
+                                <span class="cn-user-info d-none d-lg-flex">
+                                    <strong>{{ Str::limit($user->name, 18) }}</strong>
+
+                                    <small>
+                                        @if($role === 'ADM')
+                                            Administrator
+                                        @elseif($role === 'SVP')
+                                            Service Provider
+                                        @else
+                                            Customer
+                                        @endif
+                                    </small>
+                                </span>
+
+                                <i class="bi bi-chevron-down d-none d-lg-block"></i>
+                            </button>
+
+
+                            <div class="cn-user-menu" id="cnUserMenu">
+
+                                <div class="cn-user-menu-header">
+
+                                    <span class="cn-avatar cn-avatar-large">
+                                        {{ $initials ?: 'U' }}
+                                    </span>
+
+                                    <div>
+                                        <strong>{{ $user->name }}</strong>
+                                        <small>{{ $user->email }}</small>
+                                    </div>
+
+                                </div>
+
+                                <div class="cn-dropdown-divider"></div>
+
+                                @if($role === 'ADM')
+
+                                    <a href="{{ route('admin.dashboard') }}">
+                                        <i class="bi bi-speedometer2"></i>
+                                        Dashboard
+                                    </a>
+
+                                @elseif($role === 'SVP')
+
+                                    <a href="{{ route('sprovider.dashboard') }}">
+                                        <i class="bi bi-speedometer2"></i>
+                                        Dashboard
+                                    </a>
+
+                                @else
+
+                                    <a href="{{ route('customer.dashboard') }}">
+                                        <i class="bi bi-speedometer2"></i>
+                                        Dashboard
+                                    </a>
+
+                                @endif
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+
+                                    <button type="submit" class="cn-logout">
+                                        <i class="bi bi-box-arrow-right"></i>
+                                        Logout
+                                    </button>
+                                </form>
+
                             </div>
 
-                            <strong>
-                                Grow your business
-                            </strong>
+                        </div>
 
-                            <p>
-                                List your services and connect with customers
-                                across Rwanda.
-                            </p>
+                    @else
 
-                            <a
-                                href="{{ route('register') }}"
-                                class="cn-promo-button"
-                            >
-                                Become a provider
-                                <svg width="14" height="14"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
-                                    <path d="M5 12h14"/>
-                                    <path d="m13 6 6 6-6 6"/>
-                                </svg>
-                            </a>
+                        <a href="{{ route('register') }}"
+                           class="cn-register-btn">
+                            Get Started
+                        </a>
+
+                    @endauth
+
+
+                    {{-- MOBILE BUTTON --}}
+                    <button type="button"
+                            class="cn-mobile-toggle"
+                            id="cnMobileToggle"
+                            aria-controls="cnMobilePanel"
+                            aria-expanded="false">
+
+                        <span></span>
+                        <span></span>
+                        <span></span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    {{-- ========================================================
+        EXPLORE OFFCANVAS
+        ======================================================== --}}
+
+    <div class="cn-explore-overlay" id="cnExploreOverlay"></div>
+
+    <aside class="cn-explore-panel"
+           id="cnExplorePanel"
+           aria-hidden="true">
+
+        <div class="cn-explore-header">
+
+            <div>
+                <span class="cn-panel-label">
+                    EXPLORE
+                </span>
+
+                <h5>Find a Service</h5>
+
+                <p>
+                    Browse services by category and location.
+                </p>
+            </div>
+
+            <button type="button"
+                    class="cn-panel-close"
+                    id="cnExploreClose">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        <div class="cn-explore-content">
+
+            {{-- ALL CATEGORIES --}}
+            <a href="{{ route('home.service_categories') }}"
+               class="cn-explore-all">
+
+                <span class="cn-explore-all-icon">
+                    <i class="bi bi-grid"></i>
+                </span>
+
+                <span>
+                    <strong>All Service Categories</strong>
+                    <small>
+                        Browse everything available
+                    </small>
+                </span>
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+
+            {{-- REAL CATEGORIES --}}
+            <div class="cn-category-list">
+
+                @forelse($exploreCategories as $category)
+
+                    <div class="cn-category-item">
+
+                        <button type="button"
+                                class="cn-category-trigger"
+                                data-category-toggle>
+
+                            <span class="cn-category-icon">
+                                @if($category->image)
+                                    <img src="{{ asset('storage/' . $category->image) }}"
+                                         alt="{{ $category->name }}">
+                                @else
+                                    <i class="bi bi-grid"></i>
+                                @endif
+                            </span>
+
+                            <span class="cn-category-content">
+
+                                <strong>
+                                    {{ $category->name }}
+                                </strong>
+
+                                <small>
+                                    {{ $category->services_count }}
+                                    {{ Str::plural('service', $category->services_count) }}
+                                </small>
+
+                            </span>
+
+                            @if($category->subcategories->count())
+                                <i class="bi bi-chevron-right cn-category-arrow"></i>
+                            @endif
+
+                        </button>
+
+
+                        {{-- SUBCATEGORIES --}}
+                        @if($category->subcategories->count())
+
+                            <div class="cn-category-submenu">
+
+                                <div class="cn-submenu-heading">
+
+                                    <a href="{{ route('home.service_by_category', [
+                                        'category_slug' => $category->slug
+                                    ]) }}">
+
+                                        View all {{ $category->name }}
+
+                                    </a>
+
+                                    <i class="bi bi-arrow-up-right"></i>
+
+                                </div>
+
+
+                                @foreach($category->subcategories as $subcategory)
+
+                                    @php
+                                        $locations = $getLocations($subcategory);
+                                    @endphp
+
+                                    <div class="cn-subcategory-item">
+
+                                        <button type="button"
+                                                class="cn-subcategory-trigger"
+                                                data-subcategory-toggle>
+
+                                            <span>
+                                                {{ $subcategory->name }}
+                                            </span>
+
+                                            @if($locations->count())
+                                                <i class="bi bi-chevron-right"></i>
+                                            @endif
+
+                                        </button>
+
+
+                                        {{-- LOCATIONS --}}
+                                        @if($locations->count())
+
+                                            <div class="cn-location-menu">
+
+                                                <a href="{{ route('home.service_by_category', [
+                                                    'category_slug' => $category->slug,
+                                                    'scategory_slug' => $subcategory->slug
+                                                ]) }}"
+                                                   class="cn-view-subcategory">
+
+                                                    <i class="bi bi-grid"></i>
+                                                    All {{ $subcategory->name }}
+
+                                                </a>
+
+                                                @foreach($locations as $location)
+
+                                                    <a href="{{ route('home.service_location', [
+                                                        'service_location' => Str::slug($location)
+                                                    ]) }}">
+
+                                                        <i class="bi bi-geo-alt"></i>
+
+                                                        {{ $location }}
+
+                                                    </a>
+
+                                                @endforeach
+
+                                            </div>
+
+                                        @else
+
+                                            <a href="{{ route('home.service_by_category', [
+                                                'category_slug' => $category->slug,
+                                                'scategory_slug' => $subcategory->slug
+                                            ]) }}"
+                                               class="cn-subcategory-direct">
+
+                                                <i class="bi bi-arrow-right"></i>
+
+                                            </a>
+
+                                        @endif
+
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                @empty
+
+                    <div class="cn-empty-category">
+
+                        <i class="bi bi-grid"></i>
+
+                        <strong>No categories available</strong>
+
+                        <p>
+                            Service categories will appear here.
+                        </p>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    {{-- ========================================================
+        MOBILE NAVIGATION
+        ======================================================== --}}
+
+    <div class="cn-mobile-overlay" id="cnMobileOverlay"></div>
+
+    <aside class="cn-mobile-panel"
+           id="cnMobilePanel"
+           aria-hidden="true">
+
+        <div class="cn-mobile-header">
+
+            <a href="{{ route('home') }}" class="cn-mobile-brand">
+
+                <span class="cn-brand-mark">
+                    <i class="bi bi-link-45deg"></i>
+                </span>
+
+                <strong>Connector</strong>
+
+            </a>
+
+            <button type="button"
+                    class="cn-mobile-close"
+                    id="cnMobileClose">
+
+                <i class="bi bi-x-lg"></i>
+
+            </button>
+
+        </div>
+
+
+        {{-- MOBILE SEARCH --}}
+        <form action="{{ route('services.search') }}"
+              method="GET"
+              class="cn-mobile-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="search"
+                name="query"
+                value="{{ request('query') }}"
+                placeholder="Search services..."
+            >
+
+            <button type="submit">
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </form>
+
+
+        <nav class="cn-mobile-nav">
+
+            <a href="{{ route('home') }}"
+               class="{{ request()->routeIs('home') ? 'active' : '' }}">
+                <i class="bi bi-house"></i>
+                <span>Home</span>
+            </a>
+
+
+            <a href="{{ route('home.service_categories') }}"
+               class="{{ request()->routeIs('home.service_categories') ? 'active' : '' }}">
+                <i class="bi bi-grid"></i>
+                <span>All Categories</span>
+            </a>
+
+
+            <a href="{{ route('home.services') }}">
+                <i class="bi bi-briefcase"></i>
+                <span>All Services</span>
+            </a>
+
+
+            {{-- MOBILE CATEGORIES --}}
+            <div class="cn-mobile-section">
+
+                <button type="button"
+                        class="cn-mobile-section-trigger"
+                        data-mobile-section>
+
+                    <span>
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        Service Categories
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </button>
+
+
+                <div class="cn-mobile-section-content">
+
+                    @foreach($exploreCategories as $category)
+
+                        <div class="cn-mobile-category">
+
+                            <button type="button"
+                                    class="cn-mobile-category-trigger"
+                                    data-mobile-category>
+
+                                <span>
+                                    {{ $category->name }}
+                                </span>
+
+                                @if($category->subcategories->count())
+                                    <i class="bi bi-plus"></i>
+                                @else
+                                    <i class="bi bi-arrow-right"></i>
+                                @endif
+
+                            </button>
+
+
+                            @if($category->subcategories->count())
+
+                                <div class="cn-mobile-subcategories">
+
+                                    <a href="{{ route('home.service_by_category', [
+                                        'category_slug' => $category->slug
+                                    ]) }}"
+                                       class="cn-mobile-view-all">
+
+                                        All {{ $category->name }}
+
+                                    </a>
+
+
+                                    @foreach($category->subcategories as $subcategory)
+
+                                        <a href="{{ route('home.service_by_category', [
+                                            'category_slug' => $category->slug,
+                                            'scategory_slug' => $subcategory->slug
+                                        ]) }}">
+
+                                            {{ $subcategory->name }}
+
+                                            <i class="bi bi-arrow-right"></i>
+
+                                        </a>
+
+                                    @endforeach
+
+                                </div>
+
+                            @else
+
+                                <a href="{{ route('home.service_by_category', [
+                                    'category_slug' => $category->slug
+                                ]) }}"
+                                   class="cn-mobile-category-direct">
+
+                                    View services
+                                </a>
+
+                            @endif
 
                         </div>
 
-                    </div>
+                    @endforeach
+
+                </div>
+
+            </div>
+
+
+            {{-- COMPANY --}}
+            <div class="cn-mobile-section">
+
+                <button type="button"
+                        class="cn-mobile-section-trigger"
+                        data-mobile-section>
+
+                    <span>
+                        <i class="bi bi-building"></i>
+                        Company
+                    </span>
+
+                    <i class="bi bi-chevron-down"></i>
+
+                </button>
+
+
+                <div class="cn-mobile-section-content cn-mobile-company">
+
+                    <a href="{{ route('about') }}">
+                        About Us
+                    </a>
+
+                    <a href="{{ route('faq') }}">
+                        FAQ
+                    </a>
+
+                    <a href="{{ route('home.jobs') }}">
+                        Jobs
+                    </a>
+
+                    <a href="{{ route('home.blogs') }}">
+                        Blog
+                    </a>
+
+                    <a href="{{ route('home.contact') }}">
+                        Contact
+                    </a>
+
+                    <a href="{{ route('policy') }}">
+                        Privacy Policy
+                    </a>
 
                 </div>
 
@@ -287,3109 +781,1755 @@
         </nav>
 
 
-        {{-- ==========================================================
-             SEARCH
-        =========================================================== --}}
-        <form
-            action="{{ route('services.search') }}"
-            method="GET"
-            class="cn-search"
-        >
+        {{-- MOBILE ACCOUNT --}}
+        <div class="cn-mobile-account">
 
-            <svg
-                class="cn-search-icon"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
-                <circle cx="11" cy="11" r="7"/>
-                <path d="m20 20-4-4"/>
-            </svg>
+            @auth
 
-            <input
-                type="search"
-                name="query"
-                value="{{ request('query') }}"
-                placeholder="Search services, providers..."
-                autocomplete="off"
-            >
+                <div class="cn-mobile-user">
 
-            <button type="submit">
-                Search
-            </button>
+                    <span class="cn-avatar">
+                        {{ $initials ?: 'U' }}
+                    </span>
 
-        </form>
+                    <div>
+                        <strong>{{ $user->name }}</strong>
 
-
-        {{-- ==========================================================
-             RIGHT ACTIONS
-        =========================================================== --}}
-        <div class="cn-actions">
-
-
-            {{-- AI --}}
-            <a
-                href="#"
-                class="cn-ai"
-                title="AI Assistant"
-            >
-                <svg width="17" height="17"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="1.8">
-                    <path d="M12 3v3"/>
-                    <path d="M12 18v3"/>
-                    <path d="M3 12h3"/>
-                    <path d="M18 12h3"/>
-                    <path d="m4.9 4.9 2.1 2.1"/>
-                    <path d="m17 17 2.1 2.1"/>
-                    <path d="m19.1 4.9-2.1 2.1"/>
-                    <path d="m7 17-2.1 2.1"/>
-                    <circle cx="12" cy="12" r="3.2"/>
-                </svg>
-
-                <span>AI</span>
-            </a>
-
-
-            @if(Route::has('login'))
-
-                @auth
-
-                    @php
-                        $utype = Auth::user()->utype;
-                    @endphp
-
-
-                    {{-- USER MENU --}}
-                    <div class="cn-user">
-
-                        <button
-                            type="button"
-                            class="cn-user-trigger"
-                            id="userPill"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                        >
-
-                            <img
-                                src="{{ asset('admin/img/undraw_profile.svg') }}"
-                                alt=""
-                            >
-
-                            <span class="cn-user-name">
-                                {{ Str::words(auth()->user()->name, 1, '') }}
-                            </span>
-
-                            <svg width="12" height="12"
-                                 viewBox="0 0 24 24"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="2.5">
-                                <path d="m6 9 6 6 6-6"/>
-                            </svg>
-
-                        </button>
-
-
-                        <div
-                            class="cn-user-menu"
-                            id="userDropdown"
-                        >
-
-                            <div class="cn-user-menu-head">
-
-                                <img
-                                    src="{{ asset('admin/img/undraw_profile.svg') }}"
-                                    alt=""
-                                >
-
-                                <div>
-                                    <strong>
-                                        {{ auth()->user()->name }}
-                                    </strong>
-
-                                    <span>
-                                        {{ auth()->user()->email }}
-                                    </span>
-                                </div>
-
-                            </div>
-
-
-                            <div class="cn-user-menu-divider"></div>
-
-
-                            @if($utype === 'ADM')
-
-                                <a href="{{ route('admin.dashboard') }}" target="_blank">
-
-                                    <svg width="16" height="16"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"/>
-                                        <rect x="14" y="3" width="7" height="7"/>
-                                        <rect x="14" y="14" width="7" height="7"/>
-                                        <rect x="3" y="14" width="7" height="7"/>
-                                    </svg>
-
-                                    Dashboard
-
-                                </a>
-
-                            @elseif($utype === 'SVP')
-
-                                <a href="{{ route('sprovider.dashboard') }}" target="_blank">
-
-                                    <svg width="16" height="16"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"/>
-                                        <rect x="14" y="3" width="7" height="7"/>
-                                        <rect x="14" y="14" width="7" height="7"/>
-                                        <rect x="3" y="14" width="7" height="7"/>
-                                    </svg>
-
-                                    Dashboard
-
-                                </a>
-
+                        <small>
+                            @if($role === 'ADM')
+                                Administrator
+                            @elseif($role === 'SVP')
+                                Service Provider
                             @else
-
-                                <a href="{{ route('customer.dashboard') }}" target="_blank">
-
-                                    <svg width="16" height="16"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="2">
-                                        <rect x="3" y="3" width="7" height="7"/>
-                                        <rect x="14" y="3" width="7" height="7"/>
-                                        <rect x="14" y="14" width="7" height="7"/>
-                                        <rect x="3" y="14" width="7" height="7"/>
-                                    </svg>
-
-                                    Dashboard
-
-                                </a>
-
+                                Customer
                             @endif
-
-
-                            <a
-                                href="#"
-                                class="cn-logout"
-                                onclick="event.preventDefault(); document.getElementById('cn-logout-form').submit();"
-                            >
-
-                                <svg width="16" height="16"
-                                     viewBox="0 0 24 24"
-                                     fill="none"
-                                     stroke="currentColor"
-                                     stroke-width="2">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                                    <path d="m16 17 5-5-5-5"/>
-                                    <path d="M21 12H9"/>
-                                </svg>
-
-                                Logout
-
-                            </a>
-
-                        </div>
-
+                        </small>
                     </div>
 
+                </div>
 
-                    <form
-                        id="cn-logout-form"
-                        method="POST"
-                        action="{{ route('logout') }}"
-                        style="display:none"
-                    >
-                        @csrf
-                    </form>
 
+                @if($role === 'ADM')
+
+                    <a href="{{ route('admin.dashboard') }}"
+                       class="cn-mobile-dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+
+                @elseif($role === 'SVP')
+
+                    <a href="{{ route('sprovider.dashboard') }}"
+                       class="cn-mobile-dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
 
                 @else
 
-                    <a
-                        href="#"
-                        class="cn-login"
-                        data-bs-toggle="modal"
-                        data-bs-target="#loginModal"
-                    >
-                        Login
+                    <a href="{{ route('customer.dashboard') }}"
+                       class="cn-mobile-dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
                     </a>
 
-                    <a
-                        href="{{ route('register') }}"
-                        class="cn-get-started"
-                    >
-                        Get Started
-                    </a>
-
-                @endauth
-
-            @endif
+                @endif
 
 
-            {{-- MOBILE --}}
-            <button
-                type="button"
-                class="cn-mobile-toggle"
-                id="cnToggler"
-                aria-label="Open navigation"
-                aria-expanded="false"
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+                <form method="POST"
+                      action="{{ route('logout') }}">
+
+                    @csrf
+
+                    <button type="submit"
+                            class="cn-mobile-logout">
+
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+
+                    </button>
+
+                </form>
+
+            @else
+
+                <a href="{{ route('register') }}"
+                   class="cn-mobile-register">
+
+                    Get Started
+
+                </a>
+
+            @endauth
 
         </div>
 
-    </div>
+    </aside>
 
 </header>
 
 
-{{-- ================================================================
-     EXPLORE OFFCANVAS
-================================================================ --}}
-
-<div
-    class="cnf-overlay"
-    id="cnf-overlay"
-    onclick="cnfCloseOffcanvas()"
-></div>
-
-
-<aside
-    class="cnf-offcanvas"
-    id="cnf-offcanvas"
-    aria-label="Explore Connector"
->
-
-    <div class="cnf-header">
-
-        <div>
-
-            <span class="cnf-kicker">
-                DISCOVER
-            </span>
-
-            <h3>
-                Explore Connector
-            </h3>
-
-        </div>
-
-        <button
-            type="button"
-            class="cnf-close"
-            onclick="cnfCloseOffcanvas()"
-            aria-label="Close"
-        >
-            <svg width="18" height="18"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2">
-                <path d="M18 6 6 18"/>
-                <path d="m6 6 12 12"/>
-            </svg>
-        </button>
-
-    </div>
-
-
-    <div class="cnf-body">
-
-        <div class="cnf-intro">
-            Find trusted services, professionals and opportunities.
-        </div>
-
-
-        <div class="cnf-cat-list">
-
-            @forelse($exploreCategories as $ci => $cat)
-
-                <div class="cnf-cat-row">
-
-                    <button
-                        type="button"
-                        class="cnf-cat-item"
-                        data-opens-flyout="cnf-subflyout-cat-{{ $ci }}"
-                        onclick="cnfToggleCat(event, 'cat-{{ $ci }}')"
-                        onmouseenter="cnfHoverOpen('cnf-subflyout-cat-{{ $ci }}', this, 'cat')"
-                        onmouseleave="cnfHoverClose('cnf-subflyout-cat-{{ $ci }}')"
-                    >
-
-                        <span class="cnf-cat-left">
-
-                            <span class="cnf-cat-icon">
-
-                                @if(($cat['icon'] ?? '') === 'home')
-
-                                    <svg width="17" height="17"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <path d="m3 11 9-8 9 8"/>
-                                        <path d="M5 10v10h14V10"/>
-                                        <path d="M9 20v-6h6v6"/>
-                                    </svg>
-
-                                @elseif(($cat['icon'] ?? '') === 'calendar')
-
-                                    <svg width="17" height="17"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <rect x="3" y="4" width="18" height="17" rx="2"/>
-                                        <path d="M16 2v4"/>
-                                        <path d="M8 2v4"/>
-                                        <path d="M3 10h18"/>
-                                    </svg>
-
-                                @elseif(($cat['icon'] ?? '') === 'briefcase')
-
-                                    <svg width="17" height="17"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <rect x="3" y="7" width="18" height="13" rx="2"/>
-                                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                    </svg>
-
-                                @else
-
-                                    <svg width="17" height="17"
-                                         viewBox="0 0 24 24"
-                                         fill="none"
-                                         stroke="currentColor"
-                                         stroke-width="1.8">
-                                        <path d="m12 3 1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3Z"/>
-                                    </svg>
-
-                                @endif
-
-                            </span>
-
-                            <span>
-                                {{ $cat['name'] }}
-                            </span>
-
-                        </span>
-
-                        <svg width="15" height="15"
-                             viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2">
-                            <path d="m9 18 6-6-6-6"/>
-                        </svg>
-
-                    </button>
-
-                </div>
-
-            @empty
-
-                <div class="cnf-empty">
-                    No service categories yet.
-                </div>
-
-            @endforelse
-
-
-            {{-- PROVIDERS --}}
-            <div class="cnf-section-divider"></div>
-
-            <div class="cnf-cat-row">
-
-                <button
-                    type="button"
-                    class="cnf-cat-item"
-                    data-opens-flyout="cnf-subflyout-providers"
-                    onclick="cnfToggleCat(event, 'providers')"
-                    onmouseenter="cnfHoverOpen('cnf-subflyout-providers', this, 'cat')"
-                    onmouseleave="cnfHoverClose('cnf-subflyout-providers')"
-                >
-
-                    <span class="cnf-cat-left">
-
-                        <span class="cnf-cat-icon">
-
-                            <svg width="17" height="17"
-                                 viewBox="0 0 24 24"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="1.8">
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M3 21a6 6 0 0 1 12 0"/>
-                                <path d="M16 11a4 4 0 0 1 5 4"/>
-                            </svg>
-
-                        </span>
-
-                        <span>Providers</span>
-
-                    </span>
-
-                    <svg width="15" height="15"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-
-                </button>
-
-            </div>
-
-
-            {{-- NEWS --}}
-            <div class="cnf-cat-row">
-
-                <button
-                    type="button"
-                    class="cnf-cat-item"
-                    data-opens-flyout="cnf-subflyout-updates"
-                    onclick="cnfToggleCat(event, 'updates')"
-                    onmouseenter="cnfHoverOpen('cnf-subflyout-updates', this, 'cat')"
-                    onmouseleave="cnfHoverClose('cnf-subflyout-updates')"
-                >
-
-                    <span class="cnf-cat-left">
-
-                        <span class="cnf-cat-icon">
-
-                            <svg width="17" height="17"
-                                 viewBox="0 0 24 24"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="1.8">
-                                <path d="M4 4h16v16H4z"/>
-                                <path d="M8 8h8"/>
-                                <path d="M8 12h8"/>
-                                <path d="M8 16h5"/>
-                            </svg>
-
-                        </span>
-
-                        <span>Updates & News</span>
-
-                    </span>
-
-                    <svg width="15" height="15"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</aside>
-
-
-{{-- ================================================================
-     CATEGORY FLYOUTS
-================================================================ --}}
-
-@foreach($exploreCategories as $ci => $cat)
-
-    <div
-        class="cnf-flyout cnf-sub-flyout"
-        id="cnf-subflyout-cat-{{ $ci }}"
-        onmouseenter="cnfCancelClose('cnf-subflyout-cat-{{ $ci }}')"
-        onmouseleave="cnfHoverClose('cnf-subflyout-cat-{{ $ci }}')"
-    >
-
-        <div class="cnf-flyout-title">
-            {{ $cat['name'] }}
-        </div>
-
-        @forelse($cat['subcategories'] as $si => $sub)
-
-            <button
-                type="button"
-                class="cnf-flyout-item"
-                data-opens-flyout="cnf-flyout-cat-{{ $ci }}-{{ $si }}"
-                onclick="cnfToggleSub(event, 'cat-{{ $ci }}-{{ $si }}')"
-                onmouseenter="cnfHoverOpen('cnf-flyout-cat-{{ $ci }}-{{ $si }}', this, 'sub')"
-                onmouseleave="cnfHoverClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')"
-            >
-
-                <span>
-                    {{ $sub['name'] }}
-                </span>
-
-                <svg width="14" height="14"
-                     viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2">
-                    <path d="m9 18 6-6-6-6"/>
-                </svg>
-
-            </button>
-
-        @empty
-
-            <div class="cnf-flyout-empty">
-                No sub-categories yet
-            </div>
-
-        @endforelse
-
-    </div>
-
-@endforeach
-
-
-{{-- LEVEL 3 --}}
-@foreach($exploreCategories as $ci => $cat)
-
-    @foreach($cat['subcategories'] as $si => $sub)
-
-        <div
-            class="cnf-flyout cnf-service-flyout"
-            id="cnf-flyout-cat-{{ $ci }}-{{ $si }}"
-            data-parent-flyout="cnf-subflyout-cat-{{ $ci }}"
-            onmouseenter="cnfCancelClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')"
-            onmouseleave="cnfHoverClose('cnf-flyout-cat-{{ $ci }}-{{ $si }}')"
-        >
-
-            <div class="cnf-flyout-title">
-                {{ $sub['name'] }}
-            </div>
-
-            @forelse($sub['locations'] as $loc)
-
-                <a
-                    href="{{ route('home.services', [
-                        'category' => $cat['name'],
-                        'sub' => $sub['name'],
-                        'location' => $loc
-                    ]) }}"
-                    class="cnf-flyout-item"
-                >
-                    <span>{{ $loc }}</span>
-
-                    <svg width="14" height="14"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-                        <path d="m9 18 6-6-6-6"/>
-                    </svg>
-                </a>
-
-            @empty
-
-                <div class="cnf-flyout-empty">
-                    No locations yet
-                </div>
-
-            @endforelse
-
-        </div>
-
-    @endforeach
-
-@endforeach
-
-
-{{-- PROVIDER FLYOUT --}}
-<div
-    class="cnf-flyout cnf-sub-flyout"
-    id="cnf-subflyout-providers"
-    onmouseenter="cnfCancelClose('cnf-subflyout-providers')"
-    onmouseleave="cnfHoverClose('cnf-subflyout-providers')"
->
-
-    <div class="cnf-flyout-title">
-        Provider categories
-    </div>
-
-    @forelse($providerCategories as $pi => $pcat)
-
-        <button
-            type="button"
-            class="cnf-flyout-item"
-            data-opens-flyout="cnf-flyout-provider-{{ $pi }}"
-            onclick="cnfToggleSub(event, 'provider-{{ $pi }}')"
-            onmouseenter="cnfHoverOpen('cnf-flyout-provider-{{ $pi }}', this, 'sub')"
-            onmouseleave="cnfHoverClose('cnf-flyout-provider-{{ $pi }}')"
-        >
-
-            <span>
-                {{ $pcat['name'] }}
-            </span>
-
-            <svg width="14" height="14"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2">
-                <path d="m9 18 6-6-6-6"/>
-            </svg>
-
-        </button>
-
-    @empty
-
-        <div class="cnf-flyout-empty">
-            No provider categories yet
-        </div>
-
-    @endforelse
-
-</div>
-
-
-{{-- PROVIDER LOCATIONS --}}
-@foreach($providerCategories as $pi => $pcat)
-
-    <div
-        class="cnf-flyout cnf-service-flyout"
-        id="cnf-flyout-provider-{{ $pi }}"
-        data-parent-flyout="cnf-subflyout-providers"
-        onmouseenter="cnfCancelClose('cnf-flyout-provider-{{ $pi }}')"
-        onmouseleave="cnfHoverClose('cnf-flyout-provider-{{ $pi }}')"
-    >
-
-        <div class="cnf-flyout-title">
-            {{ $pcat['name'] }}
-        </div>
-
-        @forelse($pcat['locations'] as $loc)
-
-            <a
-                href="{{ route('home.service_provider', [
-                    'category' => $pcat['name'],
-                    'location' => $loc
-                ]) }}"
-                class="cnf-flyout-item"
-            >
-                {{ $loc }}
-            </a>
-
-        @empty
-
-            <div class="cnf-flyout-empty">
-                No locations yet
-            </div>
-
-        @endforelse
-
-    </div>
-
-@endforeach
-
-
-{{-- NEWS / JOBS --}}
-<div
-    class="cnf-flyout cnf-sub-flyout cnf-updates-flyout"
-    id="cnf-subflyout-updates"
-    onmouseenter="cnfCancelClose('cnf-subflyout-updates')"
-    onmouseleave="cnfHoverClose('cnf-subflyout-updates')"
->
-
-    <div class="cnf-flyout-title">
-        Latest updates
-    </div>
-
-    <div class="cnf-flyout-label">
-        News
-    </div>
-
-    @forelse($latestNews as $item)
-
-        <a
-            href="{{ $item['url'] }}"
-            class="cnf-news-item"
-        >
-            <span>{{ $item['title'] }}</span>
-            <small>{{ $item['date'] }}</small>
-        </a>
-
-    @empty
-
-        <div class="cnf-flyout-empty">
-            No news yet
-        </div>
-
-    @endforelse
-
-
-    <a
-        href="{{ route('home.blogs') }}"
-        class="cnf-view-all"
-    >
-        View all news
-        <span>→</span>
-    </a>
-
-
-    <div class="cnf-divider"></div>
-
-
-    <div class="cnf-flyout-label">
-        Jobs
-    </div>
-
-    @forelse($latestJobs as $item)
-
-        <a
-            href="{{ $item['url'] }}"
-            class="cnf-news-item"
-        >
-            <span>{{ $item['title'] }}</span>
-            <small>{{ $item['location'] }}</small>
-        </a>
-
-    @empty
-
-        <div class="cnf-flyout-empty">
-            No jobs yet
-        </div>
-
-    @endforelse
-
-
-    <a
-        href="{{ route('home.jobs') }}"
-        class="cnf-view-all"
-    >
-        View all jobs
-        <span>→</span>
-    </a>
-
-</div>
-
+{{-- ============================================================
+    HEADER CSS
+    ============================================================ --}}
 
 <style>
 
-/* ================================================================
-   CONNECTOR HEADER
-================================================================ */
-
 :root {
-    --cn-green: #6B9080;
-    --cn-green-dark: #557668;
-    --cn-green-soft: #EEF5F2;
-
-    --cn-dark: #254035;
-    --cn-text: #253A32;
-    --cn-muted: #71857D;
-
+    --cn-primary: #6B9080;
+    --cn-primary-dark: #254035;
+    --cn-primary-soft: #edf5f1;
     --cn-white: #ffffff;
-    --cn-border: #E4ECE8;
-
-    --cn-shadow:
-        0 8px 30px rgba(37, 64, 53, .08);
-
-    --cn-shadow-lg:
-        0 18px 55px rgba(37, 64, 53, .15);
-
-    --cn-transition:
-        .22s cubic-bezier(.4, 0, .2, 1);
+    --cn-text: #18231f;
+    --cn-muted: #718078;
+    --cn-border: #e7ece9;
+    --cn-shadow: 0 15px 45px rgba(37, 64, 53, .13);
 }
 
 
-/* ================================================================
+/* ============================================================
    HEADER
-================================================================ */
+   ============================================================ */
 
 .cn-header {
+    position: relative;
+    z-index: 1100;
+    width: 100%;
+}
 
-    position: fixed;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    z-index: 1050;
-
+.cn-header-main {
     height: 78px;
-
-    background: rgba(37, 64, 53, .98);
-
-    border-bottom: 1px solid rgba(255,255,255,.08);
-
-    transition:
-        background .3s ease,
-        box-shadow .3s ease,
-        height .3s ease;
+    background: var(--cn-primary-dark);
+    transition: all .25s ease;
 }
 
-
-.cn-header.scrolled {
-
-    background: rgba(255,255,255,.97);
-
-    backdrop-filter: blur(16px);
-
-    border-bottom-color: var(--cn-border);
-
-    box-shadow:
-        0 5px 25px rgba(37,64,53,.08);
-
+.cn-header.scrolled .cn-header-main {
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 0 5px 25px rgba(0,0,0,.07);
+    backdrop-filter: blur(12px);
 }
 
-
-.cn-container {
-
-    width: min(1440px, calc(100% - 64px));
-
-    height: 100%;
-
-    margin: 0 auto;
-
+.cn-header-inner {
+    height: 78px;
     display: flex;
-
     align-items: center;
-
-    gap: 20px;
+    gap: 26px;
 }
 
 
-/* ================================================================
-   LOGO
-================================================================ */
+/* ============================================================
+   BRAND
+   ============================================================ */
 
 .cn-brand {
-
     display: flex;
-
     align-items: center;
-
-    flex-shrink: 0;
-
+    gap: 11px;
+    color: #fff;
     text-decoration: none;
-}
-
-
-.cn-brand-logo {
-
-    display: block;
-
-    width: auto;
-
-    height: 38px;
-
-    max-width: 150px;
-
-    object-fit: contain;
-}
-
-
-/* ================================================================
-   PRIMARY NAV
-================================================================ */
-
-.cn-primary-nav {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 3px;
-
     flex-shrink: 0;
 }
 
+.cn-brand:hover {
+    color: #fff;
+}
 
-.cn-nav-link,
-.cn-explore-trigger {
-
+.cn-brand-mark {
+    width: 40px;
     height: 40px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    padding: 0 12px;
-
-    border-radius: 8px;
-
-    border: 0;
-
-    background: transparent;
-
-    color: rgba(255,255,255,.86);
-
-    font-family: inherit;
-
-    font-size: 13.5px;
-
-    font-weight: 600;
-
-    text-decoration: none;
-
-    white-space: nowrap;
-
-    cursor: pointer;
-
-    transition:
-        color var(--cn-transition),
-        background var(--cn-transition);
-}
-
-
-.cn-nav-link:hover,
-.cn-explore-trigger:hover {
-
-    color: #fff;
-
-    background: rgba(255,255,255,.09);
-}
-
-
-.cn-nav-link.active {
-
-    color: #fff;
-
-    background: rgba(255,255,255,.11);
-}
-
-
-.cn-header.scrolled .cn-nav-link,
-.cn-header.scrolled .cn-explore-trigger {
-
-    color: var(--cn-dark);
-}
-
-
-.cn-header.scrolled .cn-nav-link:hover,
-.cn-header.scrolled .cn-explore-trigger:hover {
-
-    color: var(--cn-green-dark);
-
-    background: var(--cn-green-soft);
-}
-
-
-/* ================================================================
-   EXPLORE
-================================================================ */
-
-.cn-explore-trigger {
-
-    background: var(--cn-green);
-
-    color: #fff;
-
-    padding: 0 14px;
-
-    margin-right: 4px;
-}
-
-
-.cn-explore-trigger:hover {
-
-    background: var(--cn-green-dark);
-
-    color: #fff;
-}
-
-
-.cn-explore-icon {
-
-    display: grid;
-
-    place-items: center;
-}
-
-
-.cn-chevron {
-
-    transition: transform .2s ease;
-}
-
-
-.cn-explore-trigger[aria-expanded="true"] .cn-chevron {
-
-    transform: rotate(180deg);
-}
-
-
-/* ================================================================
-   SEARCH
-================================================================ */
-
-.cn-search {
-
-    flex: 1;
-
-    min-width: 180px;
-
-    max-width: 430px;
-
-    height: 44px;
-
-    margin-left: auto;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 0 6px 0 14px;
-
-    background: rgba(255,255,255,.1);
-
-    border: 1px solid rgba(255,255,255,.16);
-
-    border-radius: 10px;
-
-    transition:
-        background var(--cn-transition),
-        border var(--cn-transition);
-}
-
-
-.cn-header.scrolled .cn-search {
-
-    background: #F5F8F6;
-
-    border-color: var(--cn-border);
-}
-
-
-.cn-search:focus-within {
-
-    border-color: var(--cn-green);
-
-    background: rgba(255,255,255,.14);
-}
-
-
-.cn-header.scrolled .cn-search:focus-within {
-
-    background: #fff;
-
-    box-shadow:
-        0 0 0 3px rgba(107,144,128,.10);
-}
-
-
-.cn-search-icon {
-
-    flex-shrink: 0;
-
-    color: rgba(255,255,255,.6);
-}
-
-
-.cn-header.scrolled .cn-search-icon {
-
-    color: var(--cn-green);
-}
-
-
-.cn-search input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    height: 100%;
-
-    border: 0;
-
-    outline: 0;
-
-    background: transparent;
-
-    color: #fff;
-
-    font-family: inherit;
-
-    font-size: 13px;
-}
-
-
-.cn-header.scrolled .cn-search input {
-
-    color: var(--cn-text);
-}
-
-
-.cn-search input::placeholder {
-
-    color: rgba(255,255,255,.55);
-}
-
-
-.cn-header.scrolled .cn-search input::placeholder {
-
-    color: #9AA9A3;
-}
-
-
-.cn-search button {
-
-    height: 34px;
-
-    padding: 0 14px;
-
-    border: 0;
-
-    border-radius: 7px;
-
-    background: var(--cn-green);
-
-    color: #fff;
-
-    font-family: inherit;
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: background .2s ease;
-}
-
-
-.cn-search button:hover {
-
-    background: var(--cn-green-dark);
-}
-
-
-/* ================================================================
-   ACTIONS
-================================================================ */
-
-.cn-actions {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    flex-shrink: 0;
-}
-
-
-/* AI */
-
-.cn-ai {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 6px;
-
-    height: 38px;
-
-    padding: 0 10px;
-
-    color: rgba(255,255,255,.85);
-
-    text-decoration: none;
-
-    border-radius: 8px;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    transition: all .2s ease;
-}
-
-
-.cn-ai:hover {
-
-    background: rgba(255,255,255,.08);
-
-    color: #fff;
-}
-
-
-.cn-header.scrolled .cn-ai {
-
-    color: var(--cn-dark);
-}
-
-
-.cn-header.scrolled .cn-ai:hover {
-
-    color: var(--cn-green-dark);
-
-    background: var(--cn-green-soft);
-}
-
-
-/* LOGIN */
-
-.cn-login {
-
-    height: 38px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    padding: 0 13px;
-
-    color: #fff;
-
-    text-decoration: none;
-
-    border-radius: 8px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    transition: all .2s ease;
-}
-
-
-.cn-login:hover {
-
-    background: rgba(255,255,255,.08);
-
-    color: #fff;
-}
-
-
-.cn-header.scrolled .cn-login {
-
-    color: var(--cn-dark);
-}
-
-
-.cn-header.scrolled .cn-login:hover {
-
-    background: var(--cn-green-soft);
-
-    color: var(--cn-green-dark);
-}
-
-
-/* GET STARTED */
-
-.cn-get-started {
-
-    height: 40px;
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 0 17px;
-
-    background: var(--cn-green);
-
-    color: #fff;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    transition: all .2s ease;
-}
-
-
-.cn-get-started:hover {
-
-    background: var(--cn-green-dark);
-
-    color: #fff;
-
-    transform: translateY(-1px);
-}
-
-
-/* ================================================================
-   USER
-================================================================ */
-
-.cn-user {
-
-    position: relative;
-}
-
-
-.cn-user-trigger {
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    padding: 3px 10px 3px 4px;
-
-    border: 1px solid rgba(255,255,255,.18);
-
-    border-radius: 9px;
-
-    background: rgba(255,255,255,.06);
-
-    cursor: pointer;
-
-    color: #fff;
-
-    font-family: inherit;
-}
-
-
-.cn-user-trigger:hover {
-
-    background: rgba(255,255,255,.1);
-}
-
-
-.cn-header.scrolled .cn-user-trigger {
-
-    background: #F7F9F8;
-
-    border-color: var(--cn-border);
-
-    color: var(--cn-dark);
-}
-
-
-.cn-user-trigger img {
-
-    width: 31px;
-
-    height: 31px;
-
-    border-radius: 7px;
-
-    object-fit: cover;
-}
-
-
-.cn-user-name {
-
-    max-width: 90px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    font-size: 12.5px;
-
-    font-weight: 600;
-}
-
-
-.cn-user-menu {
-
-    display: none;
-
-    position: absolute;
-
-    top: calc(100% + 10px);
-
-    right: 0;
-
-    width: 245px;
-
-    padding: 7px;
-
-    background: #fff;
-
-    border: 1px solid var(--cn-border);
-
     border-radius: 12px;
-
-    box-shadow: var(--cn-shadow-lg);
-
-    z-index: 1200;
-}
-
-
-.cn-user-menu.open {
-
-    display: block;
-
-    animation: cnMenuIn .18s ease;
-}
-
-
-@keyframes cnMenuIn {
-
-    from {
-        opacity: 0;
-        transform: translateY(-5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-
-.cn-user-menu-head {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 9px;
-}
-
-
-.cn-user-menu-head img {
-
-    width: 38px;
-
-    height: 38px;
-
-    border-radius: 8px;
-}
-
-
-.cn-user-menu-head strong {
-
-    display: block;
-
-    color: var(--cn-dark);
-
-    font-size: 13px;
-}
-
-
-.cn-user-menu-head span {
-
-    display: block;
-
-    max-width: 160px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
-
-    color: var(--cn-muted);
-
-    font-size: 11px;
-
-    margin-top: 2px;
-}
-
-
-.cn-user-menu-divider {
-
-    height: 1px;
-
-    margin: 5px;
-
-    background: var(--cn-border);
-}
-
-
-.cn-user-menu > a {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 10px;
-
-    border-radius: 7px;
-
-    color: var(--cn-dark);
-
-    text-decoration: none;
-
-    font-size: 13px;
-
-    font-weight: 500;
-
-    transition: background .15s ease;
-}
-
-
-.cn-user-menu > a:hover {
-
-    background: var(--cn-green-soft);
-}
-
-
-.cn-user-menu .cn-logout {
-
-    color: #B34D45;
-}
-
-
-.cn-user-menu .cn-logout:hover {
-
-    background: #FFF3F1;
-}
-
-
-/* ================================================================
-   COMPANY MENU
-================================================================ */
-
-.cn-company {
-
-    position: relative;
-}
-
-
-.cn-company-menu {
-
-    position: absolute;
-
-    top: calc(100% + 12px);
-
-    left: 50%;
-
-    width: 680px;
-
-    transform:
-        translateX(-50%)
-        translateY(-5px);
-
-    padding: 18px;
-
-    background: #fff;
-
-    border: 1px solid var(--cn-border);
-
-    border-radius: 14px;
-
-    box-shadow: var(--cn-shadow-lg);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-    transition:
-        opacity .18s ease,
-        transform .18s ease,
-        visibility .18s ease;
-}
-
-
-.cn-company-menu.open {
-
-    opacity: 1;
-
-    visibility: visible;
-
-    pointer-events: auto;
-
-    transform:
-        translateX(-50%)
-        translateY(0);
-}
-
-
-.cn-company-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        1fr
-        1fr
-        1.15fr;
-
-    gap: 10px;
-}
-
-
-.cn-company-column {
-
-    padding: 8px;
-}
-
-
-.cn-menu-label {
-
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: var(--cn-green);
-
-    font-size: 10px;
-
-    font-weight: 800;
-
-    text-transform: uppercase;
-
-    letter-spacing: .09em;
-}
-
-
-.cn-company-column a {
-
-    display: block;
-
-    padding: 9px;
-
-    border-radius: 8px;
-
-    text-decoration: none;
-
-    transition: background .15s ease;
-}
-
-
-.cn-company-column a:hover {
-
-    background: var(--cn-green-soft);
-}
-
-
-.cn-company-column a span {
-
-    display: block;
-
-    color: var(--cn-dark);
-
-    font-size: 13px;
-
-    font-weight: 650;
-}
-
-
-.cn-company-column a small {
-
-    display: block;
-
-    margin-top: 2px;
-
-    color: var(--cn-muted);
-
-    font-size: 10.5px;
-
-    line-height: 1.35;
-}
-
-
-/* PROVIDER PROMO */
-
-.cn-provider-promo {
-
-    padding: 20px;
-
-    background: var(--cn-green-soft);
-
-    border-radius: 11px;
-}
-
-
-.cn-promo-icon {
-
-    width: 38px;
-
-    height: 38px;
-
-    display: grid;
-
-    place-items: center;
-
-    margin-bottom: 15px;
-
-    background: var(--cn-green);
-
+    background: var(--cn-primary);
     color: #fff;
-
-    border-radius: 9px;
-}
-
-
-.cn-provider-promo strong {
-
-    display: block;
-
-    color: var(--cn-dark);
-
-    font-size: 14px;
-}
-
-
-.cn-provider-promo p {
-
-    margin: 6px 0 16px;
-
-    color: var(--cn-muted);
-
-    font-size: 11.5px;
-
-    line-height: 1.5;
-}
-
-
-.cn-promo-button {
-
     display: inline-flex;
-
     align-items: center;
-
-    gap: 7px;
-
-    color: var(--cn-green-dark);
-
-    text-decoration: none;
-
-    font-size: 11.5px;
-
-    font-weight: 750;
-}
-
-
-/* ================================================================
-   MOBILE TOGGLER
-================================================================ */
-
-.cn-mobile-toggle {
-
-    display: none;
-
-    width: 38px;
-
-    height: 38px;
-
-    border: 1px solid rgba(255,255,255,.2);
-
-    background: rgba(255,255,255,.06);
-
-    border-radius: 8px;
-
-    align-items: center;
-
     justify-content: center;
+    font-size: 22px;
+}
 
+.cn-brand-text {
+    display: flex;
     flex-direction: column;
+    line-height: 1.1;
+}
 
-    gap: 4px;
+.cn-brand-text strong {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+}
 
-    cursor: pointer;
+.cn-brand-text small {
+    font-size: 9px;
+    opacity: .65;
+    margin-top: 4px;
 }
 
 
-.cn-mobile-toggle span {
+/* ============================================================
+   DESKTOP NAV
+   ============================================================ */
 
-    width: 18px;
+.cn-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+}
 
-    height: 2px;
-
-    background: #fff;
-
-    border-radius: 2px;
-
+.cn-nav-link {
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,.78);
+    text-decoration: none;
+    padding: 11px 12px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 500;
     transition: .2s ease;
 }
 
-
-.cn-header.scrolled .cn-mobile-toggle {
-
-    border-color: var(--cn-border);
-
-    background: #F7F9F8;
-}
-
-
-.cn-header.scrolled .cn-mobile-toggle span {
-
-    background: var(--cn-dark);
-}
-
-
-/* ================================================================
-   EXPLORE OFFCANVAS
-================================================================ */
-
-.cnf-overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 1199;
-
-    background: rgba(20,34,29,.45);
-
-    backdrop-filter: blur(3px);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity .25s ease,
-        visibility .25s ease;
-}
-
-
-.cnf-overlay.open {
-
-    opacity: 1;
-
-    visibility: visible;
-}
-
-
-.cnf-offcanvas {
-
-    position: fixed;
-
-    top: 0;
-
-    bottom: 0;
-
-    left: 0;
-
-    width: 350px;
-
-    max-width: 90vw;
-
-    z-index: 1200;
-
-    display: flex;
-
-    flex-direction: column;
-
-    background: #fff;
-
-    box-shadow:
-        15px 0 60px rgba(0,0,0,.18);
-
-    transform: translateX(-100%);
-
-    transition:
-        transform .32s cubic-bezier(.4,0,.2,1);
-}
-
-
-.cnf-offcanvas.open {
-
-    transform: translateX(0);
-}
-
-
-.cnf-header {
-
-    min-height: 88px;
-
-    padding: 20px 22px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    background: var(--cn-dark);
-
+.cn-nav-link:hover,
+.cn-nav-link.active {
     color: #fff;
+    background: rgba(255,255,255,.09);
+}
+
+.cn-header.scrolled .cn-nav-link {
+    color: #52605a;
+}
+
+.cn-header.scrolled .cn-nav-link:hover,
+.cn-header.scrolled .cn-nav-link.active {
+    color: var(--cn-primary-dark);
+    background: var(--cn-primary-soft);
+}
+
+.cn-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cn-dropdown-trigger i {
+    font-size: 10px;
 }
 
 
-.cnf-kicker {
+/* ============================================================
+   COMPANY DROPDOWN
+   ============================================================ */
 
-    display: block;
+.cn-nav-dropdown {
+    position: relative;
+}
 
-    margin-bottom: 4px;
+.cn-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 13px);
+    left: 0;
+    width: 275px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid var(--cn-border);
+    border-radius: 15px;
+    box-shadow: var(--cn-shadow);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: .2s ease;
+}
 
-    color: #A9C2B8;
+.cn-nav-dropdown:hover .cn-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
 
-    font-size: 9px;
+.cn-dropdown-menu > a {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px;
+    color: var(--cn-text);
+    text-decoration: none;
+    border-radius: 10px;
+}
 
-    font-weight: 800;
+.cn-dropdown-menu > a:hover {
+    background: var(--cn-primary-soft);
+}
 
-    letter-spacing: .12em;
+.cn-dropdown-menu > a > span:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.cn-dropdown-menu strong {
+    font-size: 13px;
+}
+
+.cn-dropdown-menu small {
+    color: var(--cn-muted);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.cn-dropdown-icon {
+    width: 35px;
+    height: 35px;
+    background: var(--cn-primary-soft);
+    color: var(--cn-primary-dark);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cn-dropdown-divider {
+    height: 1px;
+    background: var(--cn-border);
+    margin: 6px 4px;
 }
 
 
-.cnf-header h3 {
+/* ============================================================
+   SEARCH
+   ============================================================ */
 
-    margin: 0;
+.cn-header-search {
+    margin-left: auto;
+    width: min(300px, 25vw);
+    height: 43px;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    padding-left: 13px;
+    transition: .2s ease;
+}
 
-    font-size: 18px;
+.cn-header-search > i {
+    color: rgba(255,255,255,.55);
+    font-size: 14px;
+}
 
+.cn-header-search input {
+    min-width: 0;
+    flex: 1;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+.cn-header-search input::placeholder {
+    color: rgba(255,255,255,.55);
+}
+
+.cn-header-search button {
+    border: 0;
+    background: var(--cn-primary);
+    color: #fff;
+    height: 35px;
+    margin-right: 4px;
+    padding: 0 13px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cn-header.scrolled .cn-header-search {
+    background: #f5f8f6;
+    border-color: var(--cn-border);
+}
+
+.cn-header.scrolled .cn-header-search > i {
+    color: var(--cn-muted);
+}
+
+.cn-header.scrolled .cn-header-search input {
+    color: var(--cn-text);
+}
+
+.cn-header.scrolled .cn-header-search input::placeholder {
+    color: #8c9993;
+}
+
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+
+.cn-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.cn-explore-btn {
+    height: 43px;
+    padding: 0 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.07);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cn-explore-btn:hover {
+    background: rgba(255,255,255,.13);
+}
+
+.cn-header.scrolled .cn-explore-btn {
+    color: var(--cn-primary-dark);
+    background: var(--cn-primary-soft);
+    border-color: transparent;
+}
+
+.cn-explore-icon {
+    display: flex;
+}
+
+
+/* ============================================================
+   REGISTER
+   ============================================================ */
+
+.cn-register-btn {
+    height: 43px;
+    padding: 0 16px;
+    border-radius: 10px;
+    background: var(--cn-primary);
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cn-register-btn:hover {
+    color: #fff;
+    background: #5d8272;
+}
+
+
+/* ============================================================
+   USER
+   ============================================================ */
+
+.cn-user-dropdown {
+    position: relative;
+}
+
+.cn-user-btn {
+    border: 0;
+    background: transparent;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 4px;
+}
+
+.cn-header.scrolled .cn-user-btn {
+    color: var(--cn-text);
+}
+
+.cn-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--cn-primary);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
     font-weight: 700;
 }
 
-
-.cnf-close {
-
-    width: 34px;
-
-    height: 34px;
-
-    display: grid;
-
-    place-items: center;
-
-    border: 0;
-
-    border-radius: 8px;
-
-    background: rgba(255,255,255,.09);
-
-    color: #fff;
-
-    cursor: pointer;
+.cn-avatar-large {
+    width: 43px;
+    height: 43px;
 }
 
-
-.cnf-close:hover {
-
-    background: var(--cn-green);
+.cn-user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.15;
 }
 
-
-.cnf-body {
-
-    flex: 1;
-
-    overflow-y: auto;
-}
-
-
-.cnf-intro {
-
-    padding: 18px 22px 10px;
-
-    color: var(--cn-muted);
-
+.cn-user-info strong {
     font-size: 12px;
-
-    line-height: 1.5;
 }
 
-
-.cnf-cat-list {
-
-    padding: 8px 12px 20px;
+.cn-user-info small {
+    font-size: 10px;
+    opacity: .65;
+    margin-top: 3px;
 }
 
-
-.cnf-cat-item {
-
-    width: 100%;
-
-    min-height: 52px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 12px;
-
-    padding: 8px 10px;
-
-    border: 0;
-
-    background: transparent;
-
-    border-radius: 9px;
-
-    color: var(--cn-dark);
-
-    font-family: inherit;
-
-    font-size: 13.5px;
-
-    font-weight: 650;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    transition: all .18s ease;
-}
-
-
-.cnf-cat-item:hover,
-.cnf-cat-item.active {
-
-    color: var(--cn-green-dark);
-
-    background: var(--cn-green-soft);
-}
-
-
-.cnf-cat-left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 11px;
-}
-
-
-.cnf-cat-icon {
-
-    width: 34px;
-
-    height: 34px;
-
-    display: grid;
-
-    place-items: center;
-
-    border-radius: 8px;
-
-    background: #F4F8F6;
-
-    color: var(--cn-green);
-
-    flex-shrink: 0;
-}
-
-
-.cnf-cat-item:hover .cnf-cat-icon,
-.cnf-cat-item.active .cnf-cat-icon {
-
+.cn-user-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 260px;
     background: #fff;
-}
-
-
-.cnf-section-divider {
-
-    height: 1px;
-
-    margin: 8px 6px;
-
-    background: var(--cn-border);
-}
-
-
-/* ================================================================
-   FLYOUT
-================================================================ */
-
-.cnf-flyout {
-
-    position: fixed;
-
-    z-index: 1250;
-
-    min-width: 240px;
-
-    max-width: 310px;
-
-    max-height: 70vh;
-
-    overflow-y: auto;
-
-    padding: 9px;
-
-    background: #fff;
-
     border: 1px solid var(--cn-border);
+    border-radius: 15px;
+    box-shadow: var(--cn-shadow);
+    padding: 8px;
+    display: none;
+}
 
-    border-radius: 12px;
+.cn-user-menu.show {
+    display: block;
+}
 
-    box-shadow: var(--cn-shadow-lg);
+.cn-user-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px;
+}
 
-    opacity: 0;
+.cn-user-menu-header > div {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
 
-    visibility: hidden;
+.cn-user-menu-header strong {
+    font-size: 13px;
+}
 
-    pointer-events: none;
+.cn-user-menu-header small {
+    color: var(--cn-muted);
+    font-size: 10px;
+    margin-top: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-    transform: translateX(-7px);
+.cn-user-menu > a,
+.cn-user-menu .cn-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 0;
+    background: transparent;
+    color: var(--cn-text);
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+    text-align: left;
+}
 
-    transition:
-        opacity .16s ease,
-        transform .16s ease,
-        visibility .16s ease;
+.cn-user-menu > a:hover,
+.cn-user-menu .cn-logout:hover {
+    background: var(--cn-primary-soft);
+}
+
+.cn-user-menu .cn-logout {
+    color: #b44343;
 }
 
 
-.cnf-flyout.open {
+/* ============================================================
+   EXPLORE PANEL
+   ============================================================ */
 
+.cn-explore-overlay,
+.cn-mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 25, 21, .42);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: .25s ease;
+    z-index: 1090;
+}
+
+.cn-explore-overlay.show,
+.cn-mobile-overlay.show {
     opacity: 1;
-
     visibility: visible;
+}
 
-    pointer-events: auto;
+.cn-explore-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 410px;
+    max-width: 92vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 1110;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 20px 0 50px rgba(0,0,0,.12);
+    overflow: hidden;
+}
 
+.cn-explore-panel.show {
     transform: translateX(0);
 }
 
-
-.cnf-flyout-title {
-
-    padding: 9px 10px 7px;
-
-    color: var(--cn-dark);
-
-    font-size: 12px;
-
-    font-weight: 750;
-
+.cn-explore-header {
+    padding: 28px 25px 22px;
     border-bottom: 1px solid var(--cn-border);
-
-    margin-bottom: 4px;
-}
-
-
-.cnf-flyout-item {
-
-    width: 100%;
-
-    min-height: 39px;
-
     display: flex;
-
-    align-items: center;
-
     justify-content: space-between;
-
-    gap: 10px;
-
-    padding: 8px 10px;
-
-    border: 0;
-
-    background: transparent;
-
-    border-radius: 7px;
-
-    color: var(--cn-dark);
-
-    font-family: inherit;
-
-    font-size: 12.5px;
-
-    font-weight: 550;
-
-    text-decoration: none;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    transition: all .16s ease;
+    gap: 20px;
 }
 
-
-.cnf-flyout-item:hover,
-.cnf-flyout-item.active {
-
-    background: var(--cn-green-soft);
-
-    color: var(--cn-green-dark);
-}
-
-
-.cnf-flyout-empty {
-
-    padding: 15px 10px;
-
-    color: var(--cn-muted);
-
-    font-size: 11.5px;
-}
-
-
-.cnf-updates-flyout {
-
-    width: 310px;
-
-    max-width: 90vw;
-}
-
-
-.cnf-flyout-label {
-
-    padding: 9px 10px 4px;
-
-    color: #8A9A94;
-
-    font-size: 9px;
-
+.cn-panel-label {
+    color: var(--cn-primary);
+    font-size: 10px;
     font-weight: 800;
-
-    text-transform: uppercase;
-
-    letter-spacing: .08em;
+    letter-spacing: 1.5px;
 }
 
-
-.cnf-news-item {
-
-    display: block;
-
-    padding: 9px 10px;
-
-    border-radius: 7px;
-
-    text-decoration: none;
+.cn-explore-header h5 {
+    margin: 5px 0;
+    color: var(--cn-primary-dark);
+    font-size: 20px;
 }
 
-
-.cnf-news-item:hover {
-
-    background: var(--cn-green-soft);
+.cn-explore-header p {
+    margin: 0;
+    color: var(--cn-muted);
+    font-size: 12px;
 }
 
-
-.cnf-news-item span {
-
-    display: block;
-
-    color: var(--cn-dark);
-
-    font-size: 11.5px;
-
-    font-weight: 600;
-
-    line-height: 1.35;
+.cn-panel-close,
+.cn-mobile-close {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border: 1px solid var(--cn-border);
+    background: #fff;
+    color: var(--cn-text);
+    border-radius: 10px;
 }
 
-
-.cnf-news-item small {
-
-    display: block;
-
-    margin-top: 2px;
-
-    color: #91A39B;
-
-    font-size: 9.5px;
+.cn-panel-close:hover,
+.cn-mobile-close:hover {
+    background: var(--cn-primary-soft);
+    color: var(--cn-primary-dark);
 }
 
+.cn-explore-content {
+    height: calc(100vh - 133px);
+    overflow-y: auto;
+    padding: 15px;
+}
 
-.cnf-view-all {
-
+.cn-explore-all {
     display: flex;
-
     align-items: center;
-
-    justify-content: space-between;
-
-    padding: 9px 10px;
-
-    color: var(--cn-green-dark);
-
+    gap: 11px;
+    padding: 13px;
+    margin-bottom: 12px;
+    border: 1px solid var(--cn-border);
+    border-radius: 12px;
+    color: var(--cn-text);
     text-decoration: none;
+}
 
+.cn-explore-all:hover {
+    background: var(--cn-primary-soft);
+    border-color: #d5e4dd;
+}
+
+.cn-explore-all-icon {
+    width: 37px;
+    height: 37px;
+    background: var(--cn-primary-soft);
+    color: var(--cn-primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+}
+
+.cn-explore-all span:nth-child(2) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.cn-explore-all strong {
+    font-size: 12px;
+}
+
+.cn-explore-all small {
+    color: var(--cn-muted);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.cn-explore-all > i {
+    color: var(--cn-primary);
+}
+
+
+/* ============================================================
+   CATEGORY
+   ============================================================ */
+
+.cn-category-item {
+    border-bottom: 1px solid var(--cn-border);
+}
+
+.cn-category-trigger {
+    width: 100%;
+    border: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 12px 8px;
+    text-align: left;
+}
+
+.cn-category-trigger:hover {
+    background: #fafcfb;
+}
+
+.cn-category-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: var(--cn-primary-soft);
+    color: var(--cn-primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.cn-category-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cn-category-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.cn-category-content strong {
+    color: var(--cn-text);
+    font-size: 13px;
+}
+
+.cn-category-content small {
+    color: var(--cn-muted);
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.cn-category-arrow {
+    color: #9ba8a2;
+    font-size: 12px;
+    transition: .2s ease;
+}
+
+.cn-category-item.open .cn-category-arrow {
+    transform: rotate(90deg);
+    color: var(--cn-primary);
+}
+
+
+/* ============================================================
+   SUBCATEGORY
+   ============================================================ */
+
+.cn-category-submenu {
+    display: none;
+    padding: 0 8px 10px 61px;
+}
+
+.cn-category-item.open .cn-category-submenu {
+    display: block;
+}
+
+.cn-submenu-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0 9px;
+}
+
+.cn-submenu-heading a {
+    color: var(--cn-primary);
+    text-decoration: none;
     font-size: 11px;
+    font-weight: 700;
+}
 
-    font-weight: 750;
+.cn-submenu-heading i {
+    color: var(--cn-primary);
+    font-size: 10px;
+}
+
+.cn-subcategory-item {
+    position: relative;
+}
+
+.cn-subcategory-trigger {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: #4f5e57;
+    padding: 8px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    text-align: left;
+}
+
+.cn-subcategory-trigger:hover {
+    color: var(--cn-primary-dark);
+}
+
+.cn-subcategory-trigger i {
+    font-size: 9px;
+}
+
+.cn-location-menu {
+    display: none;
+    padding: 3px 0 7px 9px;
+}
+
+.cn-subcategory-item.open .cn-location-menu {
+    display: block;
+}
+
+.cn-location-menu a {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 4px;
+    color: var(--cn-muted);
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.cn-location-menu a:hover {
+    color: var(--cn-primary-dark);
+}
+
+.cn-location-menu a i {
+    color: var(--cn-primary);
+}
+
+.cn-location-menu .cn-view-subcategory {
+    color: var(--cn-primary-dark);
+    font-weight: 600;
+    border-bottom: 1px solid var(--cn-border);
+    margin-bottom: 2px;
+}
+
+.cn-subcategory-direct {
+    display: flex;
+    justify-content: flex-end;
+    color: var(--cn-primary);
+    font-size: 11px;
+    padding: 5px;
+}
+
+.cn-empty-category {
+    text-align: center;
+    padding: 45px 20px;
+    color: var(--cn-muted);
+}
+
+.cn-empty-category > i {
+    font-size: 32px;
+    color: var(--cn-primary);
+}
+
+.cn-empty-category strong {
+    display: block;
+    color: var(--cn-text);
+    margin-top: 12px;
+}
+
+.cn-empty-category p {
+    font-size: 12px;
 }
 
 
-.cnf-divider {
+/* ============================================================
+   MOBILE TOGGLE
+   ============================================================ */
 
-    height: 1px;
+.cn-mobile-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.07);
+    border-radius: 10px;
+    padding: 10px;
+}
 
-    margin: 7px 4px;
+.cn-mobile-toggle span {
+    display: block;
+    height: 2px;
+    background: #fff;
+    margin: 4px 0;
+    border-radius: 5px;
+}
 
-    background: var(--cn-border);
+.cn-header.scrolled .cn-mobile-toggle {
+    border-color: var(--cn-border);
+    background: var(--cn-primary-soft);
+}
+
+.cn-header.scrolled .cn-mobile-toggle span {
+    background: var(--cn-primary-dark);
 }
 
 
-/* ================================================================
-   MOBILE
-================================================================ */
+/* ============================================================
+   MOBILE PANEL
+   ============================================================ */
 
-@media (max-width: 1200px) {
+.cn-mobile-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 390px;
+    max-width: 92vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 1110;
+    transform: translateX(100%);
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 50px rgba(0,0,0,.12);
+}
 
-    .cn-container {
+.cn-mobile-panel.show {
+    transform: translateX(0);
+}
 
-        width: min(100% - 36px, 1440px);
+.cn-mobile-header {
+    min-height: 74px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--cn-border);
+}
 
-        gap: 12px;
+.cn-mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--cn-primary-dark);
+    text-decoration: none;
+}
+
+.cn-mobile-brand strong {
+    font-size: 18px;
+}
+
+.cn-mobile-search {
+    margin: 15px;
+    height: 45px;
+    border: 1px solid var(--cn-border);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+}
+
+.cn-mobile-search > i {
+    color: var(--cn-muted);
+}
+
+.cn-mobile-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    padding: 0 9px;
+    font-size: 13px;
+}
+
+.cn-mobile-search button {
+    width: 37px;
+    height: 37px;
+    margin-right: 4px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--cn-primary);
+    color: #fff;
+}
+
+.cn-mobile-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 15px 20px;
+}
+
+.cn-mobile-nav > a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 47px;
+    padding: 0 11px;
+    color: var(--cn-text);
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+}
+
+.cn-mobile-nav > a:hover,
+.cn-mobile-nav > a.active {
+    color: var(--cn-primary-dark);
+    background: var(--cn-primary-soft);
+}
+
+.cn-mobile-nav > a i {
+    width: 20px;
+    color: var(--cn-primary);
+}
+
+
+/* ============================================================
+   MOBILE SECTIONS
+   ============================================================ */
+
+.cn-mobile-section {
+    margin-top: 5px;
+    border-top: 1px solid var(--cn-border);
+}
+
+.cn-mobile-section-trigger {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    min-height: 48px;
+    padding: 0 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--cn-text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.cn-mobile-section-trigger span {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cn-mobile-section-trigger span i {
+    width: 20px;
+    color: var(--cn-primary);
+}
+
+.cn-mobile-section.open
+.cn-mobile-section-trigger > i {
+    transform: rotate(180deg);
+}
+
+.cn-mobile-section-content {
+    display: none;
+    padding: 0 0 8px;
+}
+
+.cn-mobile-section.open .cn-mobile-section-content {
+    display: block;
+}
+
+.cn-mobile-category {
+    border-top: 1px solid #f0f3f1;
+}
+
+.cn-mobile-category-trigger {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px 0 32px;
+    border: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #536159;
+    font-size: 12px;
+    text-align: left;
+}
+
+.cn-mobile-category-trigger:hover {
+    color: var(--cn-primary-dark);
+}
+
+.cn-mobile-category-trigger i {
+    color: var(--cn-primary);
+}
+
+.cn-mobile-category.open
+.cn-mobile-category-trigger i {
+    transform: rotate(45deg);
+}
+
+.cn-mobile-subcategories {
+    display: none;
+    padding: 0 0 7px 45px;
+}
+
+.cn-mobile-category.open .cn-mobile-subcategories {
+    display: block;
+}
+
+.cn-mobile-subcategories a,
+.cn-mobile-category-direct {
+    min-height: 34px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--cn-muted);
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.cn-mobile-subcategories a:hover {
+    color: var(--cn-primary-dark);
+}
+
+.cn-mobile-subcategories .cn-mobile-view-all {
+    color: var(--cn-primary-dark);
+    font-weight: 700;
+}
+
+.cn-mobile-category-direct {
+    padding-left: 45px;
+    color: var(--cn-primary);
+}
+
+
+/* ============================================================
+   MOBILE COMPANY
+   ============================================================ */
+
+.cn-mobile-company {
+    padding-left: 32px;
+}
+
+.cn-mobile-company a {
+    display: block;
+    padding: 8px 10px;
+    color: var(--cn-muted);
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.cn-mobile-company a:hover {
+    color: var(--cn-primary-dark);
+}
+
+
+/* ============================================================
+   MOBILE ACCOUNT
+   ============================================================ */
+
+.cn-mobile-account {
+    border-top: 1px solid var(--cn-border);
+    padding: 15px;
+    background: #fbfcfb;
+}
+
+.cn-mobile-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.cn-mobile-user > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.cn-mobile-user strong {
+    color: var(--cn-text);
+    font-size: 13px;
+}
+
+.cn-mobile-user small {
+    color: var(--cn-muted);
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.cn-mobile-dashboard,
+.cn-mobile-logout {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    min-height: 39px;
+    padding: 0 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 0;
+    background: transparent;
+    color: var(--cn-text);
+    font-size: 12px;
+}
+
+.cn-mobile-dashboard:hover {
+    background: var(--cn-primary-soft);
+}
+
+.cn-mobile-logout {
+    color: #b44343;
+}
+
+.cn-mobile-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 43px;
+    background: var(--cn-primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1199.98px) {
+
+    .cn-header-inner {
+        gap: 14px;
     }
 
-    .cn-primary-nav {
-
-        gap: 0;
+    .cn-desktop-nav {
+        margin-left: 0;
     }
 
-    .cn-nav-link,
-    .cn-explore-trigger {
-
-        padding-left: 9px;
-
-        padding-right: 9px;
+    .cn-nav-link {
+        padding-left: 8px;
+        padding-right: 8px;
     }
 
-    .cn-search {
-
-        max-width: 340px;
+    .cn-header-search {
+        width: 220px;
     }
 
-    .cn-ai span {
+}
 
+@media (max-width: 991.98px) {
+
+    .cn-desktop-nav,
+    .cn-header-search {
         display: none;
     }
 
-}
-
-
-@media (max-width: 1050px) {
-
-    .cn-primary-nav {
-
-        display: none;
+    .cn-header-inner {
+        justify-content: space-between;
     }
 
-    .cn-search {
-
-        max-width: none;
-
-        margin-left: auto;
+    .cn-brand {
+        margin-right: auto;
     }
 
     .cn-mobile-toggle {
+        display: block;
+    }
 
-        display: flex;
+    .cn-explore-btn {
+        display: none;
+    }
+
+    .cn-register-btn {
+        display: none;
     }
 
 }
 
+@media (max-width: 575.98px) {
 
-@media (max-width: 700px) {
-
-    .cn-header {
-
+    .cn-header-main,
+    .cn-header-inner {
         height: 68px;
     }
 
-    .cn-container {
-
-        width: calc(100% - 28px);
-
-        gap: 8px;
+    .cn-brand-mark {
+        width: 37px;
+        height: 37px;
     }
 
-    .cn-brand-logo {
-
-        height: 32px;
-
-        max-width: 125px;
+    .cn-brand-text strong {
+        font-size: 18px;
     }
 
-    .cn-search {
-
+    .cn-brand-text small {
         display: none;
     }
 
-    .cn-ai {
+    .cn-user-info,
+    .cn-user-btn > i {
+        display: none !important;
+    }
 
+    .cn-avatar {
         width: 36px;
-
         height: 36px;
-
-        padding: 0;
     }
 
-    .cn-login {
-
-        display: none;
-    }
-
-    .cn-get-started {
-
-        height: 36px;
-
-        padding: 0 11px;
-
-        font-size: 11px;
-    }
-
-    .cn-user-name {
-
-        display: none;
-    }
-
-    .cn-user-trigger {
-
-        padding-right: 5px;
-    }
-
-    .cnf-offcanvas {
-
+    .cn-mobile-panel {
         width: 100%;
-
         max-width: 100%;
     }
 
 }
 
 
-@media (max-width: 420px) {
-
-    .cn-get-started {
-
-        display: none;
-    }
-
-    .cn-actions {
-
-        margin-left: auto;
-    }
-
-}
-
-
-/* ================================================================
-   ACCESSIBILITY
-================================================================ */
-
-.cn-nav-link:focus-visible,
-.cn-explore-trigger:focus-visible,
-.cn-search:focus-within,
-.cn-get-started:focus-visible,
-.cn-login:focus-visible,
-.cn-user-trigger:focus-visible,
-.cn-mobile-toggle:focus-visible {
-
-    outline: 3px solid rgba(107,144,128,.35);
-
-    outline-offset: 2px;
-}
-
+/* ============================================================
+   LOCK BODY WHEN MENU IS OPEN
+   ============================================================ */
 
 body.cn-menu-open {
-
     overflow: hidden;
 }
 
 </style>
 
 
+{{-- ============================================================
+    HEADER JAVASCRIPT
+    ============================================================ --}}
+
 <script>
+document.addEventListener('DOMContentLoaded', function () {
 
-/* ================================================================
-   HEADER SCROLL
-================================================================ */
+    /*
+    |--------------------------------------------------------------------------
+    | Elements
+    |--------------------------------------------------------------------------
+    */
 
-(function () {
+    const header = document.getElementById('connectorHeader');
 
-    const header = document.getElementById('cn-header');
+    const exploreBtn = document.getElementById('cnExploreBtn');
+    const explorePanel = document.getElementById('cnExplorePanel');
+    const exploreOverlay = document.getElementById('cnExploreOverlay');
+    const exploreClose = document.getElementById('cnExploreClose');
 
-    if (!header) return;
+    const mobileToggle = document.getElementById('cnMobileToggle');
+    const mobilePanel = document.getElementById('cnMobilePanel');
+    const mobileOverlay = document.getElementById('cnMobileOverlay');
+    const mobileClose = document.getElementById('cnMobileClose');
+
+    const userBtn = document.getElementById('cnUserBtn');
+    const userMenu = document.getElementById('cnUserMenu');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Header scroll
+    |--------------------------------------------------------------------------
+    */
 
     function updateHeader() {
 
-        header.classList.toggle(
-            'scrolled',
-            window.scrollY > 30
-        );
+        if (window.scrollY > 25) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
 
     }
-
-    window.addEventListener(
-        'scroll',
-        updateHeader,
-        { passive: true }
-    );
 
     updateHeader();
 
-})();
-
-
-/* ================================================================
-   COMPANY DROPDOWN
-================================================================ */
-
-(function () {
-
-    const trigger = document.getElementById('cncTrigger');
-    const panel = document.getElementById('cncPanel');
-
-    if (!trigger || !panel) return;
-
-    trigger.addEventListener('click', function (event) {
-
-        event.stopPropagation();
-
-        const open = panel.classList.toggle('open');
-
-        trigger.setAttribute(
-            'aria-expanded',
-            open ? 'true' : 'false'
-        );
-
+    window.addEventListener('scroll', updateHeader, {
+        passive: true
     });
 
-    document.addEventListener('click', function (event) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Body lock
+    |--------------------------------------------------------------------------
+    */
+
+    function lockBody() {
+        document.body.classList.add('cn-menu-open');
+    }
+
+    function unlockBody() {
 
         if (
-            !panel.contains(event.target) &&
-            !trigger.contains(event.target)
+            !explorePanel?.classList.contains('show') &&
+            !mobilePanel?.classList.contains('show')
         ) {
-
-            panel.classList.remove('open');
-
-            trigger.setAttribute(
-                'aria-expanded',
-                'false'
-            );
-
-        }
-
-    });
-
-})();
-
-
-/* ================================================================
-   USER DROPDOWN
-================================================================ */
-
-(function () {
-
-    const trigger = document.getElementById('userPill');
-    const dropdown = document.getElementById('userDropdown');
-
-    if (!trigger || !dropdown) return;
-
-    trigger.addEventListener('click', function (event) {
-
-        event.stopPropagation();
-
-        const open = dropdown.classList.toggle('open');
-
-        trigger.setAttribute(
-            'aria-expanded',
-            open ? 'true' : 'false'
-        );
-
-    });
-
-    document.addEventListener('click', function (event) {
-
-        if (
-            !dropdown.contains(event.target) &&
-            !trigger.contains(event.target)
-        ) {
-
-            dropdown.classList.remove('open');
-
-            trigger.setAttribute(
-                'aria-expanded',
-                'false'
-            );
-
-        }
-
-    });
-
-})();
-
-
-/* ================================================================
-   MOBILE NAV
-================================================================ */
-
-(function () {
-
-    const toggler = document.getElementById('cnToggler');
-    const nav = document.getElementById('cn-primary-nav');
-
-    if (!toggler || !nav) return;
-
-    toggler.addEventListener('click', function () {
-
-        const open = nav.classList.toggle('mobile-open');
-
-        toggler.setAttribute(
-            'aria-expanded',
-            open ? 'true' : 'false'
-        );
-
-    });
-
-})();
-
-
-/* ================================================================
-   EXPLORE FLYOUT
-================================================================ */
-
-(function () {
-
-    const overlay =
-        document.getElementById('cnf-overlay');
-
-    const panel =
-        document.getElementById('cnf-offcanvas');
-
-    if (!overlay || !panel) return;
-
-    const CLOSE_DELAY = 240;
-
-    const timers = {};
-
-
-    function parentFlyout(id) {
-
-        const element =
-            document.getElementById(id);
-
-        return element
-            ? element.dataset.parentFlyout || null
-            : null;
-
-    }
-
-
-    function cancelClose(id) {
-
-        if (timers[id]) {
-
-            clearTimeout(timers[id]);
-
-            delete timers[id];
-
-        }
-
-        const parent =
-            parentFlyout(id);
-
-        if (parent) {
-
-            cancelClose(parent);
-
+            document.body.classList.remove('cn-menu-open');
         }
 
     }
 
 
-    function closeFlyout(id) {
+    /*
+    |--------------------------------------------------------------------------
+    | Explore
+    |--------------------------------------------------------------------------
+    */
 
-        const element =
-            document.getElementById(id);
+    function openExplore() {
 
-        if (!element) return;
+        if (!explorePanel) return;
 
-        element.classList.remove('open');
+        explorePanel.classList.add('show');
+        exploreOverlay.classList.add('show');
 
-        document
-            .querySelectorAll(
-                '[data-opens-flyout="' + id + '"]'
-            )
-            .forEach(function (item) {
+        explorePanel.setAttribute('aria-hidden', 'false');
 
-                item.classList.remove('active');
+        exploreBtn?.setAttribute('aria-expanded', 'true');
 
-            });
-
-        document
-            .querySelectorAll(
-                '[data-parent-flyout="' + id + '"]'
-            )
-            .forEach(function (child) {
-
-                if (child.id) {
-
-                    closeFlyout(child.id);
-
-                }
-
-            });
+        lockBody();
 
     }
 
 
-    function scheduleClose(id) {
+    function closeExplore() {
 
-        if (timers[id]) {
+        if (!explorePanel) return;
 
-            clearTimeout(timers[id]);
+        explorePanel.classList.remove('show');
+        exploreOverlay.classList.remove('show');
 
-        }
+        explorePanel.setAttribute('aria-hidden', 'true');
 
-        timers[id] = setTimeout(function () {
+        exploreBtn?.setAttribute('aria-expanded', 'false');
 
-            closeFlyout(id);
-
-            delete timers[id];
-
-        }, CLOSE_DELAY);
+        unlockBody();
 
     }
 
 
-    function positionFlyout(
-        flyout,
-        trigger,
-        type
-    ) {
+    exploreBtn?.addEventListener('click', function (event) {
 
-        const triggerRect =
-            trigger.getBoundingClientRect();
+        event.preventDefault();
 
-        if (type === 'cat') {
-
-            const panelRect =
-                panel.getBoundingClientRect();
-
-            flyout.style.top =
-                triggerRect.top + 'px';
-
-            flyout.style.left =
-                (panelRect.right + 6) + 'px';
-
-            flyout.style.right = '';
-
+        if (explorePanel.classList.contains('show')) {
+            closeExplore();
         } else {
-
-            const parent =
-                trigger.closest('.cnf-flyout');
-
-            const parentRect =
-                parent
-                    ? parent.getBoundingClientRect()
-                    : triggerRect;
-
-            flyout.style.top =
-                triggerRect.top + 'px';
-
-            flyout.style.left =
-                (parentRect.right + 6) + 'px';
-
-            flyout.style.right = '';
-
+            closeMobile();
+            openExplore();
         }
 
+    });
 
-        requestAnimationFrame(function () {
 
-            const rect =
-                flyout.getBoundingClientRect();
+    exploreClose?.addEventListener('click', closeExplore);
+    exploreOverlay?.addEventListener('click', closeExplore);
 
-            if (rect.right > window.innerWidth - 12) {
 
-                flyout.style.left = '';
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile menu
+    |--------------------------------------------------------------------------
+    */
 
-                flyout.style.right = '12px';
+    function openMobile() {
 
-            }
+        if (!mobilePanel) return;
 
-            if (rect.bottom > window.innerHeight - 12) {
+        mobilePanel.classList.add('show');
+        mobileOverlay.classList.add('show');
 
-                flyout.style.top =
-                    Math.max(
-                        12,
-                        window.innerHeight -
-                        rect.height -
-                        12
-                    ) + 'px';
+        mobilePanel.setAttribute('aria-hidden', 'false');
 
-            }
+        mobileToggle?.setAttribute('aria-expanded', 'true');
+
+        lockBody();
+
+    }
+
+
+    function closeMobile() {
+
+        if (!mobilePanel) return;
+
+        mobilePanel.classList.remove('show');
+        mobileOverlay.classList.remove('show');
+
+        mobilePanel.setAttribute('aria-hidden', 'true');
+
+        mobileToggle?.setAttribute('aria-expanded', 'false');
+
+        unlockBody();
+
+    }
+
+
+    mobileToggle?.addEventListener('click', function () {
+
+        if (mobilePanel.classList.contains('show')) {
+            closeMobile();
+        } else {
+            closeExplore();
+            openMobile();
+        }
+
+    });
+
+
+    mobileClose?.addEventListener('click', closeMobile);
+    mobileOverlay?.addEventListener('click', closeMobile);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Escape key
+    |--------------------------------------------------------------------------
+    */
+
+    document.addEventListener('keydown', function (event) {
+
+        if (event.key !== 'Escape') return;
+
+        closeExplore();
+        closeMobile();
+
+        if (userMenu) {
+            userMenu.classList.remove('show');
+        }
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | User menu
+    |--------------------------------------------------------------------------
+    */
+
+    userBtn?.addEventListener('click', function (event) {
+
+        event.stopPropagation();
+
+        userMenu?.classList.toggle('show');
+
+    });
+
+
+    document.addEventListener('click', function (event) {
+
+        if (
+            userMenu &&
+            !userMenu.contains(event.target) &&
+            !userBtn?.contains(event.target)
+        ) {
+            userMenu.classList.remove('show');
+        }
+
+    });
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop category accordion
+    |--------------------------------------------------------------------------
+    */
+
+    document.querySelectorAll('[data-category-toggle]').forEach(function (button) {
+
+        button.addEventListener('click', function () {
+
+            const item = button.closest('.cn-category-item');
+
+            if (!item) return;
+
+            const wasOpen = item.classList.contains('open');
+
+            document
+                .querySelectorAll('.cn-category-item.open')
+                .forEach(function (openItem) {
+
+                    if (openItem !== item) {
+                        openItem.classList.remove('open');
+
+                        openItem
+                            .querySelectorAll('.cn-subcategory-item.open')
+                            .forEach(function (subItem) {
+                                subItem.classList.remove('open');
+                            });
+                    }
+
+                });
+
+            item.classList.toggle('open', !wasOpen);
 
         });
 
-    }
+    });
 
 
-    window.cnfHoverOpen =
-        function (flyoutId, trigger, type) {
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop subcategory accordion
+    |--------------------------------------------------------------------------
+    */
 
-            cancelClose(flyoutId);
+    document.querySelectorAll('[data-subcategory-toggle]').forEach(function (button) {
 
-            const flyout =
-                document.getElementById(flyoutId);
+        button.addEventListener('click', function (event) {
 
-            if (!flyout) return;
+            event.preventDefault();
+            event.stopPropagation();
 
-            document
-                .querySelectorAll('.cnf-flyout.open')
-                .forEach(function (item) {
+            const item = button.closest('.cn-subcategory-item');
 
-                    if (
-                        item.id !== flyoutId &&
-                        (
-                            type === 'cat' ||
-                            item.dataset.parentFlyout ===
-                            flyout.dataset.parentFlyout
-                        )
-                    ) {
+            if (!item) return;
 
-                        closeFlyout(item.id);
+            const wasOpen = item.classList.contains('open');
 
+            item
+                .closest('.cn-category-submenu')
+                ?.querySelectorAll('.cn-subcategory-item.open')
+                .forEach(function (openItem) {
+
+                    if (openItem !== item) {
+                        openItem.classList.remove('open');
                     }
 
                 });
 
-            positionFlyout(
-                flyout,
-                trigger,
-                type
-            );
+            item.classList.toggle('open', !wasOpen);
 
-            flyout.classList.add('open');
+        });
 
-            trigger.classList.add('active');
-
-        };
+    });
 
 
-    window.cnfHoverClose =
-        function (flyoutId) {
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile main sections
+    |--------------------------------------------------------------------------
+    */
 
-            scheduleClose(flyoutId);
+    document.querySelectorAll('[data-mobile-section]').forEach(function (button) {
 
-        };
+        button.addEventListener('click', function () {
 
+            const section = button.closest('.cn-mobile-section');
 
-    window.cnfCancelClose =
-        function (flyoutId) {
+            if (!section) return;
 
-            cancelClose(flyoutId);
-
-        };
-
-
-    window.cnfOpenOffcanvas =
-        function () {
-
-            overlay.classList.add('open');
-
-            panel.classList.add('open');
-
-            document.body.classList.add(
-                'cn-menu-open'
-            );
-
-            const trigger =
-                document.getElementById(
-                    'cnfExploreBtn'
-                );
-
-            if (trigger) {
-
-                trigger.setAttribute(
-                    'aria-expanded',
-                    'true'
-                );
-
-            }
-
-        };
-
-
-    window.cnfCloseOffcanvas =
-        function () {
-
-            overlay.classList.remove('open');
-
-            panel.classList.remove('open');
-
-            document.body.classList.remove(
-                'cn-menu-open'
-            );
+            const wasOpen = section.classList.contains('open');
 
             document
-                .querySelectorAll(
-                    '.cnf-flyout.open'
-                )
-                .forEach(function (item) {
+                .querySelectorAll('.cn-mobile-section.open')
+                .forEach(function (openSection) {
 
-                    closeFlyout(item.id);
-
-                });
-
-            const trigger =
-                document.getElementById(
-                    'cnfExploreBtn'
-                );
-
-            if (trigger) {
-
-                trigger.setAttribute(
-                    'aria-expanded',
-                    'false'
-                );
-
-            }
-
-        };
-
-
-    window.cnfToggleCat =
-        function (event, catId) {
-
-            const flyoutId =
-                'cnf-subflyout-' + catId;
-
-            const flyout =
-                document.getElementById(flyoutId);
-
-            if (!flyout) return;
-
-            if (flyout.classList.contains('open')) {
-
-                closeFlyout(flyoutId);
-
-                return;
-
-            }
-
-            document
-                .querySelectorAll(
-                    '.cnf-sub-flyout.open'
-                )
-                .forEach(function (item) {
-
-                    if (item.id !== flyoutId) {
-
-                        closeFlyout(item.id);
-
+                    if (openSection !== section) {
+                        openSection.classList.remove('open');
                     }
 
                 });
 
-            positionFlyout(
-                flyout,
-                event.currentTarget,
-                'cat'
-            );
+            section.classList.toggle('open', !wasOpen);
 
-            flyout.classList.add('open');
+        });
 
-            event.currentTarget.classList.add(
-                'active'
-            );
-
-        };
+    });
 
 
-    window.cnfToggleSub =
-        function (event, subId) {
+    /*
+    |--------------------------------------------------------------------------
+    | Mobile categories
+    |--------------------------------------------------------------------------
+    */
 
-            const flyoutId =
-                'cnf-flyout-' + subId;
+    document.querySelectorAll('[data-mobile-category]').forEach(function (button) {
 
-            const flyout =
-                document.getElementById(flyoutId);
+        button.addEventListener('click', function () {
 
-            if (!flyout) return;
+            const category = button.closest('.cn-mobile-category');
 
-            if (flyout.classList.contains('open')) {
+            if (!category) return;
 
-                closeFlyout(flyoutId);
+            const wasOpen = category.classList.contains('open');
 
-                return;
+            category
+                .parentElement
+                ?.querySelectorAll('.cn-mobile-category.open')
+                .forEach(function (openCategory) {
 
-            }
+                    if (openCategory !== category) {
+                        openCategory.classList.remove('open');
+                    }
 
-            const parent =
-                event.currentTarget.closest(
-                    '.cnf-flyout'
-                );
+                });
 
-            if (parent) {
+            category.classList.toggle('open', !wasOpen);
 
-                document
-                    .querySelectorAll(
-                        '[data-parent-flyout="' +
-                        parent.id +
-                        '"].open'
-                    )
-                    .forEach(function (item) {
+        });
 
-                        if (item.id !== flyoutId) {
-
-                            closeFlyout(item.id);
-
-                        }
-
-                    });
-
-            }
-
-            positionFlyout(
-                flyout,
-                event.currentTarget,
-                'sub'
-            );
-
-            flyout.classList.add('open');
-
-            event.currentTarget.classList.add(
-                'active'
-            );
-
-        };
+    });
 
 
-    overlay.addEventListener(
-        'click',
-        window.cnfCloseOffcanvas
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | Close mobile menu when clicking a link
+    |--------------------------------------------------------------------------
+    */
+
+    mobilePanel?.querySelectorAll('a').forEach(function (link) {
+
+        link.addEventListener('click', function () {
+            closeMobile();
+        });
+
+    });
 
 
-    document.addEventListener(
-        'keydown',
-        function (event) {
+    /*
+    |--------------------------------------------------------------------------
+    | Resize
+    |--------------------------------------------------------------------------
+    */
 
-            if (event.key === 'Escape') {
+    window.addEventListener('resize', function () {
 
-                window.cnfCloseOffcanvas();
-
-            }
-
+        if (window.innerWidth >= 992) {
+            closeMobile();
         }
-    );
 
-})();
+    });
 
+});
 </script>

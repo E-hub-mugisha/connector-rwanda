@@ -8,174 +8,618 @@ use App\Models\ServiceCategory;
 use App\Models\ServiceSubCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class BlogController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Blog listing
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $blogs = Blogs::all();
-        return view('admin.blogs.index', compact('blogs'));
+        $query = Blogs::query()
+            ->with(['category', 'subcategory', 'user'])
+            ->latest();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%')
+                    ->orWhere('slug', 'like', '%' . $search . '%');
+
+            });
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Status
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('status')) {
+
+            $query->where(
+                'status',
+                $request->status
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Category
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('category')) {
+
+            $query->where(
+                'service_category_id',
+                $request->category
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Featured
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('featured')) {
+
+            $query->where(
+                'featured',
+                $request->featured
+            );
+        }
+
+
+        $blogs = $query->paginate(15)->withQueryString();
+
+        $categories = ServiceCategory::orderBy('name')->get();
+
+
+        return view(
+            'admin.blogs.index',
+            compact(
+                'blogs',
+                'categories'
+            )
+        );
     }
 
+
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Create
      */
     public function create()
     {
-        //
         $categories = ServiceCategory::all();
+
         $subcategory = ServiceSubCategory::all();
-        return view('admin.blogs.create', compact('categories','subcategory'));
+
+        return view(
+            'admin.blogs.create',
+            compact(
+                'categories',
+                'subcategory'
+            )
+        );
     }
 
+
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Store
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
-            'title' => 'required',
-            'blog_category' => 'required',
-            'content' => 'required',
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'service_category_id' => [
+                'required',
+                'exists:service_categories,id',
+            ],
+
+            'service_sub_category_id' => [
+                'nullable',
+                'exists:service_sub_categories,id',
+            ],
+
+            'content' => [
+                'required',
+                'string',
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
+
+            'thumbnail' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
+
+            'status' => [
+                'nullable',
+                'in:pending,approved,rejected',
+            ],
         ]);
 
-        $blog = new Blogs();
-        $slugTitle = Str::slug($request->input("title"));
-        $blog->slug = $slugTitle;
-        $blog->title = $request->input('title');
-        $blog->author_id = Auth::user()->id;
-        $blog->blog_category = $request->input('blog_category');
-        $blog->sub_category = $request->input('sub_category');
-        $blog->content = $request->input('content');
-        $blog->featured = $request->input('featured');
-        $blog->status = $request->input('status');
 
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/blog/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $blog['image'] = "$profileImage";
+        $blog = new Blogs();
+
+        $blog->title = $validated['title'];
+
+        $blog->slug = $this->generateUniqueSlug(
+            $validated['title']
+        );
+
+        $blog->content = $validated['content'];
+
+        $blog->user_id = Auth::id();
+
+        $blog->service_category_id =
+            $validated['service_category_id'];
+
+        $blog->service_sub_category_id =
+            $validated['service_sub_category_id'] ?? null;
+
+        $blog->status =
+            $validated['status'] ?? 'pending';
+
+        $blog->featured =
+            $request->boolean('featured');
+
+        $blog->views = 0;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Main image
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('image')) {
+
+            $destinationPath = public_path('image/blog');
+
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory(
+                    $destinationPath,
+                    0755,
+                    true
+                );
+            }
+
+            $image = $request->file('image');
+
+            $imageName =
+                time() .
+                '_' .
+                Str::random(8) .
+                '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                $destinationPath,
+                $imageName
+            );
+
+            $blog->image = $imageName;
         }
-        if ($thumbnail = $request->file('thumbnail')) {
-            $destinationPath = 'thumbnail/blog/';
-            $profileThumbnail = date('YmdHis') . "." . $thumbnail->getClientOriginalExtension();
-            $thumbnail->move($destinationPath, $profileThumbnail);
-            $blog['thumbnail'] = "$profileThumbnail";
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Thumbnail
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('thumbnail')) {
+
+            $destinationPath =
+                public_path('thumbnail/blog');
+
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory(
+                    $destinationPath,
+                    0755,
+                    true
+                );
+            }
+
+            $thumbnail =
+                $request->file('thumbnail');
+
+            $thumbnailName =
+                time() .
+                '_' .
+                Str::random(8) .
+                '.' .
+                $thumbnail->getClientOriginalExtension();
+
+            $thumbnail->move(
+                $destinationPath,
+                $thumbnailName
+            );
+
+            $blog->thumbnail = $thumbnailName;
         }
+
 
         $blog->save();
-        session()->flash('message', 'blog saved');
-        return redirect()->route('admin.blogs');
+
+
+        return redirect()
+            ->route('admin.blogs')
+            ->with(
+                'message',
+                'Article created successfully.'
+            );
     }
 
+
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Show
      */
     public function show($slug)
     {
-        //
-        $blog = Blogs::where('slug', $slug)->first();
-        return view('admin.blogs.show', compact('blog'));
+        $blog = Blogs::with([
+            'category',
+            'subcategory',
+            'user',
+            'comments'
+        ])
+        ->where('slug', $slug)
+        ->firstOrFail();
+
+
+        return view(
+            'admin.blogs.show',
+            compact('blog')
+        );
     }
 
+
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Edit
      */
     public function edit($id)
     {
-        //
-        $categories = ServiceCategory::all();
-        $subcategory = ServiceSubCategory::all();
         $blog = Blogs::findOrFail($id);
-        return view('admin.blogs.edit', compact('categories', 'blog','subcategory'));
+
+        $categories =
+            ServiceCategory::all();
+
+        $subcategory =
+            ServiceSubCategory::all();
+
+
+        return view(
+            'admin.blogs.edit',
+            compact(
+                'categories',
+                'blog',
+                'subcategory'
+            )
+        );
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-        $blog = Blogs::find($id);
 
-        $request->validate([
-            'title' => 'required',
-            'blog_category' => 'required',
-            'content' => 'required',
+    /**
+     * Update
+     */
+    public function update(
+        Request $request,
+        $id
+    ) {
+
+        $blog = Blogs::findOrFail($id);
+
+
+        $validated = $request->validate([
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'service_category_id' => [
+                'required',
+                'exists:service_categories,id',
+            ],
+
+            'service_sub_category_id' => [
+                'nullable',
+                'exists:service_sub_categories,id',
+            ],
+
+            'content' => [
+                'required',
+                'string',
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
+
+            'thumbnail' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
+
+            'status' => [
+                'nullable',
+                'in:pending,approved,rejected',
+            ],
         ]);
 
-        $slugTitle = Str::slug($request->input("title"));
-        $blog->slug = $slugTitle;
-        $blog->title = $request->input('title');
-        $blog->author_id = Auth::user()->id;
-        $blog->blog_category = $request->input('blog_category');
-        $blog->sub_category = $request->input('sub_category');
-        $blog->content = $request->input('content');
-        $blog->featured = $request->input('featured');
-        $blog->status = $request->input('status');
 
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/blog/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $blog['image'] = "$profileImage";
-        }
-        if ($thumbnail = $request->file('thumbnail')) {
-            $destinationPath = 'thumbnail/blog/';
-            $profileThumbnail = date('YmdHis') . "." . $thumbnail->getClientOriginalExtension();
-            $thumbnail->move($destinationPath, $profileThumbnail);
-            $blog['thumbnail'] = "$profileThumbnail";
+        $blog->title =
+            $validated['title'];
+
+        $blog->slug =
+            $this->generateUniqueSlug(
+                $validated['title'],
+                $blog->id
+            );
+
+        $blog->content =
+            $validated['content'];
+
+        $blog->service_category_id =
+            $validated['service_category_id'];
+
+        $blog->service_sub_category_id =
+            $validated['service_sub_category_id'] ?? null;
+
+        $blog->status =
+            $validated['status'] ?? $blog->status;
+
+        $blog->featured =
+            $request->boolean('featured');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Replace main image
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('image')) {
+
+            $destinationPath =
+                public_path('image/blog');
+
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory(
+                    $destinationPath,
+                    0755,
+                    true
+                );
+            }
+
+            $image =
+                $request->file('image');
+
+            $imageName =
+                time() .
+                '_' .
+                Str::random(8) .
+                '.' .
+                $image->getClientOriginalExtension();
+
+            $image->move(
+                $destinationPath,
+                $imageName
+            );
+
+            if (
+                $blog->image &&
+                File::exists(
+                    $destinationPath . '/' . $blog->image
+                )
+            ) {
+                File::delete(
+                    $destinationPath . '/' . $blog->image
+                );
+            }
+
+            $blog->image = $imageName;
         }
 
-        $blog->update();
-        session()->flash('message', 'blog updated');
-        return redirect()->route('admin.blogs');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Replace thumbnail
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('thumbnail')) {
+
+            $destinationPath =
+                public_path('thumbnail/blog');
+
+            if (!File::exists($destinationPath)) {
+                File::makeDirectory(
+                    $destinationPath,
+                    0755,
+                    true
+                );
+            }
+
+            $thumbnail =
+                $request->file('thumbnail');
+
+            $thumbnailName =
+                time() .
+                '_' .
+                Str::random(8) .
+                '.' .
+                $thumbnail->getClientOriginalExtension();
+
+            $thumbnail->move(
+                $destinationPath,
+                $thumbnailName
+            );
+
+            if (
+                $blog->thumbnail &&
+                File::exists(
+                    $destinationPath . '/' . $blog->thumbnail
+                )
+            ) {
+                File::delete(
+                    $destinationPath . '/' . $blog->thumbnail
+                );
+            }
+
+            $blog->thumbnail =
+                $thumbnailName;
+        }
+
+
+        $blog->save();
+
+
+        return redirect()
+            ->route('admin.blogs')
+            ->with(
+                'message',
+                'Article updated successfully.'
+            );
     }
 
+
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Approve
      */
     public function approveBlog($id)
     {
-        //
-        $data = Blogs::findOrFail($id);
-        $data->status = "approved";
-        $data->save();
-        Session()->flash('message', 'blogs has been approved Successfully!');
-        return redirect()->route('admin.blogs');
+        $blog = Blogs::findOrFail($id);
+
+        $blog->status = 'approved';
+
+        $blog->save();
+
+
+        return redirect()
+            ->route('admin.blogs')
+            ->with(
+                'message',
+                'Article approved successfully.'
+            );
     }
+
+
+    /**
+     * Delete
+     */
     public function destroy($id)
     {
-        //
-        $data = Blogs::findOrFail($id);
-        $data->delete();
-        Session()->flash('message', 'blogs has been deleted Successfully!');
-        return redirect()->route('admin.blogs');
+        $blog = Blogs::findOrFail($id);
+
+
+        if ($blog->image) {
+
+            $imagePath =
+                public_path(
+                    'image/blog/' . $blog->image
+                );
+
+            if (File::exists($imagePath)) {
+                File::delete($imagePath);
+            }
+        }
+
+
+        if ($blog->thumbnail) {
+
+            $thumbnailPath =
+                public_path(
+                    'thumbnail/blog/' . $blog->thumbnail
+                );
+
+            if (File::exists($thumbnailPath)) {
+                File::delete($thumbnailPath);
+            }
+        }
+
+
+        $blog->delete();
+
+
+        return redirect()
+            ->route('admin.blogs')
+            ->with(
+                'message',
+                'Article deleted successfully.'
+            );
+    }
+
+
+    /**
+     * Generate unique slug
+     */
+    private function generateUniqueSlug(
+        string $title,
+        $ignoreId = null
+    ) {
+
+        $slug = Str::slug($title);
+
+        $originalSlug = $slug;
+
+        $counter = 1;
+
+
+        while (
+            Blogs::where('slug', $slug)
+                ->when(
+                    $ignoreId,
+                    function ($query) use ($ignoreId) {
+                        $query->where('id', '!=', $ignoreId);
+                    }
+                )
+                ->exists()
+        ) {
+
+            $slug =
+                $originalSlug .
+                '-' .
+                $counter++;
+
+        }
+
+
+        return $slug;
     }
 }

@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Add Service Provider')
+@section('title', 'Edit Service Provider')
 
 @push('styles')
 
 <style>
+
     :root {
         --connector-primary: #254035;
         --connector-accent: #6B9080;
@@ -13,15 +14,17 @@
         --connector-border: #dfe8e4;
         --connector-muted: #71807a;
         --connector-danger: #c0392b;
+        --connector-warning: #b7791f;
+        --connector-success: #2e7d5b;
     }
 
-    .provider-create-page {
+    .provider-edit-page {
         min-height: calc(100vh - 70px);
         background: var(--connector-bg);
         padding: 28px 0 50px;
     }
 
-    .provider-create-container {
+    .provider-edit-container {
         max-width: 1250px;
     }
 
@@ -59,7 +62,7 @@
         margin: 0;
     }
 
-    /* Main card */
+    /* Card */
 
     .form-card {
         background: #fff;
@@ -77,6 +80,8 @@
     .form-section:last-child {
         border-bottom: 0;
     }
+
+    /* Section */
 
     .section-header {
         display: flex;
@@ -160,39 +165,6 @@
         font-size: 12px;
     }
 
-    /* Image */
-
-    .image-upload-box {
-        border: 1px dashed #b9cbc3;
-        border-radius: 14px;
-        padding: 20px;
-        background: #fafcfb;
-    }
-
-    .image-preview {
-        width: 105px;
-        height: 105px;
-        border-radius: 15px;
-        object-fit: cover;
-        background: var(--connector-light);
-        border: 1px solid var(--connector-border);
-        display: block;
-        margin-bottom: 14px;
-    }
-
-    .upload-title {
-        color: var(--connector-primary);
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-
-    .upload-description {
-        color: var(--connector-muted);
-        font-size: 11px;
-        margin-bottom: 12px;
-    }
-
     /* Password */
 
     .password-wrapper {
@@ -216,6 +188,116 @@
 
     .password-toggle:hover {
         color: var(--connector-primary);
+    }
+
+    /* Image */
+
+    .image-upload-box {
+        border: 1px dashed #b9cbc3;
+        border-radius: 14px;
+        padding: 20px;
+        background: #fafcfb;
+    }
+
+    .image-preview-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .image-preview {
+        width: 110px;
+        height: 110px;
+        border-radius: 15px;
+        object-fit: cover;
+        background: var(--connector-light);
+        border: 1px solid var(--connector-border);
+        display: block;
+    }
+
+    .image-current-title {
+        color: var(--connector-primary);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .image-current-text {
+        color: var(--connector-muted);
+        font-size: 11px;
+        line-height: 1.6;
+    }
+
+    .upload-title {
+        color: var(--connector-primary);
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .upload-description {
+        color: var(--connector-muted);
+        font-size: 11px;
+        margin-bottom: 12px;
+    }
+
+    /* Status */
+
+    .status-card {
+        border: 1px solid var(--connector-border);
+        border-radius: 13px;
+        padding: 16px;
+        background: #fafcfb;
+    }
+
+    .status-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-option .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin-top: 0;
+        cursor: pointer;
+    }
+
+    .status-option label {
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--connector-primary);
+    }
+
+    .status-description {
+        color: var(--connector-muted);
+        font-size: 11px;
+        margin-top: 5px;
+        margin-left: 28px;
+    }
+
+    /* Account info */
+
+    .account-meta {
+        background: var(--connector-light);
+        border: 1px solid #dce9e3;
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+
+    .account-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: var(--connector-primary);
+        font-size: 12px;
+    }
+
+    .account-meta-item i {
+        color: var(--connector-accent);
+        font-size: 17px;
     }
 
     /* Notice */
@@ -243,7 +325,18 @@
         padding: 20px 25px;
         background: #fafcfb;
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .footer-left {
+        color: var(--connector-muted);
+        font-size: 11px;
+    }
+
+    .footer-actions {
+        display: flex;
         gap: 10px;
     }
 
@@ -285,11 +378,11 @@
         font-size: 13px;
     }
 
-    /* Mobile */
+    /* Responsive */
 
     @media (max-width: 767px) {
 
-        .provider-create-page {
+        .provider-edit-page {
             padding: 18px 0 35px;
         }
 
@@ -298,18 +391,29 @@
         }
 
         .form-footer {
-            padding: 17px 20px;
-            flex-direction: column-reverse;
+            flex-direction: column;
+            align-items: stretch;
         }
 
-        .form-footer .btn {
+        .footer-actions {
+            flex-direction: column;
+        }
+
+        .footer-actions .btn {
             width: 100%;
         }
 
         .page-header h1 {
             font-size: 23px;
         }
+
+        .image-preview-wrapper {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
     }
+
 </style>
 
 @endpush
@@ -317,31 +421,29 @@
 
 @section('content')
 
-<div class="provider-create-page">
+<div class="provider-edit-page">
 
-    <div class="container-fluid provider-create-container">
+    <div class="container-fluid provider-edit-container">
 
-
-        {{-- =========================================================
-             PAGE HEADER
-        ========================================================== --}}
+        {{-- Page Header --}}
 
         <div class="page-header">
 
             <a
-                href="{{ route('admin.service_providers') }}"
+                href="{{ route('admin.ShowServiceProviders', $provider->id) }}"
                 class="back-link"
             >
                 <i class="mdi mdi-arrow-left"></i>
-                Back to Service Providers
+                Back to Provider Profile
             </a>
 
             <h1>
-                Add Service Provider
+                Edit Service Provider
             </h1>
 
             <p>
-                Create a professional service provider profile and account.
+                Update the provider's account, professional information,
+                profile image and status.
             </p>
 
         </div>
@@ -374,25 +476,36 @@
         @endif
 
 
-        {{-- =========================================================
-             FORM
-        ========================================================== --}}
+        {{-- Success Message --}}
+
+        @if(session('message'))
+
+            <div class="alert alert-success validation-alert mb-4">
+
+                <i class="mdi mdi-check-circle-outline me-1"></i>
+
+                {{ session('message') }}
+
+            </div>
+
+        @endif
+
 
         <form
-            action="{{ route('admin.StoreServiceProvider') }}"
+            action="{{ route('admin.UpdateServiceProvider', $provider->id) }}"
             method="POST"
             enctype="multipart/form-data"
         >
 
             @csrf
 
+            @method('PUT')
+
 
             <div class="form-card">
 
 
-                {{-- =================================================
-                     ACCOUNT INFORMATION
-                ================================================== --}}
+                {{-- ACCOUNT INFORMATION --}}
 
                 <div class="form-section">
 
@@ -409,7 +522,7 @@
                             </h3>
 
                             <p>
-                                Login information for the service provider
+                                Update the provider's login information
                             </p>
 
                         </div>
@@ -431,7 +544,7 @@
                             <input
                                 type="text"
                                 name="name"
-                                value="{{ old('name') }}"
+                                value="{{ old('name', $provider->user?->name) }}"
                                 class="form-control @error('name') is-invalid @enderror"
                                 placeholder="Enter provider's full name"
                                 required
@@ -460,7 +573,7 @@
                             <input
                                 type="email"
                                 name="email"
-                                value="{{ old('email') }}"
+                                value="{{ old('email', $provider->user?->email) }}"
                                 class="form-control @error('email') is-invalid @enderror"
                                 placeholder="provider@example.com"
                                 required
@@ -482,8 +595,7 @@
                         <div class="col-md-6">
 
                             <label class="form-label">
-                                Password
-                                <span class="required">*</span>
+                                New Password
                             </label>
 
                             <div class="password-wrapper">
@@ -493,8 +605,8 @@
                                     name="password"
                                     id="password"
                                     class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Minimum 8 characters"
-                                    required
+                                    placeholder="Leave blank to keep current password"
+                                    autocomplete="new-password"
                                 >
 
                                 <button
@@ -502,9 +614,16 @@
                                     class="password-toggle"
                                     onclick="togglePassword('password', this)"
                                 >
+
                                     <i class="mdi mdi-eye-outline"></i>
+
                                 </button>
 
+                            </div>
+
+                            <div class="form-text">
+                                Leave this field empty if you do not want to
+                                change the password.
                             </div>
 
                             @error('password')
@@ -523,8 +642,7 @@
                         <div class="col-md-6">
 
                             <label class="form-label">
-                                Confirm Password
-                                <span class="required">*</span>
+                                Confirm New Password
                             </label>
 
                             <div class="password-wrapper">
@@ -534,8 +652,8 @@
                                     name="password_confirmation"
                                     id="password_confirmation"
                                     class="form-control"
-                                    placeholder="Repeat password"
-                                    required
+                                    placeholder="Repeat new password"
+                                    autocomplete="new-password"
                                 >
 
                                 <button
@@ -543,8 +661,78 @@
                                     class="password-toggle"
                                     onclick="togglePassword('password_confirmation', this)"
                                 >
+
                                     <i class="mdi mdi-eye-outline"></i>
+
                                 </button>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- Account metadata --}}
+
+                        <div class="col-12">
+
+                            <div class="account-meta">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+
+                                        <div class="account-meta-item">
+
+                                            <i class="mdi mdi-account-badge-outline"></i>
+
+                                            <span>
+                                                Account Type:
+                                                <strong>
+                                                    SVP
+                                                </strong>
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="account-meta-item">
+
+                                            <i class="mdi mdi-identifier"></i>
+
+                                            <span>
+                                                Provider ID:
+                                                <strong>
+                                                    #{{ $provider->id }}
+                                                </strong>
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="account-meta-item">
+
+                                            <i class="mdi mdi-calendar-outline"></i>
+
+                                            <span>
+                                                Created:
+                                                <strong>
+                                                    {{ $provider->created_at?->format('d M Y') }}
+                                                </strong>
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
 
                             </div>
 
@@ -555,9 +743,7 @@
                 </div>
 
 
-                {{-- =================================================
-                     PROFESSIONAL INFORMATION
-                ================================================== --}}
+                {{-- PROFESSIONAL INFORMATION --}}
 
                 <div class="form-section">
 
@@ -574,7 +760,7 @@
                             </h3>
 
                             <p>
-                                Define the provider's professional profile
+                                Update the provider's professional profile
                             </p>
 
                         </div>
@@ -583,6 +769,7 @@
 
 
                     <div class="row g-4">
+
 
                         {{-- Category --}}
 
@@ -606,7 +793,10 @@
                                     <option
                                         value="{{ $category->id }}"
                                         @selected(
-                                            old('service_category_id') == $category->id
+                                            old(
+                                                'service_category_id',
+                                                $provider->service_category_id
+                                            ) == $category->id
                                         )
                                     >
                                         {{ $category->name }}
@@ -638,7 +828,10 @@
                             <input
                                 type="text"
                                 name="service_locations"
-                                value="{{ old('service_locations') }}"
+                                value="{{ old(
+                                    'service_locations',
+                                    $provider->service_locations
+                                ) }}"
                                 class="form-control @error('service_locations') is-invalid @enderror"
                                 placeholder="e.g. Kigali, Gasabo"
                             >
@@ -666,10 +859,11 @@
                                 name="skills"
                                 class="form-control @error('skills') is-invalid @enderror"
                                 placeholder="e.g. Plumbing, pipe installation, maintenance"
-                            >{{ old('skills') }}</textarea>
+                            >{{ old('skills', $provider->skills) }}</textarea>
 
                             <div class="form-text">
-                                Separate multiple skills using commas, semicolons, or new lines.
+                                Separate multiple skills using commas,
+                                semicolons, or new lines.
                             </div>
 
                             @error('skills')
@@ -695,7 +889,10 @@
                                 name="qualification"
                                 class="form-control @error('qualification') is-invalid @enderror"
                                 placeholder="Education, certifications, licenses..."
-                            >{{ old('qualification') }}</textarea>
+                            >{{ old(
+                                'qualification',
+                                $provider->qualification
+                            ) }}</textarea>
 
                             @error('qualification')
 
@@ -720,7 +917,10 @@
                                 name="experience"
                                 class="form-control @error('experience') is-invalid @enderror"
                                 placeholder="Describe professional experience..."
-                            >{{ old('experience') }}</textarea>
+                            >{{ old(
+                                'experience',
+                                $provider->experience
+                            ) }}</textarea>
 
                             @error('experience')
 
@@ -746,7 +946,10 @@
                                 class="form-control @error('about') is-invalid @enderror"
                                 rows="6"
                                 placeholder="Write a professional description of the provider..."
-                            >{{ old('about') }}</textarea>
+                            >{{ old(
+                                'about',
+                                $provider->about
+                            ) }}</textarea>
 
                             @error('about')
 
@@ -763,9 +966,7 @@
                 </div>
 
 
-                {{-- =================================================
-                     PROFILE IMAGE
-                ================================================== --}}
+                {{-- PROFILE IMAGE --}}
 
                 <div class="form-section">
 
@@ -782,7 +983,7 @@
                             </h3>
 
                             <p>
-                                Add a professional image for the provider profile
+                                Update the provider's profile image
                             </p>
 
                         </div>
@@ -792,20 +993,69 @@
 
                     <div class="image-upload-box">
 
-                        <img
-                            src="{{ asset('assets/images/sproviders/avatar.jpg') }}"
-                            id="imagePreview"
-                            class="image-preview"
-                            alt="Provider preview"
-                        >
+
+                        <div class="image-preview-wrapper">
+
+                            @php
+
+                                $currentImage =
+                                    $provider->image &&
+                                    file_exists(
+                                        public_path(
+                                            'image/profile/' .
+                                            $provider->image
+                                        )
+                                    )
+                                    ? asset(
+                                        'image/profile/' .
+                                        $provider->image
+                                    )
+                                    : asset(
+                                        'assets/images/sproviders/avatar.jpg'
+                                    );
+
+                            @endphp
+
+
+                            <img
+                                src="{{ $currentImage }}"
+                                id="imagePreview"
+                                class="image-preview"
+                                alt="Provider profile image"
+                            >
+
+
+                            <div>
+
+                                <div class="image-current-title">
+                                    Current Profile Image
+                                </div>
+
+                                <div class="image-current-text">
+
+                                    Select a new image below to replace
+                                    the current profile photo.
+
+                                    <br>
+
+                                    JPG, JPEG or PNG.
+                                    Maximum size: 2MB.
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
 
                         <div class="upload-title">
-                            Provider Profile Photo
+                            Replace Profile Photo
                         </div>
 
                         <div class="upload-description">
-                            JPG, JPEG or PNG. Maximum file size: 2MB.
+                            Choose a professional image for the provider.
                         </div>
+
 
                         <input
                             type="file"
@@ -815,6 +1065,7 @@
                             accept=".jpg,.jpeg,.png,image/jpeg,image/png"
                             onchange="previewImage(this)"
                         >
+
 
                         @error('image')
 
@@ -829,9 +1080,144 @@
                 </div>
 
 
-                {{-- =================================================
-                     ACCOUNT NOTICE
-                ================================================== --}}
+                {{-- STATUS --}}
+
+                <div class="form-section">
+
+                    <div class="section-header">
+
+                        <div class="section-icon">
+                            <i class="mdi mdi-shield-check-outline"></i>
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Provider Status
+                            </h3>
+
+                            <p>
+                                Control the provider's availability on
+                                the platform
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="status-card">
+
+                        <div class="row g-4">
+
+
+                            {{-- Pending --}}
+
+                            <div class="col-md-4">
+
+                                <div class="status-option">
+
+                                    <input
+                                        type="radio"
+                                        name="status"
+                                        id="statusPending"
+                                        value="pending"
+                                        class="form-check-input"
+                                        @checked(
+                                            old(
+                                                'status',
+                                                $provider->status
+                                            ) === 'pending'
+                                        )
+                                    >
+
+                                    <label for="statusPending">
+                                        Pending
+                                    </label>
+
+                                </div>
+
+                                <div class="status-description">
+                                    Provider is awaiting approval.
+                                </div>
+
+                            </div>
+
+
+                            {{-- Approved --}}
+
+                            <div class="col-md-4">
+
+                                <div class="status-option">
+
+                                    <input
+                                        type="radio"
+                                        name="status"
+                                        id="statusApproved"
+                                        value="approved"
+                                        class="form-check-input"
+                                        @checked(
+                                            old(
+                                                'status',
+                                                $provider->status
+                                            ) === 'approved'
+                                        )
+                                    >
+
+                                    <label for="statusApproved">
+                                        Approved
+                                    </label>
+
+                                </div>
+
+                                <div class="status-description">
+                                    Provider can operate on the platform.
+                                </div>
+
+                            </div>
+
+
+                            {{-- Rejected --}}
+
+                            <div class="col-md-4">
+
+                                <div class="status-option">
+
+                                    <input
+                                        type="radio"
+                                        name="status"
+                                        id="statusRejected"
+                                        value="rejected"
+                                        class="form-check-input"
+                                        @checked(
+                                            old(
+                                                'status',
+                                                $provider->status
+                                            ) === 'rejected'
+                                        )
+                                    >
+
+                                    <label for="statusRejected">
+                                        Rejected
+                                    </label>
+
+                                </div>
+
+                                <div class="status-description">
+                                    Provider has been rejected.
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- NOTICE --}}
 
                 <div class="form-section">
 
@@ -842,17 +1228,15 @@
                         <div>
 
                             <strong>
-                                Provider account status
+                                Account information
                             </strong>
 
                             <br>
 
-                            New service providers are created with
-                            <strong>Pending</strong> status and assigned the
-                            <strong>SVP</strong> account type.
-
-                            The provider can then be reviewed and approved
-                            from the administration area.
+                            This profile is linked to the provider's
+                            <strong>SVP</strong> user account.
+                            Changing the email or password will update
+                            the provider's login credentials.
 
                         </div>
 
@@ -861,32 +1245,49 @@
                 </div>
 
 
-                {{-- =================================================
-                     FOOTER
-                ================================================== --}}
+                {{-- FOOTER --}}
 
                 <div class="form-footer">
 
-                    <a
-                        href="{{ route('admin.service_providers') }}"
-                        class="btn btn-cancel"
-                    >
-                        Cancel
-                    </a>
+                    <div class="footer-left">
+
+                        Last updated:
+
+                        <strong>
+                            {{ $provider->updated_at?->format('d M Y, H:i') }}
+                        </strong>
+
+                    </div>
 
 
-                    <button
-                        type="submit"
-                        class="btn btn-submit"
-                    >
+                    <div class="footer-actions">
 
-                        <i class="mdi mdi-account-plus-outline me-1"></i>
+                        <a
+                            href="{{ route(
+                                'admin.ShowServiceProviders',
+                                $provider->id
+                            ) }}"
+                            class="btn btn-cancel"
+                        >
+                            Cancel
+                        </a>
 
-                        Create Service Provider
 
-                    </button>
+                        <button
+                            type="submit"
+                            class="btn btn-submit"
+                        >
+
+                            <i class="mdi mdi-content-save-outline me-1"></i>
+
+                            Save Changes
+
+                        </button>
+
+                    </div>
 
                 </div>
+
 
             </div>
 
@@ -900,52 +1301,87 @@
 @push('scripts')
 
 <script>
+
     function togglePassword(inputId, button) {
 
-        const input = document.getElementById(inputId);
-        const icon = button.querySelector('i');
+        const input =
+            document.getElementById(inputId);
+
+        const icon =
+            button.querySelector('i');
+
 
         if (input.type === 'password') {
 
             input.type = 'text';
 
-            icon.classList.remove('mdi-eye-outline');
-            icon.classList.add('mdi-eye-off-outline');
+            icon.classList.remove(
+                'mdi-eye-outline'
+            );
+
+            icon.classList.add(
+                'mdi-eye-off-outline'
+            );
 
         } else {
 
             input.type = 'password';
 
-            icon.classList.remove('mdi-eye-off-outline');
-            icon.classList.add('mdi-eye-outline');
+            icon.classList.remove(
+                'mdi-eye-off-outline'
+            );
+
+            icon.classList.add(
+                'mdi-eye-outline'
+            );
+
         }
+
     }
 
 
     function previewImage(input) {
 
-        const preview = document.getElementById('imagePreview');
+        const preview =
+            document.getElementById('imagePreview');
 
-        if (!input.files || !input.files[0]) {
+
+        if (
+            !input.files ||
+            !input.files[0]
+        ) {
             return;
         }
 
-        const file = input.files[0];
 
-        if (!file.type.startsWith('image/')) {
+        const file =
+            input.files[0];
+
+
+        if (
+            !file.type.startsWith('image/')
+        ) {
             return;
         }
 
-        const reader = new FileReader();
 
-        reader.onload = function (event) {
+        const reader =
+            new FileReader();
 
-            preview.src = event.target.result;
 
-        };
+        reader.onload =
+            function (event) {
+
+                preview.src =
+                    event.target.result;
+
+            };
+
 
         reader.readAsDataURL(file);
+
     }
+
 </script>
 
 @endpush

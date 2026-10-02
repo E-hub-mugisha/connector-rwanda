@@ -849,8 +849,8 @@
 
         <button type="button"
           class="btn-saas btn-saas-primary"
-          data-toggle="modal"
-          data-target="#CategoryModal">
+          data-bs-toggle="modal"
+          data-bs-target="#CategoryModal">
 
           <i class="fas fa-plus"></i>
 
@@ -1041,15 +1041,9 @@
             </div>
 
             <button type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close">
-
-              <span aria-hidden="true">
-                &times;
-              </span>
-
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"></button>
 
           </div>
 
@@ -1173,7 +1167,7 @@
 
               <button type="button"
                 class="modal-btn"
-                data-dismiss="modal">
+                data-bs-dismiss="modal">
 
                 Cancel
 
@@ -1417,29 +1411,17 @@
                 $subCount = $scategory->subcategories->count();
                 @endphp
 
-                @if($subCount > 0)
-
                 <span class="sub-count">
                   {{ $subCount }}
                 </span>
 
                 <button type="button"
                   class="view-subcategories"
-                  data-toggle="modal"
-                  data-target="#subCategoryModal{{ $scategory->id }}">
-
-                  View
-
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#subCategoryPanel{{ $scategory->id }}"
+                  aria-controls="subCategoryPanel{{ $scategory->id }}">
+                  Manage
                 </button>
-
-                @else
-
-                <span style="color:#a1aea8;font-size:11px;">
-                  No subcategories
-                </span>
-
-                @endif
-
               </td>
 
 
@@ -1451,29 +1433,61 @@
 
                   {{-- View services --}}
 
-                  <a href="{{ route(
-                                                'admin.service_by_category',
-                                                ['category_slug' => $scategory->slug]
-                                            ) }}"
+                  <a
+                    href="{{ route(
+                        'admin.service_by_category',
+                        ['category_slug' => $scategory->slug]
+                    ) }}"
                     class="action-btn"
-                    title="View services">
-
-                    <i class="fas fa-list"></i>
-
+                    title="View services"
+                    aria-label="View services"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M4 5h16"></path>
+                      <path d="M4 12h16"></path>
+                      <path d="M4 19h16"></path>
+                      <circle cx="8" cy="5" r="1"></circle>
+                      <circle cx="16" cy="12" r="1"></circle>
+                      <circle cx="10" cy="19" r="1"></circle>
+                    </svg>
                   </a>
 
 
                   {{-- Edit --}}
 
-                  <a href="{{ route(
-                                                'admin.edit_service_category',
-                                                $scategory->id
-                                            ) }}"
+                  <a
+                    href="{{ route(
+                        'admin.edit_service_category',
+                        $scategory->id
+                    ) }}"
                     class="action-btn"
-                    title="Edit category">
-
-                    <i class="fas fa-pen"></i>
-
+                    title="Edit category"
+                    aria-label="Edit category"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
                   </a>
 
 
@@ -1482,22 +1496,40 @@
                   <form
                     class="action-form"
                     action="{{ route(
-                                                    'admin.delete_service_category',
-                                                    $scategory->id
-                                                ) }}"
-                    method="POST">
+                        'admin.delete_service_category',
+                        $scategory->id
+                    ) }}"
+                    method="POST"
+                  >
 
                     @csrf
 
                     @method('DELETE')
 
-                    <button type="submit"
+                    <button
+                      type="submit"
                       class="action-btn delete"
                       title="Delete category"
-                      onclick="return confirm('Are you sure you want to delete {{ addslashes($scategory->name) }}?')">
-
-                      <i class="fas fa-trash-alt"></i>
-
+                      aria-label="Delete category"
+                      onclick="return confirm('Are you sure you want to delete {{ addslashes($scategory->name) }}?')"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        <path d="M3 6h18"></path>
+                        <path d="M8 6V4h8v2"></path>
+                        <path d="M19 6l-1 14H6L5 6"></path>
+                        <path d="M10 11v5"></path>
+                        <path d="M14 11v5"></path>
+                      </svg>
                     </button>
 
                   </form>
@@ -1508,103 +1540,6 @@
 
             </tr>
 
-
-            {{-- =================================================
-                                     SUBCATEGORY MODAL
-                                ================================================== --}}
-
-            @if($subCount > 0)
-
-            <div class="modal fade saas-modal"
-              id="subCategoryModal{{ $scategory->id }}"
-              tabindex="-1"
-              role="dialog"
-              aria-hidden="true">
-
-              <div class="modal-dialog modal-dialog-centered"
-                role="document">
-
-                <div class="modal-content">
-
-                  <div class="modal-header">
-
-                    <div>
-
-                      <h5 class="modal-title">
-
-                        {{ $scategory->name }}
-
-                      </h5>
-
-                      <div class="modal-subtitle">
-
-                        {{ $subCount }}
-
-                        {{ Str::plural('subcategory', $subCount) }}
-
-                      </div>
-
-                    </div>
-
-                    <button type="button"
-                      class="close"
-                      data-dismiss="modal"
-                      aria-label="Close">
-
-                      <span aria-hidden="true">
-                        &times;
-                      </span>
-
-                    </button>
-
-                  </div>
-
-
-                  <div class="modal-body">
-
-                    <div class="subcategory-list">
-
-                      @foreach($scategory->subcategories as $index => $scat)
-
-                      <div class="subcategory-item">
-
-                        <div class="subcategory-number">
-                          {{ $index + 1 }}
-                        </div>
-
-                        <div class="subcategory-name">
-                          {{ $scat->name }}
-                        </div>
-
-                      </div>
-
-                      @endforeach
-
-                    </div>
-
-                  </div>
-
-
-                  <div class="modal-footer">
-
-                    <button type="button"
-                      class="modal-btn"
-                      data-dismiss="modal">
-
-                      Close
-
-                    </button>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            @endif
-
             @endforeach
 
           </tbody>
@@ -1613,6 +1548,257 @@
 
       </div>
 
+
+
+      {{-- =====================================================
+           SUBCATEGORY PANELS
+           Bootstrap 5 offcanvas panels are kept outside the table.
+           Each category gets its own right-side management panel.
+         ====================================================== --}}
+      @foreach($scategories as $scategory)
+        @php
+          $subCount = $scategory->subcategories->count();
+        @endphp
+
+        <div
+          class="offcanvas offcanvas-end subcategory-panel"
+          tabindex="-1"
+          id="subCategoryPanel{{ $scategory->id }}"
+          aria-labelledby="subCategoryPanelLabel{{ $scategory->id }}"
+          data-bs-backdrop="true"
+        >
+          <div class="offcanvas-header subcategory-panel-header">
+            <div class="subcategory-panel-heading">
+              <div class="subcategory-panel-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M4 5h16"></path>
+                  <path d="M4 12h16"></path>
+                  <path d="M4 19h16"></path>
+                  <circle cx="8" cy="5" r="1"></circle>
+                  <circle cx="16" cy="12" r="1"></circle>
+                  <circle cx="10" cy="19" r="1"></circle>
+                </svg>
+              </div>
+              <div>
+                <h5 class="offcanvas-title" id="subCategoryPanelLabel{{ $scategory->id }}">
+                  {{ $scategory->name }}
+                </h5>
+                <div class="modal-subtitle">
+                  {{ $subCount }} {{ Str::plural('subcategory', $subCount) }}
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          </div>
+
+          <div class="offcanvas-body subcategory-panel-body">
+            <div class="subcategory-panel-toolbar">
+              <div>
+                <div class="panel-section-title">Subcategories</div>
+                <div class="panel-section-description">
+                  Manage the service types under <strong>{{ $scategory->name }}</strong>.
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="btn-saas btn-saas-primary panel-add-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#addSubCategoryModal{{ $scategory->id }}"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 5v14"></path>
+                  <path d="M5 12h14"></path>
+                </svg>
+                Add
+              </button>
+            </div>
+
+            @if($subCount > 0)
+              <div class="subcategory-list subcategory-management-list">
+                @foreach($scategory->subcategories as $index => $scat)
+                  <div class="subcategory-item subcategory-management-item">
+                    <div class="subcategory-number">{{ $index + 1 }}</div>
+
+                    <div class="subcategory-main">
+                      <div class="subcategory-name">{{ $scat->name }}</div>
+                      @if(!empty($scat->slug))
+                        <div class="subcategory-slug">/{{ $scat->slug }}</div>
+                      @endif
+                    </div>
+
+                    <div class="subcategory-actions">
+                      <button
+                        type="button"
+                        class="panel-action-btn"
+                        title="Edit subcategory"
+                        aria-label="Edit {{ $scat->name }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editSubCategoryModal{{ $scat->id }}"
+                      >
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M12 20h9"></path>
+                          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                      </button>
+
+                      <form
+                        action="{{ route('admin.delete_sub_category', $scat->id) }}"
+                        method="POST"
+                        class="subcategory-delete-form"
+                      >
+                        @csrf
+                        @method('DELETE')
+                        <button
+                          type="submit"
+                          class="panel-action-btn delete"
+                          title="Delete subcategory"
+                          aria-label="Delete {{ $scat->name }}"
+                          onclick="return confirm('Are you sure you want to delete {{ addslashes($scat->name) }}?')"
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 6h18"></path>
+                            <path d="M8 6V4h8v2"></path>
+                            <path d="M19 6l-1 14H6L5 6"></path>
+                            <path d="M10 11v5"></path>
+                            <path d="M14 11v5"></path>
+                          </svg>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                @endforeach
+              </div>
+            @else
+              <div class="panel-empty-state">
+                <div class="panel-empty-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 6h16"></path>
+                    <path d="M4 12h16"></path>
+                    <path d="M4 18h10"></path>
+                  </svg>
+                </div>
+                <div class="panel-empty-title">No subcategories yet</div>
+                <div class="panel-empty-description">
+                  Add the first subcategory under {{ $scategory->name }}.
+                </div>
+                <button
+                  type="button"
+                  class="btn-saas btn-saas-primary"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addSubCategoryModal{{ $scategory->id }}"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                  </svg>
+                  Add subcategory
+                </button>
+              </div>
+            @endif
+          </div>
+        </div>
+
+        {{-- Add subcategory modal --}}
+        <div class="modal fade saas-modal" id="addSubCategoryModal{{ $scategory->id }}" tabindex="-1" aria-labelledby="addSubCategoryModalLabel{{ $scategory->id }}" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <div>
+                  <h5 class="modal-title" id="addSubCategoryModalLabel{{ $scategory->id }}">Add subcategory</h5>
+                  <div class="modal-subtitle">Create a service type under {{ $scategory->name }}.</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+
+              <form action="{{ route('admin.add_Subcategory') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                  <input type="hidden" name="service_category_id" value="{{ $scategory->id }}">
+
+                  <div class="form-group mb-0">
+                    <label class="form-label-saas" for="subcategory_name_{{ $scategory->id }}">
+                      Subcategory name <span class="required">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control-saas"
+                      id="subcategory_name_{{ $scategory->id }}"
+                      name="name"
+                      value="{{ old('name') }}"
+                      placeholder="e.g. House Cleaning"
+                      required
+                    >
+                    <small class="form-help">The slug can be generated automatically by your controller.</small>
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" class="modal-btn" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="modal-btn modal-btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 5v14"></path>
+                      <path d="M5 12h14"></path>
+                    </svg>
+                    Add subcategory
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {{-- Edit subcategory modals --}}
+        @foreach($scategory->subcategories as $scat)
+          <div class="modal fade saas-modal" id="editSubCategoryModal{{ $scat->id }}" tabindex="-1" aria-labelledby="editSubCategoryModalLabel{{ $scat->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <div>
+                    <h5 class="modal-title" id="editSubCategoryModalLabel{{ $scat->id }}">Edit subcategory</h5>
+                    <div class="modal-subtitle">Update this service type under {{ $scategory->name }}.</div>
+                  </div>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <form action="{{ route('admin.update_service_subcategory', $scat->id) }}" method="POST">
+                  @csrf
+                  @method('PUT')
+                  <div class="modal-body">
+                    <input type="hidden" name="service_category_id" value="{{ $scategory->id }}">
+
+                    <div class="form-group mb-0">
+                      <label class="form-label-saas" for="edit_subcategory_name_{{ $scat->id }}">
+                        Subcategory name <span class="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control-saas"
+                        id="edit_subcategory_name_{{ $scat->id }}"
+                        name="name"
+                        value="{{ $scat->name }}"
+                        required
+                      >
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button type="button" class="modal-btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="modal-btn modal-btn-primary">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                      </svg>
+                      Save changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        @endforeach
+      @endforeach
 
       {{-- Empty search state --}}
 
@@ -1656,8 +1842,8 @@
 
         <button type="button"
           class="btn-saas btn-saas-primary"
-          data-toggle="modal"
-          data-target="#CategoryModal">
+          data-bs-toggle="modal"
+          data-bs-target="#CategoryModal">
 
           <i class="fas fa-plus"></i>
 
@@ -1743,15 +1929,31 @@
 ================================================================ --}}
 
 @if($errors->any())
-
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
+    const categoryModal = document.getElementById('CategoryModal');
 
-    $('#CategoryModal').modal('show');
+    if (categoryModal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      bootstrap.Modal.getOrCreateInstance(categoryModal).show();
+      return;
+    }
 
+    const parentCategoryId = @json(old('service_category_id'));
+    const subcategoryName = @json(old('name'));
+
+    if (parentCategoryId && typeof bootstrap !== 'undefined' && bootstrap.Offcanvas) {
+      const panel = document.getElementById('subCategoryPanel' + parentCategoryId);
+      if (panel) {
+        bootstrap.Offcanvas.getOrCreateInstance(panel).show();
+      }
+
+      const addModal = document.getElementById('addSubCategoryModal' + parentCategoryId);
+      if (addModal && subcategoryName !== null) {
+        bootstrap.Modal.getOrCreateInstance(addModal).show();
+      }
+    }
   });
 </script>
-
 @endif
 
 @endsection

@@ -9,102 +9,233 @@ use Illuminate\Http\Request;
 class PartnerController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Display partners.
      */
     public function index()
     {
-        //
-        $partners = PartnerLogo::all();
+        $partners = PartnerLogo::latest()->get();
+
         return view('admin.partners.index', compact('partners'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Store a new partner.
      */
     public function store(Request $request)
     {
-        //
         $request->validate([
-            'name' => 'required',
-            'image' => 'required|mimes:jpeg,png'
+            'name' => ['required', 'string', 'max:255'],
+            'image' => [
+                'required',
+                'image',
+                'mimes:jpeg,jpg,png',
+                'max:5120',
+            ],
         ]);
 
-        $partner = new PartnerLogo();
-        $partner->name = $request->input('name');
 
-        if ($image = $request->file('image')) {
-            $destinationPath = 'image/partner/';
-            $profileImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $profileImage);
-            $partner['image'] = "$profileImage";
+        $partner = new PartnerLogo();
+
+        $partner->name = $request->name;
+
+
+        if ($request->hasFile('image')) {
+
+            $destinationPath = public_path('image/partner');
+
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+            $image = $request->file('image');
+
+            $imageName = date('YmdHis')
+                . '_'
+                . uniqid()
+                . '.'
+                . $image->getClientOriginalExtension();
+
+            $image->move(
+                $destinationPath,
+                $imageName
+            );
+
+            $partner->image = $imageName;
         }
 
+
         $partner->save();
-        session()->flash('message', 'partner save successfully');
-        return redirect('/admin/partners');
+
+
+        return redirect()
+            ->route('admin.partners')
+            ->with(
+                'message',
+                'Partner created successfully!'
+            );
     }
 
+
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Show partner.
      */
     public function show($id)
     {
-        //
+        $partner = PartnerLogo::findOrFail($id);
+
+        return view(
+            'admin.partners.show',
+            compact('partner')
+        );
     }
 
+
     /**
-     * Show the form for editing the specified resource.
+     * Edit partner.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Not required because editing is now handled
+     * directly through the index modal.
      */
     public function edit($id)
     {
-        //
+        $partner = PartnerLogo::findOrFail($id);
+
+        return view(
+            'admin.partners.edit',
+            compact('partner')
+        );
     }
 
+
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Update partner.
      */
     public function update(Request $request, $id)
     {
-        //
+        $partner = PartnerLogo::findOrFail($id);
+
+
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,jpg,png',
+                'max:5120',
+            ],
+        ]);
+
+
+        $partner->name = $request->name;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Replace Image Only If New Image Was Uploaded
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->hasFile('image')) {
+
+            $oldImagePath =
+                public_path(
+                    'image/partner/' . $partner->image
+                );
+
+
+            if (
+                $partner->image &&
+                file_exists($oldImagePath)
+            ) {
+                unlink($oldImagePath);
+            }
+
+
+            $destinationPath =
+                public_path('image/partner');
+
+
+            if (!is_dir($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+
+
+            $image =
+                $request->file('image');
+
+
+            $imageName =
+                date('YmdHis')
+                . '_'
+                . uniqid()
+                . '.'
+                . $image->getClientOriginalExtension();
+
+
+            $image->move(
+                $destinationPath,
+                $imageName
+            );
+
+
+            $partner->image = $imageName;
+        }
+
+
+        $partner->save();
+
+
+        return redirect()
+            ->route('admin.partners')
+            ->with(
+                'message',
+                'Partner updated successfully!'
+            );
     }
 
+
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Delete partner.
      */
     public function destroy($id)
     {
-        //
         $partner = PartnerLogo::findOrFail($id);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Delete Image From Public Folder
+        |--------------------------------------------------------------------------
+        */
+
+        $imagePath =
+            public_path(
+                'image/partner/' . $partner->image
+            );
+
+
+        if (
+            $partner->image &&
+            file_exists($imagePath)
+        ) {
+            unlink($imagePath);
+        }
+
+
         $partner->delete();
-        session()->flash('message', 'partner delete successfully');
-        return redirect('/admin/partners');
+
+
+        return redirect()
+            ->route('admin.partners')
+            ->with(
+                'message',
+                'Partner deleted successfully!'
+            );
     }
 }

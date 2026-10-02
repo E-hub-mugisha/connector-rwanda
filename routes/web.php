@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\FeedbackController;
+use App\Http\Controllers\admin\JobApplicationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ProductSearchController;
@@ -302,9 +303,9 @@ Route::middleware([
     Route::post('/ServiceProvider/applications/{id}/reject', [App\Http\Controllers\stadmin\JobController::class, 'rejectApplicant'])->name('provider.applications.reject');
     Route::post('/ServiceProvider/jobs/{id}/status', [App\Http\Controllers\stadmin\JobController::class, 'updateStatus'])->name('provider.jobs.updateStatus');
     Route::put(
-    '/service-provider/job-applications/{application}/status',
-    [App\Http\Controllers\stadmin\JobController::class, 'updateApplicationStatus']
-)->name('provider.jobs.applications.updateStatus');
+        '/service-provider/job-applications/{application}/status',
+        [App\Http\Controllers\stadmin\JobController::class, 'updateApplicationStatus']
+    )->name('provider.jobs.applications.updateStatus');
 });
 
 Route::middleware([
@@ -324,6 +325,7 @@ Route::middleware([
     Route::get('/admin/subCategories', [App\Http\Controllers\admin\ServiceCategoryController::class, 'SubCat'])->name('admin.sub_category');
     Route::delete('/admin/subCategory/delete/{id}', [App\Http\Controllers\admin\ServiceCategoryController::class, "destroySub"])->name('admin.delete_sub_category');
     Route::post('/admin/subCategory/create', [App\Http\Controllers\admin\ServiceCategoryController::class, 'NewSubCategory'])->name('admin.add_Subcategory');
+    Route::put('/admin/subCategory/{id}', [App\Http\Controllers\admin\ServiceCategoryController::class, 'updateSubCategory'])->name('admin.update_service_subcategory');
     // ****************** admin service routes*************
 
     Route::get('/admin/all-services', [App\Http\Controllers\admin\ServicesController::class, 'index'])->name('admin.all_services');
@@ -362,7 +364,16 @@ Route::middleware([
     Route::get('/admin/service_providers', [App\Http\Controllers\admin\ServiceProviderController::class, 'index'])->name('admin.service_providers');
     Route::get('/admin/service_providers/create', [App\Http\Controllers\admin\ServiceProviderController::class, 'create'])->name('admin.AddServiceProviders');
     Route::get('/admin/service_providers/{id}', [App\Http\Controllers\admin\ServiceProviderController::class, 'show'])->name('admin.ShowServiceProviders');
-    Route::post('/admin/AddServiceProvide', [App\Http\Controllers\admin\ServiceProviderController::class, 'storeServiceProvide'])->name('ServiceProviderAdd');
+    Route::post('/admin/AddServiceProvide', [App\Http\Controllers\admin\ServiceProviderController::class, 'storeServiceProvide'])->name('admin.StoreServiceProvider');
+    Route::get(
+        '/service-providers/{id}/edit',
+        [App\Http\Controllers\admin\ServiceProviderController::class, 'edit']
+    )->name('admin.EditServiceProvider');
+
+    Route::put(
+        '/service-providers/{id}',
+        [App\Http\Controllers\admin\ServiceProviderController::class, 'update']
+    )->name('admin.UpdateServiceProvider');
     Route::get('/admin/users',  [App\Http\Controllers\admin\UserController::class, 'index'])->name('admin.users');
     Route::delete('/admin/users/delete/{id}',  [App\Http\Controllers\admin\UserController::class, 'destroy'])->name('users.delete');
 
@@ -405,16 +416,43 @@ Route::middleware([
     Route::put('/admin/rating/{id}/approve', [App\Http\Controllers\admin\ServiceProviderController::class, 'approveRating'])->name('admin.RatingApprove');
     Route::put('/admin/feedback/{id}/approve', [App\Http\Controllers\admin\ServiceProviderController::class, 'approveFeedback'])->name('admin.feedbackApprove');
 
-    Route::get('/admin/jobs', [App\Http\Controllers\admin\JobController::class, 'index'])->name('admin.jobs');
-    Route::post('/admin/jobs', [App\Http\Controllers\admin\JobController::class, 'store'])->name('admin.jobs.store');
-    Route::put('/admin/jobs/{id}', [App\Http\Controllers\admin\JobController::class, 'update'])->name('admin.jobs.update');
-    Route::delete('/admin/jobs/{id}', [App\Http\Controllers\admin\JobController::class, 'destroy'])->name('admin.jobs.destroy');
-    Route::put('/admin/job/status/{id}', [App\Http\Controllers\admin\JobController::class, 'updateStatus'])->name('admin.jobs.updateStatus');
+    Route::prefix('admin')->group(function () {
 
-    // List all applications for a specific job
-    Route::get('/jobs/{job}/applications', [App\Http\Controllers\admin\JobApplicationController::class, 'index'])->name('admin.jobs.applications');
-    Route::post('/applications/{id}/accept', [App\Http\Controllers\admin\JobApplicationController::class, 'accept'])->name('admin.applications.accept');
-    Route::post('/applications/{id}/reject', [App\Http\Controllers\admin\JobApplicationController::class, 'reject'])->name('admin.applications.reject');
+        // Jobs
+        Route::get('/jobs', [App\Http\Controllers\admin\JobController::class, 'index'])
+            ->name('admin.jobs');
+
+        Route::get('/jobs/create', [App\Http\Controllers\admin\JobController::class, 'create'])
+            ->name('admin.jobs.create');
+
+        Route::post('/jobs', [App\Http\Controllers\admin\JobController::class, 'store'])
+            ->name('admin.jobs.store');
+
+        Route::get('/jobs/{id}', [App\Http\Controllers\admin\JobController::class, 'show'])
+            ->name('admin.jobs.show');
+
+        Route::get('/jobs/{id}/edit', [App\Http\Controllers\admin\JobController::class, 'edit'])
+            ->name('admin.jobs.edit');
+
+        Route::put('/jobs/{id}', [App\Http\Controllers\admin\JobController::class, 'update'])
+            ->name('admin.jobs.update');
+
+        Route::delete('/jobs/{id}', [App\Http\Controllers\admin\JobController::class, 'destroy'])
+            ->name('admin.jobs.destroy');
+
+        Route::patch('/jobs/{id}/status', [App\Http\Controllers\admin\JobController::class, 'updateStatus'])
+            ->name('admin.jobs.status');
+
+        // Job applications
+        Route::get('/jobs/{jobId}/applications', [App\Http\Controllers\admin\JobApplicationController::class, 'index'])
+            ->name('admin.jobs.applications');
+
+        Route::get('/job-applications/{id}', [App\Http\Controllers\admin\JobApplicationController::class, 'show'])
+            ->name('admin.job-applications.show');
+
+        Route::patch('/job-applications/{id}/status', [App\Http\Controllers\admin\JobApplicationController::class, 'updateStatus'])
+            ->name('admin.job-applications.status');
+    });
 });
 
 Route::get('/clear-cache', function () {

@@ -14,10 +14,36 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $users = User::all();
+        $query = User::query();
+
+        if ($request->filled('search')) {
+
+            $search = trim($request->search);
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($request->filled('utype')) {
+            $query->where('utype', $request->utype);
+        }
+
+        if ($request->verification === 'verified') {
+            $query->whereNotNull('email_verified_at');
+        }
+
+        if ($request->verification === 'unverified') {
+            $query->whereNull('email_verified_at');
+        }
+
+        $users = $query
+            ->latest()
+            ->paginate(15);
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -91,65 +117,74 @@ class UserController extends Controller
         return redirect()->route('admin.users');
     }
     public function adminActivate($user_id)
-{
-    $user = User::find($user_id);
+    {
+        $user = User::find($user_id);
 
-    if ($user) {
-        $user->utype = "ADM";
-        $user->save();
-        session()->flash('message', "User {$user->name} has been activated as an admin.");
-    } else {
-        session()->flash('error', 'User not found.');
+        if ($user) {
+            $user->utype = "ADM";
+            $user->save();
+            session()->flash('message', "User {$user->name} has been activated as an admin.");
+        } else {
+            session()->flash('error', 'User not found.');
+        }
+
+        return redirect()->back();
     }
 
-    return redirect()->back();
-}
+    public function customerActivate($user_id)
+    {
+        $user = User::find($user_id);
 
-public function customerActivate($user_id)
-{
-    $user = User::find($user_id);
+        if ($user) {
+            $user->utype = "CST";
+            $user->save();
+            session()->flash('message', "User {$user->name} has been activated as a customer.");
+        } else {
+            session()->flash('error', 'User not found.');
+        }
 
-    if ($user) {
-        $user->utype = "CST";
-        $user->save();
-        session()->flash('message', "User {$user->name} has been activated as a customer.");
-    } else {
-        session()->flash('error', 'User not found.');
+        return redirect()->back();
     }
 
-    return redirect()->back();
-}
+    public function providerActivate($user_id)
+    {
+        $user = User::findOrFail($user_id);
 
-public function providerActivate($user_id)
-{
-    $user = User::find($user_id);
-
-    if ($user) {
-        $user->utype = "SVP";
+        $user->utype = 'SVP';
         $user->save();
 
-        ServiceProvider::create([
-            'user_id' => $user->id,
-            'sprovider_name' => $user->name,
-            'proEmail' => $user->email,
-        ]);
+        ServiceProvider::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'sprovider_name' => $user->name,
+                'proEmail' => $user->email,
+            ]
+        );
 
-        session()->flash('message', "User {$user->name} has been activated as a service provider.");
-    } else {
-        session()->flash('error', 'User not found.');
+        return redirect()
+            ->back()
+            ->with(
+                'message',
+                "User {$user->name} has been activated as a service provider."
+            );
     }
 
-    return redirect()->back();
-}
+    public function verify($id)
+    {
+        $user = User::findOrFail($id);
 
-public function verify($id)
-{
-    $user = User::findOrFail($id);
-    if (!$user->email_verified_at && !$user->is_verified) {
-        $user->email_verified_at = now(); // or $user->is_verified = true;
-        $user->save();
-        return redirect()->back()->with('message', 'User verified successfully!');
+        if (!$user->email_verified_at) {
+
+            $user->email_verified_at = now();
+            $user->save();
+
+            return redirect()
+                ->back()
+                ->with('message', 'User verified successfully.');
+        }
+
+        return redirect()
+            ->back()
+            ->with('message', 'User is already verified.');
     }
-    return redirect()->back()->with('message', 'User is already verified.');
-}
 }

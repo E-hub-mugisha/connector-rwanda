@@ -327,16 +327,6 @@
                 </a>
 
                 <a
-                    href="{{ route('admin.sub_category') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.sub_category') ? 'active' : '' }}">
-
-                    <i class="bi bi-diagram-3"></i>
-
-                    <span>Sub Categories</span>
-
-                </a>
-
-                <a
                     href="{{ route('admin.all_services') }}"
                     class="sidebar-link {{ request()->routeIs('admin.all_services') || request()->routeIs('admin.show_service') || request()->routeIs('admin.edit_service') ? 'active' : '' }}">
 
@@ -424,16 +414,6 @@
 
                 </a>
 
-                <a
-                    href="{{ route('admin.newsletterSubscriptions.index') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.newsletterSubscriptions.*') ? 'active' : '' }}">
-
-                    <i class="bi bi-newspaper"></i>
-
-                    <span>Newsletter</span>
-
-                </a>
-
             </div>
 
 
@@ -450,35 +430,6 @@
                     <i class="bi bi-briefcase-fill"></i>
 
                     <span>Jobs</span>
-
-                </a>
-
-            </div>
-
-
-            <div class="sidebar-section">
-
-                <div class="sidebar-title">
-                    Reviews
-                </div>
-
-                <a
-                    href="{{ route('admin.ProviderFeedback') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.ProviderFeedback') ? 'active' : '' }}">
-
-                    <i class="bi bi-chat-left-text"></i>
-
-                    <span>Feedback</span>
-
-                </a>
-
-                <a
-                    href="{{ route('admin.ProviderRatings') }}"
-                    class="sidebar-link {{ request()->routeIs('admin.ProviderRatings') ? 'active' : '' }}">
-
-                    <i class="bi bi-star"></i>
-
-                    <span>Ratings</span>
 
                 </a>
 
