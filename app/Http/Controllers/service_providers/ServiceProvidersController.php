@@ -4,31 +4,38 @@ namespace App\Http\Controllers\service_providers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
+
 use App\Mail\EmailInquiry;
+
+use App\Models\ServiceProvider;
 use App\Models\Feedback;
 use App\Models\Portfolio;
 use App\Models\Rating;
 use App\Models\ServiceCategory;
 use App\Models\Service;
 use App\Models\WorkingHour;
-use Carbon\Carbon;
 use App\Models\Promotion;
 
 class ServiceProvidersController extends Controller
 {
+    /**
+     * Display approved service providers.
+     */
     public function serviceProviders(Request $request)
     {
         $query = ServiceProvider::query()
-            ->with('category', 'user')
+            ->with([
+                'category',
+                'user',
+            ])
             ->where('status', 'approved');
 
         /*
-    |--------------------------------------------------------------------------
-    | Search
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('search')) {
 
@@ -41,73 +48,50 @@ class ServiceProvidersController extends Controller
                     'like',
                     "%{$search}%"
                 )
-
-                    ->orWhere(
-                        'service_locations',
-                        'like',
-                        "%{$search}%"
-                    )
-
-                    ->orWhere(
-                        'service_locations',
-                        'like',
-                        "%{$search}%"
-                    );
+                ->orWhere(
+                    'service_locations',
+                    'like',
+                    "%{$search}%"
+                );
             });
         }
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Category
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Category
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('category')) {
 
-            $query->whereHas(
-                'category',
-                function ($q) use ($request) {
+            $category = $request->input('category');
 
-                    $q->where(
-                        'slug',
-                        $request->input('category')
-                    );
-                }
-            );
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('slug', $category);
+            });
         }
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Location
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Location
+        |--------------------------------------------------------------------------
+        */
 
         if ($request->filled('location')) {
 
             $location = $request->input('location');
 
-            $query->where(function ($q) use ($location) {
-
-                $q->where(
-                    'service_locations',
-                    $location
-                )
-
-                    ->orWhere(
-                        'service_locations',
-                        $location
-                    );
-            });
+            $query->where(
+                'service_locations',
+                $location
+            );
         }
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Sorting
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Sorting
+        |--------------------------------------------------------------------------
+        */
 
         switch ($request->input('sort', 'latest')) {
 
@@ -128,34 +112,31 @@ class ServiceProvidersController extends Controller
                 break;
         }
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Pagination
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
 
         $sproviders = $query
             ->paginate(20)
             ->withQueryString();
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Categories
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Categories
+        |--------------------------------------------------------------------------
+        */
 
         $categories = ServiceCategory::query()
             ->orderBy('name')
             ->get();
 
-
         /*
-    |--------------------------------------------------------------------------
-    | Locations
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Locations
+        |--------------------------------------------------------------------------
+        */
 
         $locations = ServiceProvider::query()
             ->where('status', 'approved')
@@ -166,48 +147,110 @@ class ServiceProvidersController extends Controller
             ->orderBy('service_locations')
             ->pluck('service_locations');
 
-        return view('service_provider.serviceProviders', compact(
-            'sproviders',
-            'categories',
-            'locations'
-        ));
+        return view(
+            'service_provider.serviceProviders',
+            compact(
+                'sproviders',
+                'categories',
+                'locations'
+            )
+        );
     }
+
     /**
      * Display service provider profile.
      */
     public function profile($sprovider_id)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Service Provider
+        |--------------------------------------------------------------------------
+        */
+
         $sprovider = ServiceProvider::query()
+            ->where('status', 'approved')
             ->with([
+                /*
+                |--------------------------------------------------------------
+                | User
+                |--------------------------------------------------------------
+                */
                 'user',
+
+                /*
+                |--------------------------------------------------------------
+                | Provider Category
+                |--------------------------------------------------------------
+                */
                 'category',
 
+                /*
+                |--------------------------------------------------------------
+                | Services
+                |--------------------------------------------------------------
+                */
                 'services' => function ($query) {
+
                     $query
                         ->with([
+                            /*
+                            | Service subcategory
+                            */
                             'subcategory',
+
+                            /*
+                            | Service portfolios
+                            */
                             'portfolios',
+
+                            /*
+                            | Service promotions
+                            |
+                            | IMPORTANT:
+                            | Promotion belongs to Service.
+                            | Promotion does NOT have category().
+                            */
                             'promotions' => function ($promotionQuery) {
+
                                 $promotionQuery
-                                    ->whereDate('end_date', '>=', now())
-                                    ->latest('end_date')
-                                    ->with([
-                                        'category',
-                                    ]);
+                                    ->whereDate(
+                                        'end_date',
+                                        '>=',
+                                        now()
+                                    )
+                                    ->latest('end_date');
                             },
                         ])
                         ->latest('created_at');
                 },
 
+                /*
+                |--------------------------------------------------------------
+                | Working Hours
+                |--------------------------------------------------------------
+                */
                 'workingHours',
 
+                /*
+                |--------------------------------------------------------------
+                | Feedback
+                |--------------------------------------------------------------
+                */
                 'feedback' => function ($query) {
+
                     $query
                         ->where('approved', true)
                         ->latest('created_at');
                 },
 
+                /*
+                |--------------------------------------------------------------
+                | Ratings
+                |--------------------------------------------------------------
+                */
                 'ratings' => function ($query) {
+
                     $query
                         ->where('status', true)
                         ->latest('created_at');
@@ -216,110 +259,146 @@ class ServiceProvidersController extends Controller
             ->findOrFail($sprovider_id);
 
         /*
-    |--------------------------------------------------------------------------
-    | Ratings
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Ratings
+        |--------------------------------------------------------------------------
+        */
 
         $ratings = $sprovider->ratings;
 
         $ratingCount = $ratings->count();
 
         $averageRating = $ratingCount > 0
-            ? round((float) $ratings->avg('rating'), 1)
+            ? round(
+                (float) $ratings->avg('rating'),
+                1
+            )
             : 0.0;
 
         /*
-    |--------------------------------------------------------------------------
-    | Feedback
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Feedback
+        |--------------------------------------------------------------------------
+        */
 
         $feedback = $sprovider->feedback;
 
         /*
-    |--------------------------------------------------------------------------
-    | Sales
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Sales
+        |--------------------------------------------------------------------------
+        */
 
-        $totalSales = (int) $sprovider->completed_jobs_count;
+        $totalSales = (int) (
+            $sprovider->completed_jobs_count ?? 0
+        );
 
         /*
-    |--------------------------------------------------------------------------
-    | Services
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Services
+        |--------------------------------------------------------------------------
+        */
 
         $services = $sprovider->services;
 
         $serviceCount = $services->count();
 
         /*
-    |--------------------------------------------------------------------------
-    | Group services by subcategory
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Group Services By Subcategory
+        |--------------------------------------------------------------------------
+        */
 
         $groupedServices = $services->groupBy(function ($service) {
-            return optional($service->subcategory)->name
-                ?: 'Other services';
+
+            return optional(
+                $service->subcategory
+            )->name ?: 'Other services';
         });
 
         /*
-    |--------------------------------------------------------------------------
-    | Portfolios
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Portfolios
+        |--------------------------------------------------------------------------
+        */
 
         $portfolios = $services
             ->flatMap(function ($service) {
-                return $service->portfolios->map(function ($portfolio) use ($service) {
-                    $portfolio->service = $service;
 
-                    return $portfolio;
-                });
+                return $service->portfolios->map(
+                    function ($portfolio) use ($service) {
+
+                        /*
+                        | Attach service to portfolio
+                        | so the Blade view can access:
+                        |
+                        | $portfolio->service
+                        */
+                        $portfolio->service = $service;
+
+                        return $portfolio;
+                    }
+                );
             })
             ->values();
 
         $portfolioCount = $portfolios->count();
 
         /*
-    |--------------------------------------------------------------------------
-    | Promotions
-    |--------------------------------------------------------------------------
-    |
-    | Promotions belong to Service, not ServiceProvider.
-    |
-    */
+        |--------------------------------------------------------------------------
+        | Active Promotions
+        |--------------------------------------------------------------------------
+        |
+        | Promotions belong to Service.
+        |
+        | Structure:
+        |
+        | ServiceProvider
+        |      ↓
+        | Services
+        |      ↓
+        | Promotions
+        |
+        */
 
         $activePromotions = $services
             ->flatMap(function ($service) {
-                return $service->promotions->map(function ($promotion) use ($service) {
-                    $promotion->service = $service;
 
-                    return $promotion;
-                });
+                return $service->promotions->map(
+                    function ($promotion) use ($service) {
+
+                        /*
+                        | Attach service to promotion
+                        |
+                        | Blade can then use:
+                        | $promotion->service
+                        */
+                        $promotion->service = $service;
+
+                        return $promotion;
+                    }
+                );
             })
             ->sortByDesc(function ($promotion) {
+
                 return $promotion->end_date;
             })
             ->values();
 
         /*
-    |--------------------------------------------------------------------------
-    | Reviews + Feedback
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Reviews + Feedback Count
+        |--------------------------------------------------------------------------
+        */
 
         $reviewsAndFeedbackCount =
             $ratingCount + $feedback->count();
 
         /*
-    |--------------------------------------------------------------------------
-    | About section
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | About Section
+        |--------------------------------------------------------------------------
+        */
 
         $hasAboutContent =
             filled($sprovider->about)
@@ -328,10 +407,10 @@ class ServiceProvidersController extends Controller
             || filled($sprovider->experience);
 
         /*
-    |--------------------------------------------------------------------------
-    | View
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Return View
+        |--------------------------------------------------------------------------
+        */
 
         return view(
             'service_provider.serviceProviderProfile',
@@ -352,32 +431,149 @@ class ServiceProvidersController extends Controller
             )
         );
     }
+
+    /**
+     * Send email inquiry to service provider.
+     */
     public function sendEmailInquiry(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Validation
+        |--------------------------------------------------------------------------
+        */
+
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+
+            'proEmail' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+
+            'phone' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+
+            'subject' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'message' => [
+                'required',
+                'string',
+                'max:5000',
+            ],
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Mail Data
+        |--------------------------------------------------------------------------
+        */
+
         $mailData = [
-            'name' => $request->get('name'),
-            'email' => $request->get('email'),
-            'proEmail' => $request->get('proEmail'),
-            'phone' => $request->get('phone'),
-            'subject' => $request->get('subject'),
-            'message' => $request->get('message'),
+            'name'     => $validated['name'],
+            'email'    => $validated['email'],
+            'proEmail' => $validated['proEmail'],
+            'phone'    => $validated['phone'] ?? null,
+            'subject'  => $validated['subject'],
+            'message'  => $validated['message'],
         ];
 
-        Mail::to($mailData['proEmail'])
-            ->send(new EmailInquiry($mailData));
+        /*
+        |--------------------------------------------------------------------------
+        | Send Email
+        |--------------------------------------------------------------------------
+        */
 
-        alert()->success('Thank You', 'Your message have been sent successfully.');
+        Mail::to($mailData['proEmail'])
+            ->send(
+                new EmailInquiry($mailData)
+            );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Success
+        |--------------------------------------------------------------------------
+        */
+
+        alert()->success(
+            'Thank You',
+            'Your message has been sent successfully.'
+        );
+
         return redirect()->back();
     }
+
+    /**
+     * Display providers by location.
+     */
     public function ProviderByLocation($location)
     {
-        $sproviders = ServiceProvider::where('service_locations', $location)->paginate(9);
-        return view('service_provider.serviceProviderByLocation', compact('sproviders'));
+        $sproviders = ServiceProvider::query()
+            ->with([
+                'user',
+                'category',
+            ])
+            ->where('status', 'approved')
+            ->where(
+                'service_locations',
+                $location
+            )
+            ->paginate(9);
+
+        return view(
+            'service_provider.serviceProviderByLocation',
+            compact('sproviders')
+        );
     }
+
+    /**
+     * Display providers by category.
+     */
     public function serviceProviderByCategory($service_category_name)
     {
-        $scategory = ServiceCategory::where('slug', $service_category_name)->first();
-        $sproviders = ServiceProvider::where('service_category_id', $scategory->id)->paginate(9);
-        return view('service_provider.serviceProviderByCategory', compact('sproviders'));
+        $scategory = ServiceCategory::query()
+            ->where(
+                'slug',
+                $service_category_name
+            )
+            ->firstOrFail();
+
+        $sproviders = ServiceProvider::query()
+            ->with([
+                'user',
+                'category',
+            ])
+            ->where('status', 'approved')
+            ->where(
+                'service_category_id',
+                $scategory->id
+            )
+            ->paginate(9);
+
+        return view(
+            'service_provider.serviceProviderByCategory',
+            compact(
+                'sproviders',
+                'scategory'
+            )
+        );
     }
 }

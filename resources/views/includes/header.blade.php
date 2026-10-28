@@ -103,6 +103,12 @@
                         Categories
                     </a>
 
+                    <!-- providers -->
+                    <a href="{{ route('home.service_provider') }}"
+                       class="cn-nav-link {{ request()->routeIs('home.service_provider') ? 'active' : '' }}">
+                        Providers
+                    </a>
+
                     <a href="{{ route('home.services') }}"
                        class="cn-nav-link {{ request()->routeIs('home.services') ? 'active' : '' }}">
                         Services
