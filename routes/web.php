@@ -465,3 +465,10 @@ Route::get('/clear-cache', function () {
 
     return "All caches cleared and rebuilt successfully!";
 });
+
+Route::get('/migrate-seeder', function () {
+    Artisan::call('migrate:fresh --seed');
+
+    return "All migration run successfully";
+    
+});
