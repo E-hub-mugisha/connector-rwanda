@@ -473,7 +473,7 @@ Route::get('/migrate-seeder', function () {
 
 });
 
-Route::get('storage', function () {
+Route::get('/storage', function () {
     Artisan::call('storage:link');
 
     return "storage created";
