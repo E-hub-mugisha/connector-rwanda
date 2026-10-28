@@ -470,5 +470,11 @@ Route::get('/migrate-seeder', function () {
     Artisan::call('migrate:fresh --seed');
 
     return "All migration run successfully";
-    
+
+});
+
+Route::get('storage', function () {
+    Artisan::call('storage:link');
+
+    return "storage created";
 });
